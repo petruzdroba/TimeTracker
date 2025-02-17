@@ -35,12 +35,12 @@ export class TimerComponent implements OnInit {
       this.startTime = currentTime;
     } else {
       this.endTime = currentTime;
-      console.log(
-        `START TIME ${this.startTime.getHours()}:${this.startTime.getMinutes()}`
-      );
-      console.log(
-        `END TIME ${this.endTime.getHours()}:${this.endTime.getMinutes()}`
-      );
+      // console.log(
+      //   `START TIME ${this.startTime.getHours()}:${this.startTime.getMinutes()}`
+      // );
+      // console.log(
+      //   `END TIME ${this.endTime.getHours()}:${this.endTime.getMinutes()}`
+      // );
     }
   }
 }

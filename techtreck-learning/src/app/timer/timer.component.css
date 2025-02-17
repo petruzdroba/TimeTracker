@@ -1,14 +1,23 @@
-.timer-group{
+.timer-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   position: absolute;
-  left: 50% ;
+  left: 50%;
   top: 50%;
+  transform: translate(-50%, -50%);
 }
 
-.btn-timer{
+.btn-timer {
   color: azure;
   font-size: 120%;
   background-color: darkblue;
   width: 150px;
   height: 100px;
-  position: inherit;
+  margin-bottom: 20px; /* Add some space between the button and text */
+}
+
+.txt-timer {
+  text-align: center;
 }
