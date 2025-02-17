@@ -1,0 +1,14 @@
+.timer-group{
+  position: absolute;
+  left: 50% ;
+  top: 50%;
+}
+
+.btn-timer{
+  color: azure;
+  font-size: 120%;
+  background-color: darkblue;
+  width: 150px;
+  height: 100px;
+  position: inherit;
+}
