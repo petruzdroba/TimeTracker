@@ -2,3 +2,4 @@
   <h1 class="txt-timer">{{ timerType === 'ON'? 'Timer Started' : elapsedTime | date:'HH:mm:ss' }} </h1>
   <button (click)="startTiming()" class="btn-timer">{{ timerType === 'ON' ? 'Stop' : 'Start'}}</button>
 </div>
+<app-progress-bar />
