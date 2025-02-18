@@ -1,9 +1,10 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [],
+  imports: [DatePipe],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.sass',
 })
@@ -13,15 +14,14 @@ export class TimerComponent implements OnInit {
   timerType: 'ON' | 'OFF' = 'OFF';
 
   ngOnInit(): void {
+    //adauga local storage later
     console.log(this.startTime.getHours());
     console.log(this.endTime.getHours());
   }
 
   get elapsedTime() {
-    const elapsed = new Date(this.endTime.getTime() - this.startTime.getTime());
-    return `${
-      elapsed.getHours() - 2
-    }:${elapsed.getMinutes()}:${elapsed.getSeconds()}`;
+    const elapsed = this.endTime.getTime() - this.startTime.getTime() - 7200000;
+    return elapsed;
   }
 
   startTiming() {
