@@ -1,10 +1,8 @@
 <div class="progress-bar-group">
   @if(timerType === 'OFF')
   {
-  <p>Remaining work time : {{ remainingTime| date: 'HH:mm:ss':'UTC'}}</p>
   <mat-progress-bar mode="determinate" value={{valueStatus}} />
   }@else {
-  <p>Remaining work time : Calculating...</p>
   <mat-progress-bar mode="indeterminate" />
   }
 </div>

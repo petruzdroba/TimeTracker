@@ -1,5 +1,10 @@
 <div class="timer-group">
-  <h1 class="txt-timer">{{ timerType === 'ON'? 'Timer Started' : elapsedTime | date:'HH:mm:ss':'UTC' }} </h1>
+  @if(timerType === 'OFF'){
+  <h2>Last Recorded Session</h2>
+  }
+  <h1 class="txt-timer">{{ timerType === 'ON'? 'Timer Started' : elapsedTime | date:'HH:mm:ss':'UTC' }}
+  </h1>
   <button (click)="startTiming()" class="btn-timer">{{ timerType === 'ON' ? 'Stop' : 'Start'}}</button>
+  <p>Remaining work time : {{timerType === 'OFF'? ( requiredTime | date: 'HH:mm:ss':'UTC') : 'Calculating...' }}</p>
 </div>
-<app-progress-bar [elapsedTime]="elapsedTime" [timerType]="timerType" />
+<app-progress-bar [elapsedTime]="elapsedTime" [timerType]="timerType" [requiredTime]="requiredTime" />
