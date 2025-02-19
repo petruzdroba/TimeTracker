@@ -1,4 +1,4 @@
-.progress-bar {
+.progress-bar-group {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -7,6 +7,6 @@
   left: 50%;
   top: 65%;
   transform: translate(-50%, -50%);
-  width: 85%;
-  height: 40px;
+  width: 70%;
 }
+

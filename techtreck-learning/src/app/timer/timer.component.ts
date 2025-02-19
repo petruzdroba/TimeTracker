@@ -21,7 +21,7 @@ export class TimerComponent implements OnInit {
   }
 
   get elapsedTime() {
-    const elapsed = this.endTime.getTime() - this.startTime.getTime() - 7200000;
+    const elapsed = this.endTime.getTime() - this.startTime.getTime();
     return elapsed;
   }
 
