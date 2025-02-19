@@ -1,0 +1,26 @@
+.timer-group
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.btn-timer
+{
+  color: azure;
+  font-size: 120%;
+  background-color: darkblue;
+  width: 150px;
+  height: 100px;
+  margin-bottom: 20px;
+}
+
+.txt-timer
+{
+  text-align: center;
+}
