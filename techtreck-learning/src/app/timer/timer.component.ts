@@ -1,7 +1,8 @@
 import { DatePipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-timer',
@@ -13,33 +14,36 @@ import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 export class TimerComponent implements OnInit {
   private startTime = new Date(0, 0, 0);
   private endTime = new Date(0, 0, 0);
+  private snackBar = inject(MatSnackBar);
   protected requiredTime = 7200000;
   protected timerType: 'ON' | 'OFF' = 'OFF';
 
   ngOnInit(): void {
-    const storedStartTime = window.localStorage.getItem('startTime');
-    const storedEndTime = window.localStorage.getItem('endTime');
-    const storedRemainingTime = window.localStorage.getItem('remainingTime');
+    if (typeof window !== 'undefined') {
+      const storedStartTime = window.localStorage.getItem('startTime');
+      const storedEndTime = window.localStorage.getItem('endTime');
+      const storedRemainingTime = window.localStorage.getItem('remainingTime');
 
-    if (storedStartTime) {
-      this.startTime = new Date(JSON.parse(storedStartTime));
-    }
-
-    if (storedEndTime) {
-      this.endTime = new Date(JSON.parse(storedEndTime));
-    }
-
-    const currentTime = new Date();
-    const dateLastSession = new Date(this.startTime);
-    currentTime.setHours(0, 0, 0, 0);
-    dateLastSession.setHours(0, 0, 0, 0);
-    if (currentTime.getTime() === dateLastSession.getTime()) {
-      if (storedRemainingTime) {
-        this.requiredTime = JSON.parse(storedRemainingTime);
+      if (storedStartTime) {
+        this.startTime = new Date(JSON.parse(storedStartTime));
       }
-    } else {
-      //resets if dates are different, 2 hours a day for each new day
-      this.requiredTime = 7200000;
+
+      if (storedEndTime) {
+        this.endTime = new Date(JSON.parse(storedEndTime));
+      }
+
+      const currentTime = new Date();
+      const dateLastSession = new Date(this.startTime);
+      currentTime.setHours(0, 0, 0, 0);
+      dateLastSession.setHours(0, 0, 0, 0);
+      if (currentTime.getTime() === dateLastSession.getTime()) {
+        if (storedRemainingTime) {
+          this.requiredTime = JSON.parse(storedRemainingTime);
+        }
+      } else {
+        //resets if dates are different, 2 hours a day for each new day
+        this.requiredTime = 7200000;
+      }
     }
   }
 
@@ -67,6 +71,12 @@ export class TimerComponent implements OnInit {
         'remainingTime',
         JSON.stringify(this.requiredTime)
       );
+
+      if (window.localStorage.length === 3) {
+        this.snackBar.open('Session recorded successfully !', '', {
+          duration: 2000,
+        });
+      }
     }
   }
 }
