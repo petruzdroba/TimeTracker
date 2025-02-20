@@ -1,0 +1,26 @@
+.reset-group{
+  display: flex;
+  flex-direction: column;
+  justify-content: right;
+  align-items: end ;
+  margin: 15px;
+}
+
+.btn-reset{
+  color: azure;
+  background-color: red;
+  border-radius: 3px;
+  border-width: 5%;
+  border-color:rgb(172, 17, 48) ;
+  font-size: 80%;
+  width: 80px;
+  height: 50px;
+  margin-bottom: 20px;
+  transition: all 0.6s ease;
+}
+
+.btn-reset:hover{
+  font-size: 85%;
+  border-width: 10%;
+  background-color: rgb(217, 17, 17);
+}

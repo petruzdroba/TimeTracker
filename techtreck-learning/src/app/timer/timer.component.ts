@@ -1,11 +1,12 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
+import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [DatePipe, ProgressBarComponent],
+  imports: [DatePipe, ProgressBarComponent, ResetTimerComponent],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.sass',
 })
