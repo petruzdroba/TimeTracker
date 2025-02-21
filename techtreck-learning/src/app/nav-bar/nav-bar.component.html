@@ -1,0 +1,17 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="nav-bar-group">
+  <button (click)="drawer.toggle(); onToggle()" class="btn-menu">
+    @if(navBarStatus==='CLOSE'){
+    <i class="fa fa-bars"></i>
+    }@else {
+    <i class="fa fa-hippo"></i>
+    }
+  </button>
+  <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
+    <mat-drawer #drawer mode="side" class="drawer">
+      <p>Lorem ipsum dolor sit amet </p>
+      <p>1233453564753</p>
+    </mat-drawer>
+  </mat-drawer-container>
+</div>

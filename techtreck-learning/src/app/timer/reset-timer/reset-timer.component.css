@@ -1,8 +1,11 @@
 .reset-group{
+  position: absolute;
+  top: 0;
+  right: 0;
   display: flex;
   flex-direction: column;
-  justify-content: right;
-  align-items: end ;
+  justify-content: flex-start;
+  align-items: flex-end;
   margin: 15px;
 }
 
