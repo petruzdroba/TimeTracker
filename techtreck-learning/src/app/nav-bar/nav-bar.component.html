@@ -10,8 +10,14 @@
   </button>
   <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
-      <p>Lorem ipsum dolor sit amet </p>
-      <p>1233453564753</p>
+      <div class="nav-bar-item">
+        <i class="fa-solid fa-business-time"></i>
+        <button class="btn-txt" (click)="navPress('Situatia la zi')">Situatia la zi</button>
+      </div>
+      <div class="nav-bar-item">
+        <i class="fas fa-umbrella-beach"></i>
+        <button class="btn-txt" (click)="navPress('Zile de Concediu')">Concediu</button>
+      </div>
     </mat-drawer>
   </mat-drawer-container>
 </div>

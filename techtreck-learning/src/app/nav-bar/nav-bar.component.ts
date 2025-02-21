@@ -14,4 +14,8 @@ export class NavBarComponent {
   onToggle() {
     this.navBarStatus = this.navBarStatus === 'OPEN' ? 'CLOSE' : 'OPEN';
   }
+
+  navPress(element: string) {
+    console.log(element);
+  }
 }
