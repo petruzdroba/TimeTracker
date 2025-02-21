@@ -70,7 +70,7 @@ export class TimerComponent implements OnInit {
         })
       );
 
-      if (window.localStorage.length === 3) {
+      if (window.localStorage.getItem('timerData')) {
         this.snackBar.open('Session recorded successfully !', '', {
           duration: 2000,
         });
