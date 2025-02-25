@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
-
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -9,13 +9,14 @@ import { MatSidenavModule } from '@angular/material/sidenav';
   styleUrl: './nav-bar.component.sass',
 })
 export class NavBarComponent {
+  private routerService = inject(Router);
   protected navBarStatus: 'OPEN' | 'CLOSE' = 'CLOSE';
 
   onToggle() {
     this.navBarStatus = this.navBarStatus === 'OPEN' ? 'CLOSE' : 'OPEN';
   }
 
-  navPress(element: string) {
-    console.log(element);
+  navPress(routePath: string) {
+    this.routerService.navigate([`/${routePath}`]);
   }
 }
