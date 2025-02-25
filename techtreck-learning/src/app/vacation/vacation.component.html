@@ -1,5 +1,12 @@
 <app-reset-vacation />
 <div class="vacation-group">
   <h1>You have {{ remainingVacationDays ? remainingVacationDays : 'no' }} remaining vacation days!</h1>
+  @if(pastVacations.length === 0){
+  <p>You have no vacations on record</p>
+  }@else {
   <app-past-vacation-table [pastVacations]="pastVacations" />
+  }
+  @if(remainingVacationDays){
+  <app-vacation-picker />
+  }
 </div>

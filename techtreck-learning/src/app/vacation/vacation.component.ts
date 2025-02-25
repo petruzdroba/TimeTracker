@@ -1,11 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { PastVacationTableComponent } from './past-vacation-table/past-vacation-table.component';
 import { ResetVacationComponent } from './reset-vacation/reset-vacation.component';
+import { VacationPickerComponent } from './vacation-picker/vacation-picker.component';
 
 @Component({
   selector: 'app-vacation',
   standalone: true,
-  imports: [PastVacationTableComponent, ResetVacationComponent],
+  imports: [
+    PastVacationTableComponent,
+    ResetVacationComponent,
+    VacationPickerComponent,
+  ],
   templateUrl: './vacation.component.html',
   styleUrl: './vacation.component.css',
 })
