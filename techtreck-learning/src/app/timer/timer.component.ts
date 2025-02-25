@@ -1,6 +1,6 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { ProgressBarComponent } from '../progress-bar/progress-bar.component';
+import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
