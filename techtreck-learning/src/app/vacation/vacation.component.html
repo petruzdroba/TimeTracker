@@ -1,6 +1,4 @@
 <div class="vacation-group">
-  <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Blanditiis iste voluptas magnam animi praesentium
-    corrupti
-    quod unde non voluptatibus impedit tempore, sit qui modi quis reiciendis odit libero iure ullam!</p>
-  <button>Broski</button>
+  <h1>You have {{ remainingVacationDays ? remainingVacationDays : 'no' }} remaining vacation days!</h1>
+  <app-past-vacation-table [pastVacations]="pastVacations" />
 </div>

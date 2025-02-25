@@ -1,0 +1,29 @@
+.vacation-list {
+  list-style-type: none;
+  width: 80vh;
+  padding: 0;
+  margin: 0;
+}
+
+.vacation-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+}
+
+.vacation-item p {
+  margin: 0;
+}
+
+
+.txt-past-vacations
+{
+  font-size: large;
+}
+
+.txt-filter
+{
+  font-size: large;
+  color: darkblue;
+  font-weight: bolder;
+}

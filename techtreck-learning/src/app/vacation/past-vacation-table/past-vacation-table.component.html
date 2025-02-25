@@ -1,0 +1,13 @@
+<p class="txt-past-vacations">Past vacations</p>
+<ul class="vacation-list">
+  <li class="vacation-item">
+    <p class="txt-filter">Data</p>
+    <p class="txt-filter">Descriere</p>
+  </li>
+  @for( vacation of pastVacations; track vacation){
+  <li class="vacation-item">
+    <p>{{vacation.date | date: 'longDate'}}</p>
+    <p>{{vacation.description}}</p>
+  </li>
+  }
+</ul>
