@@ -19,6 +19,7 @@
 .txt-past-vacations
 {
   font-size: large;
+  text-align: center;
 }
 
 .txt-filter
@@ -26,4 +27,10 @@
   font-size: large;
   color: darkblue;
   font-weight: bolder;
+  text-align: left;
+}
+
+.btn-icon{
+  border:none;
+  background-color: transparent;
 }
