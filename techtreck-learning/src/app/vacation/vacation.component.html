@@ -13,11 +13,11 @@
   @if(futureVacations.length === 0){
   <p>You have no planned vacations</p>
   }@else {
-  <app-vacation-table [vacationList]="futureVacations" />
+  <app-vacation-table [vacationList]="futureVacations" (deleteVacation)="deleteVacation($event)" />
   }
   }
   @if(remainingVacationDays){
-  <app-vacation-picker (addVacationEvent)="addVacation($event)" />
+  <app-vacation-picker (addVacationEvent)=" addVacation($event)" />
   }
 
 </div>

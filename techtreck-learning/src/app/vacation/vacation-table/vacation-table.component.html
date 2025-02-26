@@ -11,7 +11,8 @@
   <tr>
     <td>{{vacation.date | date: 'longDate'}}</td>
     <td>{{vacation.description}}</td>
-    <td><button class="btn-icon"><i class="fas fa-trash"></i></button></td>
+    <td><button class="btn-icon" (click)="onDelete(vacation.date)"><i class="fas fa-trash"></i></button>
+    </td>
   </tr>
   }
 </table>

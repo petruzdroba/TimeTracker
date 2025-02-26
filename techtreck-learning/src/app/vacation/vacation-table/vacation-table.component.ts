@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-vacation-table',
@@ -13,4 +13,9 @@ export class VacationTableComponent {
     date: Date;
     description: string;
   }[];
+  @Output() deleteVacation = new EventEmitter<Date>();
+
+  onDelete(date: Date) {
+    this.deleteVacation.emit(date);
+  }
 }

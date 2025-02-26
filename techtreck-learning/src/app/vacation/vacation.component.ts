@@ -79,4 +79,11 @@ export class VacationComponent implements OnInit {
     this.remainingVacationDays -= 1;
     this.updateVacationData();
   }
+
+  deleteVacation(date: Date) {
+    this.futureVacations = [
+      ...this.futureVacations.filter((vacation) => vacation.date !== date),
+    ];
+    this.updateVacationData();
+  }
 }
