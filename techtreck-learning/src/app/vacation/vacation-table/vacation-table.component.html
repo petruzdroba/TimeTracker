@@ -4,7 +4,7 @@
     <p class="txt-filter">Data</p>
     <p class="txt-filter">Descriere</p>
   </li>
-  @for( vacation of pastVacations; track vacation){
+  @for( vacation of vacationList; track vacation){
   <li class="vacation-item">
     <p>{{vacation.date | date: 'longDate'}}</p>
     <p>{{vacation.description}}</p>

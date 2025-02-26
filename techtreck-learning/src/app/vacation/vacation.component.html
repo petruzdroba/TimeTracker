@@ -4,7 +4,7 @@
   @if(pastVacations.length === 0){
   <p>You have no vacations on record</p>
   }@else {
-  <app-past-vacation-table [pastVacations]="pastVacations" />
+  <app-vacation-table [vacationList]="pastVacations" />
   }
   @if(remainingVacationDays){
   <app-vacation-picker />
