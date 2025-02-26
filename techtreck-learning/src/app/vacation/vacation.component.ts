@@ -21,10 +21,9 @@ interface Vacation {
 })
 export class VacationComponent implements OnInit {
   protected remainingVacationDays!: number;
-  protected pastVacations: Vacation[] = [
-    { date: new Date(), description: 'test' },
-  ];
+  protected pastVacations!: Vacation[];
   protected futureVacations!: Vacation[];
+  protected tableShowToggle: 'past' | 'future' = 'future';
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
@@ -48,6 +47,13 @@ export class VacationComponent implements OnInit {
         } else {
           this.pastVacations = [];
         }
+
+        if (storedRemainingVacationDaysObject.futureVacations) {
+          this.futureVacations =
+            storedRemainingVacationDaysObject.futureVacations;
+        } else {
+          this.futureVacations = [];
+        }
       }
     }
   }
@@ -58,7 +64,14 @@ export class VacationComponent implements OnInit {
       JSON.stringify({
         remainingVacationDays: this.remainingVacationDays,
         pastVacations: this.pastVacations,
+        futureVacations: this.futureVacations,
       })
     );
+  }
+
+  onToggle() {
+    this.tableShowToggle =
+      this.tableShowToggle === 'future' ? 'past' : 'future';
+    console.log(this.tableShowToggle);
   }
 }
