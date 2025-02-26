@@ -72,6 +72,11 @@ export class VacationComponent implements OnInit {
   onToggle() {
     this.tableShowToggle =
       this.tableShowToggle === 'future' ? 'past' : 'future';
-    console.log(this.tableShowToggle);
+  }
+
+  addVacation(vacationData: Vacation) {
+    this.futureVacations.push(vacationData);
+    this.remainingVacationDays -= 1;
+    this.updateVacationData();
   }
 }

@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Output,
+  EventEmitter,
+} from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -10,6 +15,11 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+
+interface Vacation {
+  date: Date;
+  description: string;
+}
 
 @Component({
   selector: 'app-vacation-picker',
@@ -27,6 +37,7 @@ import {
 })
 export class VacationPickerComponent {
   protected selectedDate: Date | null = null;
+  @Output() addVacationEvent = new EventEmitter<Vacation>();
   protected form = new FormGroup({
     date: new FormControl(null, { validators: Validators.required }),
     description: new FormControl('', { validators: Validators.required }),
@@ -44,7 +55,13 @@ export class VacationPickerComponent {
       console.log('INVALID FORM');
       return;
     }
-    console.log(21321);
+
+    if (this.form.value.date && this.form.value.description) {
+      this.addVacationEvent.emit({
+        date: this.form.value.date,
+        description: this.form.value.description,
+      });
+    }
     this.form.reset();
   }
 

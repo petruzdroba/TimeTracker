@@ -1,6 +1,8 @@
 <app-reset-vacation />
 <div class="vacation-group">
   <h1>You have {{ remainingVacationDays ? remainingVacationDays : 'no' }} remaining vacation days!</h1>
+  <button (click)="onToggle()" class="btn-toggle-table">{{ tableShowToggle === 'past' ? 'Past vacations' :'Upcoming'+
+    ' vacations' }}</button>
   @if(tableShowToggle === 'past'){
   @if(pastVacations.length === 0){
   <p>You have no vacations on record</p>
@@ -15,7 +17,7 @@
   }
   }
   @if(remainingVacationDays){
-  <app-vacation-picker />
+  <app-vacation-picker (addVacationEvent)="addVacation($event)" />
   }
-  <button (click)="onToggle()">Test</button>
+
 </div>
