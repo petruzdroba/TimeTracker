@@ -87,16 +87,18 @@ export class VacationComponent implements OnInit {
     this.updateVacationData();
   }
 
-  deleteVacation(date: Date, tableType: string) {
+  deleteVacation(index: number, tableType: string) {
     if (tableType === 'future') {
       this.futureVacations = [
-        ...this.futureVacations.filter((vacation) => vacation.date !== date),
+        ...this.futureVacations.slice(0, index),
+        ...this.futureVacations.slice(index + 1),
       ];
       this.remainingVacationDays += 1;
       //since vacation day is in the future, removing them should restore remaining vacation days
     } else {
       this.pastVacations = [
-        ...this.pastVacations.filter((vacation) => vacation.date !== date),
+        ...this.pastVacations.slice(0, index),
+        ...this.pastVacations.slice(index + 1),
       ];
     }
     this.updateVacationData();

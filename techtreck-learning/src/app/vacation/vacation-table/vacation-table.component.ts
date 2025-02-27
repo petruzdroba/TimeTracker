@@ -13,7 +13,7 @@ export class VacationTableComponent {
     date: Date;
     description: string;
   }[];
-  @Output() deleteVacation = new EventEmitter<Date>();
+  @Output() deleteVacation = new EventEmitter<number>();
   protected sortType: 'asc' | 'dsc' = 'asc';
 
   get list() {
@@ -32,7 +32,7 @@ export class VacationTableComponent {
     this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
   }
 
-  onDelete(date: Date) {
-    this.deleteVacation.emit(date);
+  onDelete(index: number) {
+    this.deleteVacation.emit(index);
   }
 }

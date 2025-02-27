@@ -22,7 +22,7 @@
     <tr>
       <td>{{vacation.date | date: 'mediumDate'}}</td>
       <td>{{vacation.description}}</td>
-      <td><button class="btn-icon" (click)="onDelete(vacation.date)"><i class="fas fa-trash"
+      <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
             title="Delete vacation entry"></i></button>
       </td>
     </tr>
