@@ -1,0 +1,38 @@
+.vacation-form
+{
+  list-style-type: none;
+  width: 100vh;
+  padding: 0;
+  margin-left: 35%;
+  margin-bottom: 40px;
+}
+
+.form-input
+{
+  display: flex;
+  margin-top: 20px;
+  padding: 10px 0;
+}
+
+.form-input #description
+{
+  margin-left: 15px;
+}
+
+.btn-submit
+{
+  color: azure;
+  font-size: 90%;
+  background-color: darkblue;
+  border-radius: 6px;
+  padding: 5px;
+  margin-top: 5px;
+  transition: all 0.6s ease;
+  margin-right: 5px;
+}
+
+.btn-submit:hover
+{
+  background-color: rgb(13, 13, 210)
+}
+

@@ -1,0 +1,23 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="nav-bar-group">
+  <button (click)="drawer.toggle(); onToggle()" class="btn-menu">
+    @if(navBarStatus==='CLOSE'){
+    <i class="fa fa-bars"></i>
+    }@else {
+    <i class="fa fa-hippo"></i>
+    }
+  </button>
+  <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
+    <mat-drawer #drawer mode="side" class="drawer">
+      <div class="nav-bar-item">
+        <i class="fa-solid fa-business-time"></i>
+        <button class="btn-txt" (click)="navPress('timetrack')">Situatia la zi</button>
+      </div>
+      <div class="nav-bar-item">
+        <i class="fas fa-umbrella-beach"></i>
+        <button class="btn-txt" (click)="navPress('vacationdays')">Concediu</button>
+      </div>
+    </mat-drawer>
+  </mat-drawer-container>
+</div>

@@ -24,6 +24,7 @@
     "@angular/router": "^17.2.0",
     "@angular/ssr": "^17.2.3",
     "express": "^4.18.2",
+    "moment": "^2.30.1",
     "rxjs": "~7.8.0",
     "sass": "^1.85.0",
     "tslib": "^2.3.0",

@@ -1,0 +1,38 @@
+import { DatePipe } from '@angular/common';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-vacation-table',
+  standalone: true,
+  imports: [DatePipe],
+  templateUrl: './vacation-table.component.html',
+  styleUrl: './vacation-table.component.sass',
+})
+export class VacationTableComponent {
+  @Input({ required: true }) vacationList!: {
+    date: Date;
+    description: string;
+  }[];
+  @Output() deleteVacation = new EventEmitter<number>();
+  protected sortType: 'asc' | 'dsc' = 'asc';
+
+  get list() {
+    return this.vacationList.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (this.sortType === 'asc') {
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return dateB.getTime() - dateA.getTime();
+      }
+    });
+  }
+
+  onSortType() {
+    this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
+  }
+
+  onDelete(index: number) {
+    this.deleteVacation.emit(index);
+  }
+}
