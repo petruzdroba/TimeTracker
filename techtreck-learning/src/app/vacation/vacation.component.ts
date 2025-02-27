@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ResetVacationComponent } from './reset-vacation/reset-vacation.component';
 import { VacationPickerComponent } from './vacation-picker/vacation-picker.component';
 import { VacationTableComponent } from './vacation-table/vacation-table.component';
+import { VacationProgressComponent } from './vacation-progress/vacation-progress.component';
 
 interface Vacation {
   date: Date;
@@ -15,6 +16,7 @@ interface Vacation {
     ResetVacationComponent,
     VacationPickerComponent,
     VacationTableComponent,
+    VacationProgressComponent,
   ],
   templateUrl: './vacation.component.html',
   styleUrl: './vacation.component.css',
