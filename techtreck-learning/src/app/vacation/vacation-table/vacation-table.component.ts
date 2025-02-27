@@ -14,6 +14,23 @@ export class VacationTableComponent {
     description: string;
   }[];
   @Output() deleteVacation = new EventEmitter<Date>();
+  protected sortType: 'asc' | 'dsc' = 'asc';
+
+  get list() {
+    return this.vacationList.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      if (this.sortType === 'asc') {
+        return dateA.getTime() - dateB.getTime();
+      } else {
+        return dateB.getTime() - dateA.getTime();
+      }
+    });
+  }
+
+  onSortType() {
+    this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
+  }
 
   onDelete(date: Date) {
     this.deleteVacation.emit(date);

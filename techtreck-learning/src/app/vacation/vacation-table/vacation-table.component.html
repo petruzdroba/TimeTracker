@@ -1,21 +1,28 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <!-- <p class="txt-past-vacations">Past vacations</p> -->
-<table class="vacation-list">
-  <tr>
-    <th class="txt-filter">Data</th>
-    <th class="txt-filter">Descriere</th>
-    <th class="txt-filter">Action</th>
-  </tr>
-  @for(vacation of vacationList; track vacation){
-  <tr>
-    <td>{{vacation.date | date: 'mediumDate'}}</td>
-    <td>{{vacation.description}}</td>
-    <td><button class="btn-icon" (click)="onDelete(vacation.date)"><i class="fas fa-trash"></i></button>
-    </td>
-  </tr>
-  }
-</table>
+<div class="vacation-list">
+  <div class="sort-group">
+    <p class="txt-sort">Sorty by date</p>
+    <button class="btn-sort" (click)="onSortType()">{{ sortType === 'asc' ? 'Ascending' : 'Descending' }}</button>
+  </div>
+  <table class="vacation-list">
+    <tr>
+      <th class="txt-filter">Data</th>
+      <th class="txt-filter">Descriere</th>
+      <th class="txt-filter">Action</th>
+    </tr>
+    @for(vacation of list; track vacation){
+    <tr>
+      <td>{{vacation.date | date: 'mediumDate'}}</td>
+      <td>{{vacation.description}}</td>
+      <td><button class="btn-icon" (click)="onDelete(vacation.date)"><i class="fas fa-trash"
+            title="Delete vacation entry"></i></button>
+      </td>
+    </tr>
+    }
+  </table>
+</div>
 <!-- <ul class="vacation-list">
   <li class="vacation-item">
     <p class="txt-filter">Data</p>

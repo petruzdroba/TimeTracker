@@ -2,7 +2,7 @@
   list-style-type: none;
   width: 80vh;
   padding: 0;
-  margin-top: 20px ;
+  margin-bottom: 30px;
 }
 
 .vacation-item {
@@ -39,4 +39,33 @@
 
 .btn-icon:hover{
   color: red;
+}
+
+.sort-group
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin-top: 25px;
+}
+
+.txt-sort
+{
+  margin-right: 15px;
+}
+
+.btn-sort
+{
+  color: black;
+  border: none;
+  background-color: transparent;
+  font-size: 110%;
+  font-weight: 500;
+  transition: all 0.6s ease;
+}
+
+.btn-sort:hover
+{
+  color: darkblue;
+  text-decoration: underline;
 }

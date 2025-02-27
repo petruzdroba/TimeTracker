@@ -90,6 +90,8 @@ export class VacationComponent implements OnInit {
       this.futureVacations = [
         ...this.futureVacations.filter((vacation) => vacation.date !== date),
       ];
+      this.remainingVacationDays += 1;
+      //since vacation day is in the future, removing them should restore remaining vacation days
     } else {
       this.pastVacations = [
         ...this.pastVacations.filter((vacation) => vacation.date !== date),
