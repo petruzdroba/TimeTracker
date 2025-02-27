@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<p class="txt-past-vacations">Past vacations</p>
+<!-- <p class="txt-past-vacations">Past vacations</p> -->
 <table class="vacation-list">
   <tr>
     <th class="txt-filter">Data</th>
@@ -9,7 +9,7 @@
   </tr>
   @for(vacation of vacationList; track vacation){
   <tr>
-    <td>{{vacation.date | date: 'longDate'}}</td>
+    <td>{{vacation.date | date: 'mediumDate'}}</td>
     <td>{{vacation.description}}</td>
     <td><button class="btn-icon" (click)="onDelete(vacation.date)"><i class="fas fa-trash"></i></button>
     </td>

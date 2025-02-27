@@ -2,7 +2,7 @@
   list-style-type: none;
   width: 80vh;
   padding: 0;
-  margin: 0;
+  margin-top: 20px ;
 }
 
 .vacation-item {
@@ -33,4 +33,10 @@
 .btn-icon{
   border:none;
   background-color: transparent;
+  color: black;
+  transition: color 0.6s ease;
+}
+
+.btn-icon:hover{
+  color: red;
 }

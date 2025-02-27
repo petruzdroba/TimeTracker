@@ -27,32 +27,37 @@ export class VacationComponent implements OnInit {
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
-      const storedRemainingVacationDaysString =
-        window.localStorage.getItem('vacationData');
+      const storedVacationData = window.localStorage.getItem('vacationData');
 
-      if (storedRemainingVacationDaysString) {
-        const storedRemainingVacationDaysObject = JSON.parse(
-          storedRemainingVacationDaysString
-        );
+      if (storedVacationData) {
+        const storedVacationDataObject = JSON.parse(storedVacationData);
 
-        if (storedRemainingVacationDaysObject.remainingVacationDays) {
+        if (storedVacationDataObject.remainingVacationDays) {
           this.remainingVacationDays =
-            storedRemainingVacationDaysObject.remainingVacationDays;
+            storedVacationDataObject.remainingVacationDays;
         } else {
           this.remainingVacationDays = 0;
         }
 
-        if (storedRemainingVacationDaysObject.pastVacations) {
-          this.pastVacations = storedRemainingVacationDaysObject.pastVacations;
-        } else {
-          this.pastVacations = [];
-        }
-
-        if (storedRemainingVacationDaysObject.futureVacations) {
-          this.futureVacations =
-            storedRemainingVacationDaysObject.futureVacations;
+        if (storedVacationDataObject.futureVacations) {
+          this.futureVacations = storedVacationDataObject.futureVacations;
         } else {
           this.futureVacations = [];
+        }
+
+        if (storedVacationDataObject.pastVacations) {
+          this.pastVacations = storedVacationDataObject.pastVacations;
+          const today = new Date();
+          this.futureVacations = this.futureVacations.filter((vacation) => {
+            if (new Date(vacation.date) <= today) {
+              this.pastVacations.push(vacation);
+              return false; // Remove from futureVacations
+            }
+            return true; // Keep in futureVacations
+          });
+          this.updateVacationData();
+        } else {
+          this.pastVacations = [];
         }
       }
     }
@@ -80,10 +85,16 @@ export class VacationComponent implements OnInit {
     this.updateVacationData();
   }
 
-  deleteVacation(date: Date) {
-    this.futureVacations = [
-      ...this.futureVacations.filter((vacation) => vacation.date !== date),
-    ];
+  deleteVacation(date: Date, tableType: string) {
+    if (tableType === 'future') {
+      this.futureVacations = [
+        ...this.futureVacations.filter((vacation) => vacation.date !== date),
+      ];
+    } else {
+      this.pastVacations = [
+        ...this.pastVacations.filter((vacation) => vacation.date !== date),
+      ];
+    }
     this.updateVacationData();
   }
 }
