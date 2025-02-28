@@ -18,7 +18,7 @@
   }
   }
   @if(remainingVacationDays){
-  <app-vacation-picker (addVacationEvent)=" addVacation($event)" />
+  <app-vacation-picker (addVacationEvent)=" addVacation($event)" [remainingVacation]="remainingVacationDays" />
   }
 
 </div>

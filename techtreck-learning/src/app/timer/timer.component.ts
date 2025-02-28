@@ -1,8 +1,13 @@
-import { DatePipe } from '@angular/common';
+import { DatePipe, Time } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+interface Session {
+  date: Date;
+  timeWorked: number;
+}
 
 @Component({
   selector: 'app-timer',
@@ -12,11 +17,12 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './timer.component.sass',
 })
 export class TimerComponent implements OnInit {
-  private startTime = new Date(0, 0, 0);
-  private endTime = new Date(0, 0, 0);
   private snackBar = inject(MatSnackBar);
   protected requiredTime = 7200000;
+  private startTime = new Date(0, 0, 0);
+  private endTime = new Date(0, 0, 0);
   protected timerType: 'ON' | 'OFF' = 'OFF';
+  protected workLog!: Session[];
 
   ngOnInit(): void {
     if (typeof window !== 'undefined') {
@@ -39,6 +45,12 @@ export class TimerComponent implements OnInit {
           //resets if dates are different, 2 hours a day for each new day
           this.requiredTime = 7200000;
         }
+
+        if (storedTimerDataObject.workLog.length === 0) {
+          this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        } else {
+          this.workLog = storedTimerDataObject.workLog;
+        }
       }
     }
   }
@@ -46,6 +58,24 @@ export class TimerComponent implements OnInit {
   get elapsedTime() {
     const elapsed = this.endTime.getTime() - this.startTime.getTime();
     return elapsed;
+  }
+
+  updateTimerData() {
+    window.localStorage.setItem(
+      'timerData',
+      JSON.stringify({
+        startTime: this.startTime,
+        endTime: this.endTime,
+        remainingTime: this.requiredTime,
+        workLog: this.workLog,
+      })
+    );
+
+    if (window.localStorage.getItem('timerData')) {
+      this.snackBar.open('Session recorded successfully !', '', {
+        duration: 2000,
+      });
+    }
   }
 
   startTiming() {
@@ -61,20 +91,12 @@ export class TimerComponent implements OnInit {
       this.endTime = currentTime;
       this.requiredTime -= this.elapsedTime;
 
-      window.localStorage.setItem(
-        'timerData',
-        JSON.stringify({
-          startTime: this.startTime,
-          endTime: this.endTime,
-          remainingTime: this.requiredTime,
-        })
-      );
+      this.workLog.push({
+        date: new Date(),
+        timeWorked: this.endTime.getTime() - this.startTime.getTime(),
+      });
 
-      if (window.localStorage.getItem('timerData')) {
-        this.snackBar.open('Session recorded successfully !', '', {
-          duration: 2000,
-        });
-      }
+      this.updateTimerData();
     }
   }
 }
