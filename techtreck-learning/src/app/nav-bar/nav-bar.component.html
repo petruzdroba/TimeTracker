@@ -11,8 +11,12 @@
   <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
       <div class="nav-bar-item">
+        <i class="fas fa-clock"></i>
+        <button class="btn-txt" (click)="navPress('timetrack')">Time track</button>
+      </div>
+      <div class="nav-bar-item">
         <i class="fa-solid fa-business-time"></i>
-        <button class="btn-txt" (click)="navPress('timetrack')">Situatia la zi</button>
+        <button class="btn-txt" (click)="navPress('worklog')">Situatia la zi</button>
       </div>
       <div class="nav-bar-item">
         <i class="fas fa-umbrella-beach"></i>
