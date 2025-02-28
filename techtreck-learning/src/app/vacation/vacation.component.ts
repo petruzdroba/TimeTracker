@@ -5,7 +5,8 @@ import { VacationTableComponent } from './vacation-table/vacation-table.componen
 import { VacationProgressComponent } from './vacation-progress/vacation-progress.component';
 
 interface Vacation {
-  date: Date;
+  startDate: Date;
+  endDate: Date;
   description: string;
 }
 
@@ -50,12 +51,13 @@ export class VacationComponent implements OnInit {
         if (storedVacationDataObject.pastVacations) {
           this.pastVacations = storedVacationDataObject.pastVacations;
           const today = new Date();
+
           this.futureVacations = this.futureVacations.filter((vacation) => {
-            if (new Date(vacation.date) <= today) {
+            if (new Date(vacation.endDate) <= today) {
               this.pastVacations.push(vacation);
-              return false; // Remove from futureVacations
+              return false; // Remove
             }
-            return true; // Keep in futureVacations
+            return true; // Keep
           });
           this.updateVacationData();
         } else {
@@ -83,18 +85,24 @@ export class VacationComponent implements OnInit {
 
   addVacation(vacationData: Vacation) {
     this.futureVacations.push(vacationData);
-    this.remainingVacationDays -= 1;
+    this.remainingVacationDays -= getDaysBetweenDates(
+      vacationData.startDate,
+      vacationData.endDate
+    );
     this.updateVacationData();
   }
 
   deleteVacation(index: number, tableType: string) {
     if (tableType === 'future') {
+      this.remainingVacationDays += getDaysBetweenDates(
+        this.futureVacations[index].startDate,
+        this.futureVacations[index].endDate
+      );
+      //since vacation day is in the future, removing them should restore remaining vacation days
       this.futureVacations = [
         ...this.futureVacations.slice(0, index),
         ...this.futureVacations.slice(index + 1),
       ];
-      this.remainingVacationDays += 1;
-      //since vacation day is in the future, removing them should restore remaining vacation days
     } else {
       this.pastVacations = [
         ...this.pastVacations.slice(0, index),
@@ -103,4 +111,20 @@ export class VacationComponent implements OnInit {
     }
     this.updateVacationData();
   }
+}
+
+function getDaysBetweenDates(startDate: Date, endDate: Date): number {
+  let currentDate = new Date(startDate);
+  const end = new Date(endDate);
+  let count = 0;
+
+  while (currentDate <= end) {
+    const dayOfWeek = currentDate.getDay();
+    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+      count++;
+    }
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  return count;
 }

@@ -10,7 +10,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 })
 export class VacationTableComponent {
   @Input({ required: true }) vacationList!: {
-    date: Date;
+    startDate: Date;
+    endDate: Date;
     description: string;
   }[];
   @Output() deleteVacation = new EventEmitter<number>();
@@ -18,8 +19,8 @@ export class VacationTableComponent {
 
   get list() {
     return this.vacationList.sort((a, b) => {
-      const dateA = new Date(a.date);
-      const dateB = new Date(b.date);
+      const dateA = new Date(a.startDate);
+      const dateB = new Date(b.startDate);
       if (this.sortType === 'asc') {
         return dateA.getTime() - dateB.getTime();
       } else {

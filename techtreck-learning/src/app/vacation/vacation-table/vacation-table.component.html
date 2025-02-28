@@ -14,13 +14,15 @@
   </div>
   <table class="vacation-list">
     <tr>
-      <th class="txt-filter">Data</th>
+      <th class="txt-filter">Start</th>
+      <th class="txt-filter">End</th>
       <th class="txt-filter">Descriere</th>
       <th class="txt-filter">Action</th>
     </tr>
     @for(vacation of list; track vacation){
     <tr>
-      <td>{{vacation.date | date: 'mediumDate'}}</td>
+      <td>{{vacation.startDate | date: 'mediumDate'}}</td>
+      <td>{{vacation.endDate | date: 'mediumDate'}}</td>
       <td>{{vacation.description}}</td>
       <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
             title="Delete vacation entry"></i></button>
@@ -29,17 +31,3 @@
     }
   </table>
 </div>
-<!-- <ul class="vacation-list">
-  <li class="vacation-item">
-    <p class="txt-filter">Data</p>
-    <p class="txt-filter">Descriere</p>
-    <p class="txt-filter">Action</p>
-  </li>
-  @for( vacation of vacationList; track vacation){
-  <li class="vacation-item">
-    <p>{{vacation.date | date: 'longDate'}}</p>
-    <p>{{vacation.description}}</p>
-    <button class="btn-icon"><i class="fas fa-trash"></i></button>
-  </li>
-  }
-</ul> -->
