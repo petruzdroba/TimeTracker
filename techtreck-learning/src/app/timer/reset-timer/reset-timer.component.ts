@@ -15,7 +15,6 @@ export class ResetTimerComponent {
         startTime: 0,
         endTime: 0,
         remainingTime: 7200000,
-        workLog: [],
       })
     );
     window.location.reload();

@@ -45,12 +45,20 @@ export class TimerComponent implements OnInit {
           //resets if dates are different, 2 hours a day for each new day
           this.requiredTime = 7200000;
         }
+      }
 
-        if (storedTimerDataObject.workLog.length === 0) {
-          this.workLog = [{ date: new Date(), timeWorked: 0 }];
+      const storedWorkLogString = window.localStorage.getItem('workLog');
+      if (storedWorkLogString) {
+        const storedWorkLogObject = JSON.parse(storedWorkLogString);
+
+        if (storedWorkLogObject.workLog) {
+          this.workLog = storedWorkLogObject.workLog;
         } else {
-          this.workLog = storedTimerDataObject.workLog;
+          this.workLog = [{ date: new Date(), timeWorked: 0 }];
         }
+      } else {
+        this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        this.updateWorkLog();
       }
     }
   }
@@ -67,7 +75,6 @@ export class TimerComponent implements OnInit {
         startTime: this.startTime,
         endTime: this.endTime,
         remainingTime: this.requiredTime,
-        workLog: this.workLog,
       })
     );
 
@@ -76,6 +83,10 @@ export class TimerComponent implements OnInit {
         duration: 2000,
       });
     }
+  }
+
+  updateWorkLog() {
+    window.localStorage.setItem('workLog', JSON.stringify(this.workLog));
   }
 
   startTiming() {
@@ -96,6 +107,7 @@ export class TimerComponent implements OnInit {
         timeWorked: this.endTime.getTime() - this.startTime.getTime(),
       });
 
+      this.updateWorkLog();
       this.updateTimerData();
     }
   }
