@@ -9,7 +9,15 @@ import { Component } from '@angular/core';
 })
 export class ResetTimerComponent {
   onReset() {
-    window.localStorage.clear();
+    window.localStorage.setItem(
+      'timerData',
+      JSON.stringify({
+        startTime: 0,
+        endTime: 0,
+        remainingTime: 7200000,
+        workLog: [],
+      })
+    );
     window.location.reload();
   }
 }
