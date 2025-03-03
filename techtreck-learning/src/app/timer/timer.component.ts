@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { WorkLogService } from '../work-log/work-log.service';
 
 interface Session {
   date: Date;
@@ -18,6 +19,7 @@ interface Session {
 })
 export class TimerComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
+  private workLogService = inject(WorkLogService);
   protected requiredTime = 7200000;
   private startTime = new Date(0, 0, 0);
   private endTime = new Date(0, 0, 0);
@@ -47,19 +49,8 @@ export class TimerComponent implements OnInit {
         }
       }
 
-      const storedWorkLogString = window.localStorage.getItem('workLog');
-      if (storedWorkLogString) {
-        const storedWorkLogObject = JSON.parse(storedWorkLogString);
-
-        if (storedWorkLogObject.workLog) {
-          this.workLog = storedWorkLogObject.workLog;
-        } else {
-          this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        }
-      } else {
-        this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        this.updateWorkLog();
-      }
+      this.workLogService.initWorkLog();
+      this.workLog = this.workLogService.getWorkLog;
     }
   }
 
@@ -85,10 +76,6 @@ export class TimerComponent implements OnInit {
     }
   }
 
-  updateWorkLog() {
-    window.localStorage.setItem('workLog', JSON.stringify(this.workLog));
-  }
-
   startTiming() {
     const currentTime = new Date();
     this.timerType = this.timerType === 'ON' ? 'OFF' : 'ON';
@@ -102,12 +89,13 @@ export class TimerComponent implements OnInit {
       this.endTime = currentTime;
       this.requiredTime -= this.elapsedTime;
 
-      this.workLog.push({
+      const newSession = {
         date: new Date(),
         timeWorked: this.endTime.getTime() - this.startTime.getTime(),
-      });
-
-      this.updateWorkLog();
+      };
+      //this.workLog.push(newSession);
+      this.workLogService.addSession(newSession);
+      this.workLogService.updateWorkLog();
       this.updateTimerData();
     }
   }

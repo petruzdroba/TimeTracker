@@ -1,9 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { Session } from './session.interface';
+import { WorkLogService } from './work-log.service';
 
-interface Session {
-  date: Date;
-  timeWorked: number;
-}
 @Component({
   selector: 'app-work-log',
   standalone: true,
@@ -12,7 +10,15 @@ interface Session {
   styleUrl: './work-log.component.sass',
 })
 export class WorkLogComponent implements OnInit {
-  @Input({ required: true }) workLog!: Session[];
+  private workLogService = inject(WorkLogService);
+  protected workLog!: Session[];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.workLogService.initWorkLog();
+    this.workLog = this.workLogService.getWorkLog;
+  }
+
+  onClick() {
+    console.log(this.workLog[2]);
+  }
 }
