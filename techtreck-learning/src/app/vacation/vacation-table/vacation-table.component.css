@@ -5,17 +5,6 @@
   margin-bottom: 30px;
 }
 
-.vacation-item {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-}
-
-.vacation-item p {
-  margin: 0;
-}
-
-
 .txt-past-vacations
 {
   font-size: large;

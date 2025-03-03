@@ -4,11 +4,7 @@ import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { WorkLogService } from '../work-log/work-log.service';
-
-interface Session {
-  date: Date;
-  timeWorked: number;
-}
+import { Session } from '../work-log/session.interface';
 
 @Component({
   selector: 'app-timer',
