@@ -1,5 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Vacation } from '../vacation.interface';
 
 @Component({
   selector: 'app-vacation-table',
@@ -9,11 +10,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   styleUrl: './vacation-table.component.sass',
 })
 export class VacationTableComponent {
-  @Input({ required: true }) vacationList!: {
-    startDate: Date;
-    endDate: Date;
-    description: string;
-  }[];
+  @Input({ required: true }) vacationList!: Vacation[];
   @Output() deleteVacation = new EventEmitter<number>();
   protected sortType: 'asc' | 'dsc' = 'asc';
 

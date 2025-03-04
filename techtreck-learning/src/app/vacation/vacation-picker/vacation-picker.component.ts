@@ -16,12 +16,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-
-interface Vacation {
-  startDate: Date;
-  endDate: Date;
-  description: string;
-}
+import { Vacation } from '../vacation.interface';
 
 @Component({
   selector: 'app-vacation-picker',
