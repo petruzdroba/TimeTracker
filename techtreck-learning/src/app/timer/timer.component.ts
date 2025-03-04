@@ -3,11 +3,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-
-interface Session {
-  date: Date;
-  timeWorked: number;
-}
+import { WorkLogService } from '../work-log/work-log.service';
+import { Session } from '../work-log/session.interface';
 
 @Component({
   selector: 'app-timer',
@@ -18,6 +15,7 @@ interface Session {
 })
 export class TimerComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
+  private workLogService = inject(WorkLogService);
   protected requiredTime = 7200000;
   private startTime = new Date(0, 0, 0);
   private endTime = new Date(0, 0, 0);
@@ -45,13 +43,10 @@ export class TimerComponent implements OnInit {
           //resets if dates are different, 2 hours a day for each new day
           this.requiredTime = 7200000;
         }
-
-        if (storedTimerDataObject.workLog.length === 0) {
-          this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        } else {
-          this.workLog = storedTimerDataObject.workLog;
-        }
       }
+
+      this.workLogService.initWorkLog();
+      this.workLog = this.workLogService.getWorkLog;
     }
   }
 
@@ -67,7 +62,6 @@ export class TimerComponent implements OnInit {
         startTime: this.startTime,
         endTime: this.endTime,
         remainingTime: this.requiredTime,
-        workLog: this.workLog,
       })
     );
 
@@ -91,11 +85,12 @@ export class TimerComponent implements OnInit {
       this.endTime = currentTime;
       this.requiredTime -= this.elapsedTime;
 
-      this.workLog.push({
+      const newSession = {
         date: new Date(),
         timeWorked: this.endTime.getTime() - this.startTime.getTime(),
-      });
-
+      };
+      //this.workLog.push(newSession);
+      this.workLogService.addSession(newSession);
       this.updateTimerData();
     }
   }
