@@ -15,6 +15,7 @@ export class WorkLogComponent implements OnInit {
   protected workLog!: Session[];
   protected sortBy: 'date' | 'time' = 'date';
   protected sortType: 'asc' | 'dsc' = 'asc';
+  protected showMore: boolean = false;
 
   ngOnInit(): void {
     this.workLogService.initWorkLog();
@@ -41,6 +42,11 @@ export class WorkLogComponent implements OnInit {
         }
       });
     }
+  }
+
+  endSessionTime(session: Session) {
+    const copyDate = new Date(session.date);
+    return new Date(copyDate.getTime() + session.timeWorked);
   }
 
   milisecondsToDate(mili: number) {

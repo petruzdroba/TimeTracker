@@ -15,6 +15,9 @@
           </div>
         </th>
 
+        <th class="txt-head">In</th>
+        <th class="txt-head">Out</th>
+
         <th (click)="[onSortByChange('time'), onSortTypeChange()]">
           <div class="head-group">
             <p class="txt-head">Time Worked</p>
@@ -31,6 +34,8 @@
       @for(session of sortedWorkLog; track session){
       <tr>
         <td class="log-session">{{session.date | date : 'mediumDate'}}</td>
+        <td>{{session.date | date: 'mediumTime'}}</td>
+        <td>{{endSessionTime(session)| date: 'mediumTime'}}</td>
         <td>{{milisecondsToDate(session.timeWorked) | date: 'HH:mm:ss':'UTC'}}</td>
         <td><button class="btn-icon" (click)="onDeleteSession(session)"><i class="fas fa-trash"
               title="Delete session"></i></button></td>

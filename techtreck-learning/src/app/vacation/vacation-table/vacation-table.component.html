@@ -5,11 +5,7 @@
   <div class="sort-group">
     <p class="txt-sort">Sorty by date</p>
     <button class="btn-sort" (click)="onSortType()">
-      @if(sortType === 'asc'){
-      <i class="fas fa-sort-up" title="Ascending"></i>
-      }@else {
-      <i class="fas fa-sort-down" title="Descending"></i>
-      }
+      <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
     </button>
   </div>
   <table class="vacation-list">
