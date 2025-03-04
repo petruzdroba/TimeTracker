@@ -13,6 +13,14 @@ export class WorkLogService {
 
   addSession(newSession: Session) {
     this.workLog.push(newSession);
+    this.updateWorkLog();
+  }
+
+  deleteSession(erasedSession: Session) {
+    this.workLog = [
+      ...this.workLog.filter((session) => session !== erasedSession),
+    ];
+    this.updateWorkLog();
   }
 
   updateWorkLog() {
@@ -20,17 +28,19 @@ export class WorkLogService {
   }
 
   initWorkLog() {
-    const storedWorkLogString = window.localStorage.getItem('workLog');
-    if (storedWorkLogString) {
-      const storedWorkLog = JSON.parse(storedWorkLogString);
-      if (Array.isArray(storedWorkLog)) {
-        this.workLog = storedWorkLog;
+    if (typeof window !== 'undefined') {
+      const storedWorkLogString = window.localStorage.getItem('workLog');
+      if (storedWorkLogString) {
+        const storedWorkLog = JSON.parse(storedWorkLogString);
+        if (Array.isArray(storedWorkLog)) {
+          this.workLog = storedWorkLog;
+        } else {
+          this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        }
       } else {
         this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        this.updateWorkLog();
       }
-    } else {
-      this.workLog = [{ date: new Date(), timeWorked: 0 }];
-      this.updateWorkLog();
     }
   }
 }

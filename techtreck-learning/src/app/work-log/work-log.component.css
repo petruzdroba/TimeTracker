@@ -4,12 +4,11 @@
   position: absolute;
   top: 0;
   margin-left: 12%;
-  width: 100%; /* Adjust as needed */
+  width: 80%;
 }
 
 .log-table {
   width: 90%;
-  /* border-collapse: collapse; */
 }
 
 .log-table th, .log-table td {
@@ -39,4 +38,30 @@
   color: darkblue;
   font-weight: bolder;
   text-align: left;
+  margin-right: 2%;
+}
+
+.head-group
+{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.head-group i
+{
+  color: darkblue;
+  font-size: 1.1vw;
+  transition: all 0.6s ease;
+}
+
+.head-group i:hover
+{
+  color: rgb(13, 13, 210);
+}
+
+.txt-info
+{
+  color: darkblue;
+  font-size: small;
 }

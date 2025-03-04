@@ -91,7 +91,6 @@ export class TimerComponent implements OnInit {
       };
       //this.workLog.push(newSession);
       this.workLogService.addSession(newSession);
-      this.workLogService.updateWorkLog();
       this.updateTimerData();
     }
   }

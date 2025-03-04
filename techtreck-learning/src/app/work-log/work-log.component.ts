@@ -1,20 +1,20 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
 import { Session } from './session.interface';
 import { WorkLogService } from './work-log.service';
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-work-log',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, CommonModule],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
 })
 export class WorkLogComponent implements OnInit {
   private workLogService = inject(WorkLogService);
   protected workLog!: Session[];
-  private sortBy: 'date' | 'time' = 'date';
-  private sortType: 'asc' | 'dsc' = 'asc';
+  protected sortBy: 'date' | 'time' = 'date';
+  protected sortType: 'asc' | 'dsc' = 'asc';
 
   ngOnInit(): void {
     this.workLogService.initWorkLog();
@@ -52,11 +52,14 @@ export class WorkLogComponent implements OnInit {
       this.sortType = 'asc';
     }
     this.sortBy = clicker;
-
-    console.log(this.sortBy, this.sortType);
   }
 
   onSortTypeChange() {
     this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
+  }
+
+  onDeleteSession(session: Session) {
+    this.workLogService.deleteSession(session);
+    this.workLog = this.workLogService.getWorkLog;
   }
 }

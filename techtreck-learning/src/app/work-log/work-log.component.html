@@ -2,17 +2,45 @@
 
 <div class="log-group">
   <table class="log-table">
-    <tr>
-      <th class="txt-head" (click)="[onSortByChange('date'), onSortTypeChange()]">Session Date</th>
-      <th class="txt-head" (click)="[onSortByChange('time'), onSortTypeChange()]">Time Workes</th>
-      <th class="txt-head">Action</th>
-    </tr>
-    @for(session of sortedWorkLog; track session){
-    <tr>
-      <td class="log-session">{{session.date | date : 'mediumDate'}}</td>
-      <td>{{milisecondsToDate(session.timeWorked) | date: 'HH:mm:ss':'UTC'}}</td>
-      <td><button class="btn-icon"><i class="fas fa-trash" title="Delete vacation entry"></i></button></td>
-    </tr>
-    }
+    <tbody>
+      <tr>
+        <th (click)="[onSortByChange('date'), onSortTypeChange()]">
+          <div class="head-group">
+            <p class="txt-head">Session Dates</p>
+            @if(sortBy === 'date'){
+            <i [ngClass]="sortType==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            }@else {
+            <i class="fas fa-history"></i>
+            }
+          </div>
+        </th>
+
+        <th (click)="[onSortByChange('time'), onSortTypeChange()]">
+          <div class="head-group">
+            <p class="txt-head">Time Worked</p>
+            @if(sortBy === 'time'){
+            <i [ngClass]="sortType==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            }@else {
+            <i class="fas fa-stopwatch"></i>
+            }
+          </div>
+        </th>
+        <th class="txt-head">Action</th>
+      </tr>
+
+      @for(session of sortedWorkLog; track session){
+      <tr>
+        <td class="log-session">{{session.date | date : 'mediumDate'}}</td>
+        <td>{{milisecondsToDate(session.timeWorked) | date: 'HH:mm:ss':'UTC'}}</td>
+        <td><button class="btn-icon" (click)="onDeleteSession(session)"><i class="fas fa-trash"
+              title="Delete session"></i></button></td>
+      </tr>
+      }
+      <tr>
+        <td></td>
+        <td class="txt-info">*Deleting session does not change worked time</td>
+        <td></td>
+      </tr>
+    </tbody>
   </table>
 </div>
