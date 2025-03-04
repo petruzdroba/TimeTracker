@@ -4,7 +4,7 @@ import { VacationPickerComponent } from './vacation-picker/vacation-picker.compo
 import { VacationTableComponent } from './vacation-table/vacation-table.component';
 import { VacationProgressComponent } from './vacation-progress/vacation-progress.component';
 import { Vacation } from './vacation.interface';
-import { getDaysBetweenDates, VacationService } from './vacation.service';
+import { VacationService } from './vacation.service';
 
 @Component({
   selector: 'app-vacation',

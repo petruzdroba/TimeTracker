@@ -99,7 +99,7 @@ export class VacationService {
   }
 }
 
-export function getDaysBetweenDates(startDate: Date, endDate: Date): number {
+function getDaysBetweenDates(startDate: Date, endDate: Date): number {
   let currentDate = new Date(startDate);
   const end = new Date(endDate);
   let count = 0;

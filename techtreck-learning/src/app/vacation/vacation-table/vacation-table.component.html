@@ -14,6 +14,7 @@
         <th class="txt-filter">Start</th>
         <th class="txt-filter">End</th>
         <th class="txt-filter">Descriere</th>
+        <th class="txt-filter">Status</th>
         <th class="txt-filter">Action</th>
       </tr>
       @for(vacation of list; track vacation){
@@ -21,6 +22,9 @@
         <td>{{vacation.startDate | date: 'mediumDate'}}</td>
         <td>{{vacation.endDate | date: 'mediumDate'}}</td>
         <td>{{vacation.description}}</td>
+        <td>
+          <i [ngClass]="'fas fa-circle ' + vacation.status"></i>
+        </td>
         <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
               title="Delete vacation entry"></i></button>
         </td>

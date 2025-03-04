@@ -89,6 +89,7 @@ export class VacationPickerComponent {
         startDate: this.form.value.startDate,
         endDate: this.form.value.endDate,
         description: this.form.value.description,
+        status: 'pending',
       });
     }
     this.form.reset();
