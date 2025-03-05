@@ -45,7 +45,9 @@ export class VacationService {
 
           this.futureVacations = this.futureVacations.filter((vacation) => {
             if (new Date(vacation.endDate) <= today) {
-              this.pastVacations.push(vacation);
+              if (vacation.status === 'accepted') {
+                this.pastVacations.push(vacation); //removes the ones that are past their due time and not accepted, pending or denied
+              }
               return false; // Remove
             }
             return true; // Keep
