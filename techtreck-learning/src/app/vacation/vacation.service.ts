@@ -71,19 +71,22 @@ export class VacationService {
 
   addVacation(vacationData: Vacation) {
     this.futureVacations.push(vacationData);
-    this.remainingVacationDays -= getDaysBetweenDates(
-      vacationData.startDate,
-      vacationData.endDate
-    );
+    this.acceptedVacation(vacationData);
     this.updateVacationData();
+  }
+
+  acceptedVacation(vacationData: Vacation) {
+    if (vacationData.status === 'accepted') {
+      this.remainingVacationDays -= getDaysBetweenDates(
+        vacationData.startDate,
+        vacationData.endDate
+      );
+    }
   }
 
   deleteVacation(index: number, tableType: string) {
     if (tableType === 'future') {
-      this.remainingVacationDays += getDaysBetweenDates(
-        this.futureVacations[index].startDate,
-        this.futureVacations[index].endDate
-      );
+      this.restoreVacationDays(index);
       //since vacation day is in the future, removing them should restore remaining vacation days
       this.futureVacations = [
         ...this.futureVacations.slice(0, index),
@@ -95,6 +98,20 @@ export class VacationService {
         ...this.pastVacations.slice(index + 1),
       ];
     }
+    this.updateVacationData();
+  }
+
+  restoreVacationDays(index: number) {
+    if (this.futureVacations[index].status === 'accepted') {
+      this.remainingVacationDays += getDaysBetweenDates(
+        this.futureVacations[index].startDate,
+        this.futureVacations[index].endDate
+      );
+    }
+  }
+
+  modifyStatus(index: number, newStatus: 'pending' | 'accepted' | 'denied') {
+    this.futureVacations[index].status = newStatus;
     this.updateVacationData();
   }
 }

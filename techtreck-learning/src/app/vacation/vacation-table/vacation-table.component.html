@@ -8,6 +8,7 @@
       <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
     </button>
   </div>
+
   <table class="vacation-list">
     <tbody>
       <tr>
@@ -23,7 +24,7 @@
         <td>{{vacation.endDate | date: 'mediumDate'}}</td>
         <td>{{vacation.description}}</td>
         <td>
-          <i [ngClass]="'fas fa-circle ' + vacation.status"></i>
+          <i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i>
         </td>
         <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
               title="Delete vacation entry"></i></button>
