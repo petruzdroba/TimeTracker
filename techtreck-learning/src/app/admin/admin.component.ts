@@ -1,11 +1,15 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { VacationService } from '../vacation/vacation.service';
+import {
+  getDaysBetweenDates,
+  VacationService,
+} from '../vacation/vacation.service';
 import { Vacation } from '../vacation/vacation.interface';
+import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [],
+  imports: [DatePipe, CommonModule],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.sass',
 })
@@ -38,10 +42,22 @@ export class AdminComponent implements OnInit {
     ];
   }
 
+  getValidVacation(vacation: Vacation): boolean {
+    return (
+      this.vacationService.getRemainingDays >=
+      getDaysBetweenDates(vacation.startDate, vacation.endDate)
+    );
+  }
+
   onAccept(vacation: Vacation) {
-    vacation.status = 'accepted';
-    this.vacationService.acceptedVacation(vacation);
-    this.vacationService.updateVacationData();
+    if (
+      this.vacationService.getRemainingDays >=
+      getDaysBetweenDates(vacation.startDate, vacation.endDate)
+    ) {
+      vacation.status = 'accepted';
+      this.vacationService.acceptedVacation(vacation);
+      this.vacationService.updateVacationData();
+    }
   }
 
   onDeny(vacation: Vacation) {
