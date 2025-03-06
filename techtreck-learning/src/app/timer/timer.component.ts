@@ -44,8 +44,6 @@ export class TimerComponent implements OnInit {
           this.requiredTime = 7200000;
         }
       }
-
-      this.workLogService.initWorkLog();
       this.workLog = this.workLogService.getWorkLog;
     }
   }

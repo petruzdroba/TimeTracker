@@ -20,7 +20,6 @@ export class AdminComponent implements OnInit {
   protected futureVacations!: Vacation[];
 
   ngOnInit(): void {
-    this.vacationService.initVacationsData();
     this.futureVacations = this.vacationService.getFutureVacations;
     this.pastVacations = this.vacationService.getPastVacations;
     this.remainingVacationDays = this.vacationService.getRemainingDays;

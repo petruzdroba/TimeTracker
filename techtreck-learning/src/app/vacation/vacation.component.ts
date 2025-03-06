@@ -27,7 +27,6 @@ export class VacationComponent implements OnInit {
   private vacationService = inject(VacationService);
 
   ngOnInit(): void {
-    this.vacationService.initVacationsData();
     this.futureVacations = this.vacationService.getFutureVacations;
     this.pastVacations = this.vacationService.getPastVacations;
     this.remainingVacationDays = this.vacationService.getRemainingDays;

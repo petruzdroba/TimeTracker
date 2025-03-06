@@ -7,19 +7,7 @@ export class VacationService {
   private pastVacations: Vacation[] = [];
   private remainingVacationDays: number = 0;
 
-  get getFutureVacations() {
-    return this.futureVacations;
-  }
-
-  get getPastVacations() {
-    return this.pastVacations;
-  }
-
-  get getRemainingDays() {
-    return this.remainingVacationDays;
-  }
-
-  initVacationsData() {
+  constructor() {
     if (typeof window !== 'undefined') {
       const storedVacationData = window.localStorage.getItem('vacationData');
 
@@ -58,6 +46,18 @@ export class VacationService {
         }
       }
     }
+  }
+
+  get getFutureVacations() {
+    return this.futureVacations;
+  }
+
+  get getPastVacations() {
+    return this.pastVacations;
+  }
+
+  get getRemainingDays() {
+    return this.remainingVacationDays;
   }
 
   updateVacationData() {
