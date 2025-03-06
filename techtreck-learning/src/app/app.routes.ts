@@ -3,6 +3,7 @@ import { TimerComponent } from './timer/timer.component';
 import { VacationComponent } from './vacation/vacation.component';
 import { NotFoundComponent } from './not-found/not-found.component';
 import { WorkLogComponent } from './work-log/work-log.component';
+import { AdminComponent } from './admin/admin.component';
 
 export const routes: Routes = [
   {
@@ -24,6 +25,11 @@ export const routes: Routes = [
     path: 'worklog',
     component: WorkLogComponent,
     title: 'Work Log',
+  },
+  {
+    path: 'admin',
+    component: AdminComponent,
+    title: 'Admin',
   },
   {
     path: '**',

@@ -7,6 +7,23 @@ import { Session } from './session.interface';
 export class WorkLogService {
   private workLog: Session[] = [];
 
+  constructor() {
+    if (typeof window !== 'undefined') {
+      const storedWorkLogString = window.localStorage.getItem('workLog');
+      if (storedWorkLogString) {
+        const storedWorkLog = JSON.parse(storedWorkLogString);
+        if (Array.isArray(storedWorkLog)) {
+          this.workLog = storedWorkLog;
+        } else {
+          this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        }
+      } else {
+        this.workLog = [{ date: new Date(), timeWorked: 0 }];
+        this.updateWorkLog();
+      }
+    }
+  }
+
   get getWorkLog() {
     return this.workLog;
   }
@@ -25,22 +42,5 @@ export class WorkLogService {
 
   updateWorkLog() {
     window.localStorage.setItem('workLog', JSON.stringify(this.workLog));
-  }
-
-  initWorkLog() {
-    if (typeof window !== 'undefined') {
-      const storedWorkLogString = window.localStorage.getItem('workLog');
-      if (storedWorkLogString) {
-        const storedWorkLog = JSON.parse(storedWorkLogString);
-        if (Array.isArray(storedWorkLog)) {
-          this.workLog = storedWorkLog;
-        } else {
-          this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        }
-      } else {
-        this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        this.updateWorkLog();
-      }
-    }
   }
 }

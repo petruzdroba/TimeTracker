@@ -18,7 +18,6 @@ export class WorkLogComponent implements OnInit {
   protected showMore: boolean = false;
 
   ngOnInit(): void {
-    this.workLogService.initWorkLog();
     this.workLog = this.workLogService.getWorkLog;
   }
 
