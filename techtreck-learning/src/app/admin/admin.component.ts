@@ -5,16 +5,27 @@ import {
 } from '../vacation/vacation.service';
 import { Vacation } from '../vacation/vacation.interface';
 import { CommonModule, DatePipe } from '@angular/common';
+import { DateFilter } from '../date-filter/date-filter.interface';
+import { DateFilterComponent } from '../date-filter/date-filter.component';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [DatePipe, CommonModule],
+  imports: [DatePipe, CommonModule, DateFilterComponent],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.sass',
 })
 export class AdminComponent implements OnInit {
   private vacationService = inject(VacationService);
+  private dateFilterPending: DateFilter = {
+    startDate: new Date(0),
+    endDate: new Date(0),
+  };
+
+  private dateFilterCompleted: DateFilter = {
+    startDate: new Date(0),
+    endDate: new Date(0),
+  };
   protected remainingVacationDays!: number;
   protected pastVacations!: Vacation[];
   protected futureVacations!: Vacation[];
@@ -25,6 +36,38 @@ export class AdminComponent implements OnInit {
     this.remainingVacationDays = this.vacationService.getRemainingDays;
   }
 
+  get completedVacationRequests() {
+    return [
+      ...this.pastVacations.filter((vacation) => vacation.status !== 'pending'),
+      ...this.futureVacations.filter(
+        (vacation) => vacation.status !== 'pending'
+      ),
+    ];
+  }
+
+  get filteredCompletedVacationRequests() {
+    if (
+      !this.dateFilterCompleted.startDate.getTime() &&
+      !this.dateFilterCompleted.endDate.getTime()
+    ) {
+      return this.completedVacationRequests;
+    }
+    return [
+      ...this.completedVacationRequests.filter((vacation) => {
+        const dateA = new Date(vacation.startDate);
+        const dateB = new Date(this.dateFilterCompleted.startDate);
+        const dateC = new Date(this.dateFilterCompleted.endDate);
+        if (
+          dateA.getTime() >= dateB.getTime() &&
+          dateA.getTime() <= dateC.getTime() + 86400000
+        ) {
+          return true;
+        }
+        return false;
+      }),
+    ];
+  }
+
   get pendingVacationRequests() {
     return [
       ...this.futureVacations.filter(
@@ -33,11 +76,26 @@ export class AdminComponent implements OnInit {
     ];
   }
 
-  get completedVacationRequests() {
+  get filteredPendingVacationRequests() {
+    if (
+      !this.dateFilterPending.startDate.getTime() &&
+      !this.dateFilterPending.endDate.getTime()
+    ) {
+      return this.pendingVacationRequests;
+    }
     return [
-      ...this.futureVacations.filter(
-        (vacation) => vacation.status !== 'pending'
-      ),
+      ...this.pendingVacationRequests.filter((vacation) => {
+        const dateA = new Date(vacation.startDate);
+        const dateB = new Date(this.dateFilterPending.startDate);
+        const dateC = new Date(this.dateFilterPending.endDate);
+        if (
+          dateA.getTime() >= dateB.getTime() &&
+          dateA.getTime() <= dateC.getTime() + 86400000
+        ) {
+          return true;
+        }
+        return false;
+      }),
     ];
   }
 
@@ -62,5 +120,27 @@ export class AdminComponent implements OnInit {
   onDeny(vacation: Vacation) {
     vacation.status = 'denied';
     this.vacationService.updateVacationData();
+  }
+
+  onChangeDateFilterPending(newDateFilter: DateFilter) {
+    if (newDateFilter.startDate === null && newDateFilter.endDate === null) {
+      this.dateFilterPending = {
+        startDate: new Date(0),
+        endDate: new Date(0),
+      };
+    } else {
+      this.dateFilterPending = newDateFilter;
+    }
+  }
+
+  onChangeDateFilterCompleted(newDateFilter: DateFilter) {
+    if (newDateFilter.startDate === null && newDateFilter.endDate === null) {
+      this.dateFilterCompleted = {
+        startDate: new Date(0),
+        endDate: new Date(0),
+      };
+    } else {
+      this.dateFilterCompleted = newDateFilter;
+    }
   }
 }

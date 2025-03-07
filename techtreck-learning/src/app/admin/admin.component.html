@@ -2,6 +2,7 @@
 
 <div class="admin-tables">
   <p class="txt-table-title">Pending vacation requests</p>
+  <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
   <table class="pending-table">
     <tbody>
       <tr>
@@ -10,7 +11,7 @@
         <th>Description</th>
         <th>Status</th>
       </tr>
-      @for(vacation of pendingVacationRequests; track vacation){
+      @for(vacation of filteredPendingVacationRequests; track vacation){
       <tr>
         <td>{{vacation.startDate | date: 'longDate'}}</td>
         <td>{{vacation.endDate | date: 'longDate'}}</td>
@@ -33,6 +34,7 @@
   </table>
 
   <p class="txt-table-title">Completed vacation requests</p>
+  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
   <table class="completed-table">
     <tbody>
       <tr>
@@ -40,7 +42,7 @@
         <th>Start Date</th>
         <th>End Date</th>
       </tr>
-      @for(vacation of completedVacationRequests; track vacation){
+      @for(vacation of filteredCompletedVacationRequests; track vacation){
       <tr>
         <td><i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i></td>
         <td>{{vacation.startDate | date: 'longDate'}}</td>

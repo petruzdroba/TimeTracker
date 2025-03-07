@@ -1,17 +1,23 @@
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Session } from './session.interface';
 import { WorkLogService } from './work-log.service';
 import { CommonModule, DatePipe } from '@angular/common';
+import { DateFilter } from '../date-filter/date-filter.interface';
+import { DateFilterComponent } from '../date-filter/date-filter.component';
 
 @Component({
   selector: 'app-work-log',
   standalone: true,
-  imports: [DatePipe, CommonModule],
+  imports: [DatePipe, CommonModule, DateFilterComponent],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
 })
 export class WorkLogComponent implements OnInit {
   private workLogService = inject(WorkLogService);
+  private dateFilter: DateFilter = {
+    startDate: new Date(0),
+    endDate: new Date(0),
+  };
   protected workLog!: Session[];
   protected sortBy: 'date' | 'time' = 'date';
   protected sortType: 'asc' | 'dsc' = 'asc';
@@ -43,6 +49,29 @@ export class WorkLogComponent implements OnInit {
     }
   }
 
+  get filteredWorkLog() {
+    if (
+      !this.dateFilter.startDate.getTime() &&
+      !this.dateFilter.endDate.getTime()
+    ) {
+      return this.sortedWorkLog;
+    }
+    return [
+      ...this.sortedWorkLog.filter((session) => {
+        const dateA = new Date(session.date);
+        const dateB = new Date(this.dateFilter.startDate);
+        const dateC = new Date(this.dateFilter.endDate);
+        if (
+          dateA.getTime() >= dateB.getTime() &&
+          dateA.getTime() <= dateC.getTime() + 86400000
+        ) {
+          return true;
+        }
+        return false;
+      }),
+    ];
+  }
+
   endSessionTime(session: Session) {
     const copyDate = new Date(session.date);
     return new Date(copyDate.getTime() + session.timeWorked);
@@ -66,5 +95,16 @@ export class WorkLogComponent implements OnInit {
   onDeleteSession(session: Session) {
     this.workLogService.deleteSession(session);
     this.workLog = this.workLogService.getWorkLog;
+  }
+
+  onChangeDateFilter(newDateFilter: DateFilter) {
+    if (newDateFilter.startDate === null && newDateFilter.endDate === null) {
+      this.dateFilter = {
+        startDate: new Date(0),
+        endDate: new Date(0),
+      };
+    } else {
+      this.dateFilter = newDateFilter;
+    }
   }
 }

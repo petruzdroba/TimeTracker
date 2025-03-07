@@ -1,0 +1,25 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <p>Filter by date : {{this.form.value.startDate && this.form.value.endDate ? (this.form.value.startDate|date:
+    'mediumDate') + ' to ' +
+    (this.form.value.endDate| date: 'mediumDate') : 'all'}}</p>
+  <div class="form-input">
+    <mat-form-field class="example-full-width" class="hidden-input">
+      <mat-label>Choose a date range</mat-label>
+      <mat-date-range-input
+        [dateFilter]="calendarPicker === 'all' ? allCalendar : calendarPicker === 'past'? pastCalendar: futureCalendar"
+        [rangePicker]="picker">
+        <input matStartDate placeholder="Start date" formControlName="startDate">
+        <input matEndDate placeholder="End date" formControlName="endDate">
+      </mat-date-range-input>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+    </mat-form-field>
+  </div>
+</form>
+
+<button (click)="onReset()" class="btn-submit">Reset</button>
+<button (click)="onSubmit()" class="btn-submit">Submit</button>
+<button (click)="picker.open()" class="btn-submit"><i class="fas fa-calendar"></i></button>
