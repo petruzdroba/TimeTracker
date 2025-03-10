@@ -11,7 +11,7 @@ import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { DateFilter } from './date-filter.interface';
+import { DateFilter } from '../../model/date-filter.interface';
 
 @Component({
   selector: 'app-date-filter',

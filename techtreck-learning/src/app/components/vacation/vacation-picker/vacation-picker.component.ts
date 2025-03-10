@@ -16,7 +16,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Vacation } from '../vacation.interface';
+import { Vacation } from '../../../model/vacation.interface';
 
 @Component({
   selector: 'app-vacation-picker',

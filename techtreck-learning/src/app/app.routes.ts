@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { TimerComponent } from './timer/timer.component';
-import { VacationComponent } from './vacation/vacation.component';
-import { NotFoundComponent } from './not-found/not-found.component';
-import { WorkLogComponent } from './work-log/work-log.component';
-import { AdminComponent } from './admin/admin.component';
+import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { AdminComponent } from './components/admin/admin.component';
+import { TimerComponent } from './components/timer/timer.component';
+import { VacationComponent } from './components/vacation/vacation.component';
+import { WorkLogComponent } from './components/work-log/work-log.component';
 
 export const routes: Routes = [
   {

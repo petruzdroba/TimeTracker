@@ -1,9 +1,9 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { Session } from './session.interface';
-import { WorkLogService } from './work-log.service';
 import { CommonModule, DatePipe } from '@angular/common';
-import { DateFilter } from '../date-filter/date-filter.interface';
-import { DateFilterComponent } from '../date-filter/date-filter.component';
+import { DateFilterComponent } from '../../shared/date-filter/date-filter.component';
+import { WorkLogService } from '../../service/work-log.service';
+import { DateFilter } from '../../model/date-filter.interface';
+import { Session } from '../../model/session.interface';
 
 @Component({
   selector: 'app-work-log',

@@ -3,8 +3,8 @@ import { ResetVacationComponent } from './reset-vacation/reset-vacation.componen
 import { VacationPickerComponent } from './vacation-picker/vacation-picker.component';
 import { VacationTableComponent } from './vacation-table/vacation-table.component';
 import { VacationProgressComponent } from './vacation-progress/vacation-progress.component';
-import { Vacation } from './vacation.interface';
-import { VacationService } from './vacation.service';
+import { Vacation } from '../../model/vacation.interface';
+import { VacationService } from '../../service/vacation.service';
 
 @Component({
   selector: 'app-vacation',

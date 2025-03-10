@@ -3,8 +3,8 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from './progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { WorkLogService } from '../work-log/work-log.service';
-import { Session } from '../work-log/session.interface';
+import { Session } from '../../model/session.interface';
+import { WorkLogService } from '../../service/work-log.service';
 
 @Component({
   selector: 'app-timer',

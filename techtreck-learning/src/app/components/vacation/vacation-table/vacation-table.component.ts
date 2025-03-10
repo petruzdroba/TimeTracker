@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { Vacation } from '../vacation.interface';
+import { Vacation } from '../../../model/vacation.interface';
 
 @Component({
   selector: 'app-vacation-table',
