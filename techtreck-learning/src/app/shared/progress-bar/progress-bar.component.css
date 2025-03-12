@@ -1,4 +1,4 @@
-.progress-bar-group {
+.progress-bar-group-timer {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -7,6 +7,12 @@
   left: 50%;
   top: 65%;
   transform: translate(-50%, -50%);
-  width: 70%;
+  width: 60vw;
+}
+
+.progress-bar-group-vacation
+{
+  width: 100vh;
+  margin-bottom: 10px;
 }
 

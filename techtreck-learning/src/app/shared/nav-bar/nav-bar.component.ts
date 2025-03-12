@@ -17,6 +17,10 @@ export class NavBarComponent {
   }
 
   navPress(routePath: string) {
-    this.routerService.navigate([`/${routePath}`]);
+    if (routePath !== 'timetrack') {
+      this.routerService.navigate([`/${routePath}`]);
+    } else {
+      window.location.replace(`/${routePath}`);
+    }
   }
 }

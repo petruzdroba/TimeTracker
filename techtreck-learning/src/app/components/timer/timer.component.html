@@ -1,11 +1,27 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <app-reset-timer />
 <div class="timer-group">
-  @if(timerType === 'OFF'){
-  <h2>Last Recorded Session</h2>
-  }
-  <h1 class="txt-timer">{{ timerType === 'ON'? 'Timer Started' : elapsedTime | date:'HH:mm:ss':'UTC' }}
+  <h1 class="txt-timer">{{ elapsedTime | date:'HH:mm:ss':'UTC' }}
   </h1>
-  <button (click)="startTiming()" class="btn-timer">{{ timerType === 'ON' ? 'Stop' : 'Start'}}</button>
-  <p>Remaining work time : {{timerType === 'OFF'? ( requiredTime | date: 'HH:mm:ss':'UTC') : 'Calculating...' }}</p>
+  @if(timerType === 'ON'){
+  <button (click)="pauseTimer()" class="btn-timer">Stop</button>
+  }@else {
+  <button (click)="startTimer()" class="btn-timer">Start</button>
+  }
 </div>
-<app-progress-bar [elapsedTime]="elapsedTime" [timerType]="timerType" [requiredTime]="requiredTime" />
+<div class="info-group">
+  <div class="info-el">
+    <i class="fas fa-sign-in-alt"></i>
+    <p>First Entrance of day: {{ firstClockIn !== undefined? (firstClockIn | date: "HH:mm:ss") : '-'}}</p>
+  </div>
+  <div class="info-el">
+    <i class="far fa-hourglass"></i>
+    <p>Remaining work time : {{ requiredTime | date: 'HH:mm:ss':'UTC' }}</p>
+  </div>
+  <div class="info-el">
+    <i class="fas fa-calendar"></i>
+    <p>Data curenta : {{currentDate | date : "dd/MM/YYYY"}}</p>
+  </div>
+</div>
+<app-progress-bar [currentValue]="elapsedTime" [totalValue]="requiredTime" class="progress-bar-group-timer" />

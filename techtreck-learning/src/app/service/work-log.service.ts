@@ -29,7 +29,20 @@ export class WorkLogService {
   }
 
   addSession(newSession: Session) {
-    this.workLog.push(newSession);
+    const index = this.workLog.findIndex((session) => {
+      const dateA = new Date(session.date);
+      return (
+        dateA.getDay() == newSession.date.getDay() &&
+        dateA.getMonth() == newSession.date.getMonth() &&
+        dateA.getFullYear() == newSession.date.getFullYear()
+      );
+    });
+
+    if (index !== -1) {
+      this.workLog[index].timeWorked = newSession.timeWorked;
+    } else {
+      this.workLog.push(newSession);
+    }
     this.updateWorkLog();
   }
 
@@ -42,5 +55,16 @@ export class WorkLogService {
 
   updateWorkLog() {
     window.localStorage.setItem('workLog', JSON.stringify(this.workLog));
+  }
+
+  getFirstClockIn(date: Date) {
+    return this.workLog.find((session) => {
+      const dateA = new Date(session.date);
+      return (
+        dateA.getDay() == date.getDay() &&
+        dateA.getMonth() == date.getMonth() &&
+        dateA.getFullYear() == date.getFullYear()
+      );
+    });
   }
 }

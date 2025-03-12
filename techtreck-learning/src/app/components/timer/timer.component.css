@@ -5,7 +5,19 @@
   justify-content: center;
   align-items: center;
   position: absolute;
-  left: 50%;
+  left: 40%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.info-group
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 60%;
   top: 50%;
   transform: translate(-50%, -50%);
 }
@@ -18,7 +30,7 @@
   border-radius: 6px;
   width: 150px;
   height: 100px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   transition: all 0.6s ease;
 }
 
@@ -30,5 +42,18 @@
 .txt-timer
 {
   text-align: center;
+}
+
+.info-el
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: left;
+}
+
+.info-el i
+{
+  margin-right: 1vw;
 }
 

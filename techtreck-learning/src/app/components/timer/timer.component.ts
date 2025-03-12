@@ -1,10 +1,11 @@
-import { DatePipe, Time } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { ProgressBarComponent } from './progress-bar/progress-bar.component';
+import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Session } from '../../model/session.interface';
 import { WorkLogService } from '../../service/work-log.service';
+import { TimerService } from '../../service/timer.service';
 
 @Component({
   selector: 'app-timer',
@@ -15,81 +16,97 @@ import { WorkLogService } from '../../service/work-log.service';
 })
 export class TimerComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
+  private timerService = inject(TimerService);
   private workLogService = inject(WorkLogService);
-  protected requiredTime = 7200000;
-  private startTime = new Date(0, 0, 0);
-  private endTime = new Date(0, 0, 0);
-  protected timerType: 'ON' | 'OFF' = 'OFF';
+
+  protected requiredTime!: number;
+  private startTime!: Date;
+  private endTime!: Date;
+  protected timerType!: 'ON' | 'OFF';
   protected workLog!: Session[];
 
+  private interval!: NodeJS.Timeout;
+
   ngOnInit(): void {
-    if (typeof window !== 'undefined') {
-      const storedTimerDataString = window.localStorage.getItem('timerData');
-      if (storedTimerDataString) {
-        const storedTimerDataObject = JSON.parse(storedTimerDataString);
-
-        this.startTime = new Date(storedTimerDataObject.startTime);
-        this.endTime = new Date(storedTimerDataObject.endTime);
-
-        const currentTime = new Date();
-        const dateLastSession = new Date(this.startTime);
-        currentTime.setHours(0, 0, 0, 0);
-        dateLastSession.setHours(0, 0, 0, 0);
-        if (currentTime.getTime() === dateLastSession.getTime()) {
-          if (storedTimerDataObject.remainingTime) {
-            this.requiredTime = storedTimerDataObject.remainingTime;
-          }
-        } else {
-          //resets if dates are different, 2 hours a day for each new day
-          this.requiredTime = 7200000;
-        }
-      }
-      this.workLog = this.workLogService.getWorkLog;
+    this.requiredTime = this.timerService.requiredTime;
+    this.startTime = this.timerService.startTime;
+    this.endTime = this.timerService.endTime;
+    this.timerType = this.timerService.timerType;
+    this.workLog = this.workLogService.getWorkLog;
+    if (this.timerType === 'ON') {
+      this.startTimer();
     }
   }
 
   get elapsedTime() {
-    const elapsed = this.endTime.getTime() - this.startTime.getTime();
+    const elapsed = 7200000 - this.requiredTime;
     return elapsed;
   }
 
-  updateTimerData() {
-    window.localStorage.setItem(
-      'timerData',
-      JSON.stringify({
-        startTime: this.startTime,
-        endTime: this.endTime,
-        remainingTime: this.requiredTime,
-      })
-    );
+  get firstClockIn(): Date | undefined {
+    return this.workLogService.getFirstClockIn(this.startTime)?.date;
+  }
+
+  get workedTimeToday(): Date | undefined {
+    const timeWorked = this.workLogService.getFirstClockIn(
+      this.startTime
+    )?.timeWorked;
+    if (timeWorked) {
+      return new Date(timeWorked);
+    }
+    return undefined;
+  }
+
+  get currentDate() {
+    return new Date();
+  }
+
+  startTimer() {
+    this.timerType = 'ON';
+    this.startTime = new Date();
+    this.timerService.updateTimerData({
+      startTime: this.startTime,
+      endTime: this.endTime,
+      requiredTime: this.requiredTime,
+      timerType: this.timerType,
+    });
+    const newSession = {
+      date: new Date(),
+      timeWorked: this.elapsedTime,
+    };
+
+    this.workLogService.addSession(newSession);
+
+    this.interval = setInterval(() => {
+      if (this.requiredTime > 0) {
+        this.requiredTime -= 1000;
+      } //else
+    }, 1000);
+  }
+
+  pauseTimer() {
+    this.timerType = 'OFF';
+    clearInterval(this.interval);
+
+    this.endTime = new Date();
+    const newSession = {
+      date: new Date(),
+      timeWorked: this.elapsedTime,
+    };
+
+    this.workLogService.addSession(newSession);
+    this.timerService.updateTimerData({
+      startTime: this.startTime,
+      endTime: this.endTime,
+      requiredTime: this.requiredTime,
+      timerType: this.timerType,
+    });
 
     if (window.localStorage.getItem('timerData')) {
       this.snackBar.open('Session recorded successfully !', '', {
         duration: 2000,
       });
     }
-  }
-
-  startTiming() {
-    const currentTime = new Date();
-    this.timerType = this.timerType === 'ON' ? 'OFF' : 'ON';
-
-    console.log(this.timerType + ' timer ');
-    console.log(currentTime.getHours() + ':' + currentTime.getMinutes());
-
-    if (this.timerType === 'ON') {
-      this.startTime = currentTime;
-    } else {
-      this.endTime = currentTime;
-      this.requiredTime -= this.elapsedTime;
-
-      const newSession = {
-        date: new Date(),
-        timeWorked: this.endTime.getTime() - this.startTime.getTime(),
-      };
-      //this.workLog.push(newSession);
-      this.workLogService.addSession(newSession);
-      this.updateTimerData();
-    }
+    window.location.reload();
   }
 }

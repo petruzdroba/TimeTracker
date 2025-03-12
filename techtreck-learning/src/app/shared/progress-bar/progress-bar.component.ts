@@ -9,12 +9,11 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   styleUrl: './progress-bar.component.sass',
 })
 export class ProgressBarComponent {
-  @Input({ required: true }) elapsedTime!: number;
-  @Input({ required: true }) timerType!: 'ON' | 'OFF';
-  @Input({ required: true }) requiredTime!: number;
+  @Input({ required: true }) currentValue!: number;
+  @Input({ required: true }) totalValue!: number;
+  @Input({ required: true }) class!: string;
 
   get valueStatus() {
-    const timer = this.elapsedTime;
-    return (timer / this.requiredTime) * 100;
+    return ((this.currentValue / this.totalValue) * 100).toFixed(0);
   }
 }
