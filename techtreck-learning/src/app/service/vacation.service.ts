@@ -116,6 +116,17 @@ export class VacationService {
     this.futureVacations[index].status = newStatus;
     this.updateVacationData();
   }
+
+  resetData() {
+    window.localStorage.setItem(
+      'vacationData',
+      JSON.stringify({
+        remainingVacationDays: 14,
+        pastVacations: [],
+      })
+    );
+    window.location.reload();
+  }
 }
 
 export function getDaysBetweenDates(startDate: Date, endDate: Date): number {

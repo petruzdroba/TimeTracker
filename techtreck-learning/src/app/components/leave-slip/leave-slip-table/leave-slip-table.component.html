@@ -1,0 +1,37 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="table-group">
+  <div class="sort-group">
+    <p class="txt-sort">Sorty by date</p>
+    <button class="btn-sort" (click)="onSortType()">
+      <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+    </button>
+  </div>
+  <table class="leave-table">
+    <tbody>
+      <tr class="table-row">
+        <th class="txt-filter">Date</th>
+        <th class="txt-filter">Start time</th>
+        <th class="txt-filter">End time</th>
+        <th class="txt-filter">Reason</th>
+        <th class="txt-filter">Status</th>
+        <th class="txt-filter">Action</th>
+      </tr>
+
+      @for(leave of list; track leave){
+      <tr class="table-row">
+        <td>{{leave.date | date: 'mediumDate'}}</td>
+        <td>{{leave.startTime | date: 'hh:mm a'}}</td>
+        <td>{{leave.endTime | date: 'hh:mm a'}}</td>
+        <td>{{leave.description}}</td>
+        <td>
+          <i [ngClass]="'fas fa-circle ' + leave.status" [title]="leave.status"></i>
+        </td>
+        <td><button class="btn-icon" (click)="onDelete(leaveList.indexOf(leave))"><i class="fas fa-trash"
+              title="Delete vacation entry"></i></button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</div>

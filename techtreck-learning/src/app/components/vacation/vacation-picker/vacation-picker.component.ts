@@ -35,6 +35,7 @@ import { Vacation } from '../../../model/vacation.interface';
 export class VacationPickerComponent {
   protected selectedDate: Date | null = null;
   @Input({ required: true }) remainingVacation!: number;
+  @Input({ required: true }) futureVacations!: Vacation[];
   @Output() addVacationEvent = new EventEmitter<Vacation>();
   protected form = new FormGroup({
     startDate: new FormControl(null, { validators: Validators.required }),
@@ -47,8 +48,23 @@ export class VacationPickerComponent {
   myFilter = (d: Date | null): boolean => {
     const day = (d || new Date()).getDay();
     const today = new Date();
+    let alreadyTaken: boolean = true;
+    if (day != null && d != undefined) {
+      this.futureVacations.map((vacation) => {
+        const dateA = new Date(vacation.startDate);
+        const dateB = new Date(vacation.endDate);
+
+        if (
+          d?.getTime() >= dateA.getTime() &&
+          d?.getTime() <= dateB.getTime() &&
+          vacation.status !== 'denied'
+        ) {
+          alreadyTaken = false;
+        }
+      });
+    }
     // Prevent Saturday (6) and Sunday (0) from being selected.
-    return day !== 0 && day !== 6 && (d || new Date()) >= today;
+    return alreadyTaken && day !== 0 && day !== 6 && (d || new Date()) >= today;
   };
 
   get dateValidation() {
@@ -80,7 +96,7 @@ export class VacationPickerComponent {
           this.remainingVacation
         )
       ) {
-        console.log('Date range cannot exceed 30 days');
+        //console.log('Date range cannot exceed 30 days');
         this.form.get('endDate')?.reset();
         return;
       }

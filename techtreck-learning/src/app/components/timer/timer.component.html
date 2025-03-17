@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-<app-reset-timer />
+<app-reset-button [service]="timerService" />
 <div class="timer-group">
   <h1 class="txt-timer">{{ elapsedTime | date:'HH:mm:ss':'UTC' }}
   </h1>
@@ -13,7 +13,7 @@
 <div class="info-group">
   <div class="info-el">
     <i class="fas fa-sign-in-alt"></i>
-    <p>First Entrance of day: {{ firstClockIn !== undefined? (firstClockIn | date: "HH:mm:ss") : '-'}}</p>
+    <p>First entrance of today: {{ firstClockIn !== undefined? (firstClockIn | date: "HH:mm:ss") : '-'}}</p>
   </div>
   <div class="info-el">
     <i class="far fa-hourglass"></i>
@@ -24,4 +24,4 @@
     <p>Data curenta : {{currentDate | date : "dd/MM/YYYY"}}</p>
   </div>
 </div>
-<app-progress-bar [currentValue]="elapsedTime" [totalValue]="requiredTime" class="progress-bar-group-timer" />
+<app-progress-bar [currentValue]="elapsedTime" [totalValue]="7200000" class="progress-bar-group-timer" />

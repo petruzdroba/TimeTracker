@@ -1,22 +1,22 @@
 import { DatePipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { ResetTimerComponent } from './reset-timer/reset-timer.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Session } from '../../model/session.interface';
 import { WorkLogService } from '../../service/work-log.service';
 import { TimerService } from '../../service/timer.service';
+import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [DatePipe, ProgressBarComponent, ResetTimerComponent],
+  imports: [DatePipe, ProgressBarComponent, ResetButtonComponent],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.sass',
 })
 export class TimerComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
-  private timerService = inject(TimerService);
+  protected timerService = inject(TimerService);
   private workLogService = inject(WorkLogService);
 
   protected requiredTime!: number;

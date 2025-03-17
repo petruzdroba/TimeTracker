@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {
@@ -40,7 +40,6 @@ export class TimerService {
           const elapsedTime = new Date().getTime() - this._startTime.getTime();
           this._requiredTime -= elapsedTime;
         }
-        console.log(2);
       }
     }
   }
@@ -76,5 +75,18 @@ export class TimerService {
         timerType: timerData.timerType,
       })
     );
+  }
+
+  resetData() {
+    window.localStorage.setItem(
+      'timerData',
+      JSON.stringify({
+        startTime: 0,
+        endTime: 0,
+        remainingTime: 7200000,
+        timerType: 'OFF',
+      })
+    );
+    window.location.reload();
   }
 }

@@ -1,14 +1,7 @@
-.vacation-list {
-  list-style-type: none;
-  width: 80vh;
-  padding: 0;
-  margin-bottom: 30px;
-}
-
-.txt-past-vacations
+.table-group
 {
-  font-size: large;
-  text-align: center;
+  width: max-content;
+  margin-left: 3vw;
 }
 
 .txt-filter
@@ -16,7 +9,19 @@
   font-size: large;
   color: darkblue;
   font-weight: bolder;
-  text-align: left;
+  text-align: center;
+}
+
+.leave-table
+{
+  list-style-type: none;
+  position: absolute;
+  margin-left: 5%;
+}
+
+.leave-table th, .leave-table td {
+  padding: 8px;
+  text-align: center;
 }
 
 .btn-icon{
@@ -27,6 +32,16 @@
 }
 
 .btn-icon:hover{
+  color: red;
+}
+
+.pending{
+  color: yellow;
+}
+.accepted{
+  color: chartreuse;
+}
+.denied{
   color: red;
 }
 
@@ -61,15 +76,3 @@
 {
   color: rgb(13, 13, 210);
 }
-
-.pending{
-  color: yellow;
-}
-.accepted{
-  color: chartreuse;
-}
-.denied{
-  color: red;
-}
-
-

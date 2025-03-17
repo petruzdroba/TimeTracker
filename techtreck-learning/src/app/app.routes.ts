@@ -4,6 +4,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { TimerComponent } from './components/timer/timer.component';
 import { VacationComponent } from './components/vacation/vacation.component';
 import { WorkLogComponent } from './components/work-log/work-log.component';
+import { LeaveSlipComponent } from './components/leave-slip/leave-slip.component';
 
 export const routes: Routes = [
   {
@@ -30,6 +31,11 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminComponent,
     title: 'Admin',
+  },
+  {
+    path: 'leaveslip',
+    component: LeaveSlipComponent,
+    title: 'Leave Slips',
   },
   {
     path: '**',

@@ -1,29 +1,32 @@
-<form [formGroup]="form" (ngSubmit)="onSubmit()" class="vacation-form">
-  <h3 class="txt-title"> Plan your next vacation day</h3>
-  <div class="form-input">
-    <mat-form-field class="example-full-width">
-      <mat-label>Choose a date range</mat-label>
-      <mat-date-range-input [dateFilter]="myFilter" [rangePicker]="picker">
-        <input matStartDate placeholder="Start date" formControlName="startDate">
-        <input matEndDate placeholder="End date" formControlName="endDate">
-      </mat-date-range-input>
-      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-date-range-picker #picker></mat-date-range-picker>
-      @if(!dateValidation && form.value.startDate){
-      <mat-error>You dont have enough vacation days!</mat-error>
-      }
-    </mat-form-field>
-  </div>
+<h3 class="txt-title"> Plan your next vacation day</h3>
+<div class="form-box">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-input">
+      <mat-form-field class="example-full-width">
+        <mat-label>Choose a date range</mat-label>
+        <mat-date-range-input [dateFilter]="myFilter" [rangePicker]="picker">
+          <input matStartDate placeholder="Start date" formControlName="startDate">
+          <input matEndDate placeholder="End date" formControlName="endDate">
+        </mat-date-range-input>
+        <mat-hint>MM/DD/YYYY</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-date-range-picker #picker></mat-date-range-picker>
+        @if(!dateValidation && form.value.startDate){
+        <mat-error>You dont have enough vacation days!</mat-error>
+        }
+      </mat-form-field>
+    </div>
 
-  <div class="form-input">
-    <label for="description">Description</label>
-    <input id="description" type="description" formControlName="description" />
-  </div>
+    <div class="form-input">
+      <label for="description">Description</label>
+      <input id="description" type="description" formControlName="description" />
+    </div>
 
-  <button type="reset" class="btn-submit" (click)="onReset()">Reset</button>
-  @if(this.form.invalid){
-  <button type="submit" class="btn-submit" [disabled]="form.invalid">Submit</button>
-  }@else {
-  <button type="submit" class="btn-submit">Submit</button>
-  }
-</form>
+    <button type="reset" class="btn-submit" (click)="onReset()">Reset</button>
+    @if(this.form.invalid){
+    <button type="submit" class="btn-submit" [disabled]="form.invalid">Submit</button>
+    }@else {
+    <button type="submit" class="btn-submit">Submit</button>
+    }
+  </form>
+</div>

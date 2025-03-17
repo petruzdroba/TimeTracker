@@ -17,20 +17,24 @@
   margin-right: 5px;
 }
 
-.btn-submit
+.btn-form
 {
   color: azure;
   font-size: 90%;
   background-color: darkblue;
   border-radius: 6px;
   padding: 5px;
-  margin-top: 3vh;
+  margin-top: 5px;
   transition: all 0.6s ease;
   margin-right: 5px;
 }
 
-.btn-submit:hover
+.btn-form:hover
 {
   background-color: rgb(13, 13, 210)
 }
 
+.txt-error
+{
+  font-size: 70%;
+}

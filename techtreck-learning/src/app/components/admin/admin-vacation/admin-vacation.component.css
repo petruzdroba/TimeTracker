@@ -1,0 +1,151 @@
+.admin-tables
+{
+  list-style-type: none;
+  position: absolute;
+  top: 0;
+  margin-left: 12%;
+  width: 80%;
+}
+
+.pending-table
+{
+  width: 90%;
+  margin-bottom: 10%;
+}
+
+.completed-table
+{
+  width: 90%;
+  /* margin-top: 10%; */
+}
+
+.pending-table th, .pending-table td, .completed-table th, .completed-table td {
+  padding: 8px;
+  text-align: center;
+}
+
+.txt-table-title
+{
+  font-size: large;
+  color: darkblue;
+  font-weight: bolder;
+  text-align: left;
+  margin-right: 2%;
+}
+
+.btn-status
+{
+  width: 20%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+.btn-status p
+{
+  margin-left: 5%;
+}
+
+.btn-status{
+  width: 30%;
+}
+
+.accept{
+  margin-left: 5%;
+  border-radius: 4px;
+  color: forestgreen;
+  border-color: forestgreen;
+  background-color: lightgreen;
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  padding: 0px 0px;
+  transition: all 0.6s ease;
+}
+
+.accept:hover{
+  background-color: rgb(154, 244, 154);
+  border-color: limegreen;
+}
+
+.accept:disabled{
+  box-shadow: none;
+  background-color: grey;
+  color: black;
+  border-color: black;
+}
+
+.accept p{
+  font-size: 110%;
+  font-weight: 300;
+  /* padding-left: 5%; */
+  padding-right: 13%;
+}
+
+.accept i{
+  padding-left: 10%;
+}
+
+.deny{
+  border-radius: 4px;
+  color: darkred;
+  border-color: darkred;
+  background-color: coral;
+  box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%), 0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%);
+  transition: all 0.6s ease;
+}
+
+.deny:hover{
+  background-color: rgb(249, 145, 108);
+  border-color: crimson;
+}
+
+.deny p{
+  font-size: 110%;
+  font-weight: 300;
+  /* padding-left: 5%; */
+  padding-right: 13%;
+}
+
+.deny i{
+  padding-left: 10%;
+}
+
+.pending{
+  color: yellow;
+}
+.accepted{
+  color: chartreuse;
+}
+.denied{
+  color: red;
+}
+
+.btn-toggle
+{
+  margin-top: 3vh;
+  font-size: 110%;
+  color: azure;
+  background-color: darkblue ;
+  width: 6vw;
+}
+
+.btn-toggle
+{
+  color: azure;
+  font-size: 110%;
+  background-color: darkblue;
+  border-radius: 6px;
+  padding: 5px;
+  margin-top: 3vh;
+  width: 6vw;
+  transition: all 0.6s ease;
+}
+
+.btn-toggle:hover
+{
+  background-color: rgb(13, 13, 210)
+}
+
+.txt-none
+{
+  margin-bottom: 10vh;
+}

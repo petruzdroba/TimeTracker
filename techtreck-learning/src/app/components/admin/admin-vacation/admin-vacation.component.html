@@ -1,0 +1,65 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="admin-tables">
+  <button (click)="onToggleList()" class="btn-toggle">Leaves</button>
+  <p class="txt-table-title">Pending vacation requests</p>
+  @if(pendingVacationRequests.length === 0)
+  {
+  <p class="txt-none">No pending vacation requests</p>
+  }@else {
+  <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
+  <table class="pending-table">
+    <tbody>
+      <tr>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Description</th>
+        <th>Status</th>
+      </tr>
+      @for(vacation of filteredPendingVacationRequests; track vacation){
+      <tr>
+        <td>{{vacation.startDate | date: 'longDate'}}</td>
+        <td>{{vacation.endDate | date: 'longDate'}}</td>
+        <td>{{vacation.description}}</td>
+        <td>
+          <button class="btn-status deny" (click)="onDeny(vacation)" title="Deny">
+            <i class="fas fa-times"></i>
+            <p>Deny</p>
+          </button>
+          <button class="btn-status accept" (click)="onAccept(vacation)"
+            [title]="getValidVacation(vacation)? 'Accept':'Insufficient vacation days'"
+            [disabled]="!getValidVacation(vacation)">
+            <i class="fas fa-check"></i>
+            <p>Accept</p>
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+
+  <p class="txt-table-title">Completed vacation requests</p>
+  @if(completedVacationRequests.length === 0)
+  {
+  <p class="txt-none">No completed vacation requests</p>
+  }@else {
+  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
+  <table class="completed-table">
+    <tbody>
+      <tr>
+        <th>Status</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+      </tr>
+      @for(vacation of filteredCompletedVacationRequests; track vacation){
+      <tr>
+        <td><i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i></td>
+        <td>{{vacation.startDate | date: 'longDate'}}</td>
+        <td>{{vacation.endDate | date: 'longDate'}}</td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+</div>
