@@ -80,7 +80,9 @@ export class TimerComponent implements OnInit {
     this.interval = setInterval(() => {
       if (this.requiredTime > 0) {
         this.requiredTime -= 1000;
-      } //else
+      } else {
+        this.requiredTime = 0;
+      }
     }, 1000);
   }
 
@@ -107,6 +109,9 @@ export class TimerComponent implements OnInit {
         duration: 2000,
       });
     }
-    window.location.reload();
+
+    setTimeout(() => {
+      window.location.reload();
+    }, 2000); //make window reload only happend after snack bar is shown
   }
 }

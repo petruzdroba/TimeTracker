@@ -33,9 +33,10 @@ export class VacationService {
 
           this.futureVacations = this.futureVacations.filter((vacation) => {
             if (new Date(vacation.startDate) <= today) {
-              if (vacation.status === 'accepted') {
-                this.pastVacations.push(vacation); //removes the ones that are past their due time and not accepted, pending or denied
+              if (vacation.status === 'pending') {
+                vacation.status = 'ignored';
               }
+              this.pastVacations.push(vacation); //removes the ones that are past their due time and not accepted, pending or denied
               return false; // Remove
             }
             return true; // Keep
@@ -68,6 +69,12 @@ export class VacationService {
         pastVacations: this.pastVacations,
         futureVacations: this.futureVacations,
       })
+    );
+  }
+
+  getVacationIndex(vacation: Vacation): number {
+    return this.futureVacations.findIndex(
+      (vacations) => vacation === vacations
     );
   }
 

@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { LeaveSlip } from '../../../model/leave-slip.interface';
 import { start } from 'repl';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-leave-slip-picker',
@@ -29,6 +30,7 @@ import { start } from 'repl';
 export class LeaveSlipPickerComponent {
   @Input({ required: true }) remainingTime!: number;
   @Output() addLeaveEvent = new EventEmitter<LeaveSlip>();
+  private snackBar = inject(MatSnackBar);
 
   protected form = new FormGroup({
     startTime: new FormControl('', {
@@ -83,6 +85,9 @@ export class LeaveSlipPickerComponent {
         description: this.form.value.description,
         date: new Date(this.form.value.date),
         status: 'pending',
+      });
+      this.snackBar.open('Leave request sent !', '', {
+        duration: 2000,
       });
       this.form.reset();
     }

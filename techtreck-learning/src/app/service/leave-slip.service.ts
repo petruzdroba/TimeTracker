@@ -32,9 +32,10 @@ export class LeaveSlipService {
 
           this._futureLeaves = this._futureLeaves.filter((leave) => {
             if (new Date(leave.date) < today) {
-              if (leave.status === 'accepted') {
-                this._pastLeaves.push(leave); //removes the ones that are past their due time and not accepted, pending or denied
+              if (leave.status === 'pending') {
+                leave.status = 'ignored';
               }
+              this._pastLeaves.push(leave); //removes the ones that are past their due time and not accepted, pending or denied
               return false; // Remove
             }
             return true; // Keep
@@ -57,6 +58,10 @@ export class LeaveSlipService {
 
   public get futureLeaves(): LeaveSlip[] {
     return this._futureLeaves;
+  }
+
+  getLeaveIndex(leave: LeaveSlip): number {
+    return this._futureLeaves.findIndex((leaves) => leaves === leave);
   }
 
   updateLeaveData() {

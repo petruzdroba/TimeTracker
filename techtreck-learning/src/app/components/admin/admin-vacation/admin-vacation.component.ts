@@ -35,7 +35,7 @@ export class AdminVacationComponent implements OnInit {
     this.pastVacations = this.vacationService.getPastVacations;
   }
 
-  get completedVacationRequests() {
+  private get completedVacationRequests() {
     return [
       ...this.pastVacations.filter((vacation) => vacation.status !== 'pending'),
       ...this.futureVacations.filter(
@@ -67,7 +67,7 @@ export class AdminVacationComponent implements OnInit {
     ];
   }
 
-  get pendingVacationRequests() {
+  private get pendingVacationRequests() {
     return [
       ...this.futureVacations.filter(
         (vacation) => vacation.status === 'pending'
@@ -96,6 +96,20 @@ export class AdminVacationComponent implements OnInit {
         return false;
       }),
     ];
+  }
+
+  disabled(vacation: Vacation): boolean {
+    const index = this.vacationService.getVacationIndex(vacation);
+    return index === -1;
+  }
+
+  onUndo(leave: Vacation) {
+    const index = this.vacationService.getVacationIndex(leave);
+    if (index !== -1) {
+      this.vacationService.restoreVacationDays(index);
+      leave.status = 'pending';
+      this.vacationService.updateVacationData();
+    }
   }
 
   getValidVacation(vacation: Vacation): boolean {

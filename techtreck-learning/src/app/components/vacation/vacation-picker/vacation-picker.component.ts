@@ -4,6 +4,7 @@ import {
   Output,
   EventEmitter,
   Input,
+  inject,
 } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -17,6 +18,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { Vacation } from '../../../model/vacation.interface';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-vacation-picker',
@@ -44,6 +46,7 @@ export class VacationPickerComponent {
       validators: [Validators.required, Validators.maxLength(70)],
     }),
   });
+  private snackBar = inject(MatSnackBar);
 
   myFilter = (d: Date | null): boolean => {
     const day = (d || new Date()).getDay();
@@ -106,6 +109,9 @@ export class VacationPickerComponent {
         endDate: this.form.value.endDate,
         description: this.form.value.description,
         status: 'pending',
+      });
+      this.snackBar.open('Vacation request sent !', '', {
+        duration: 2000,
       });
     }
     this.form.reset();

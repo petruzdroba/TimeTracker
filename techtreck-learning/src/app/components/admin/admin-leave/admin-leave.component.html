@@ -1,7 +1,8 @@
 <div class="admin-tables">
   <button (click)="onToggleList()" class="btn-toggle">Vacations</button>
   <p class="txt-table-title">Pending leave requests</p>
-  @if(pendingLeaveRequests.length === 0)
+  <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
+  @if(filteredPendingVacationRequests.length === 0)
   {
   <p class="txt-none">There are no pending leave requests</p>
   }@else {
@@ -15,7 +16,7 @@
         <th>Status</th>
         <th>Submitted on</th>
       </tr>
-      @for(leave of pendingLeaveRequests; track leave){
+      @for(leave of filteredPendingVacationRequests; track leave){
       <tr>
         <td>{{leave.date | date: 'mediumDate'}}</td>
         <td>{{leave.startTime | date: 'hh:mm a'}}</td>
@@ -40,7 +41,8 @@
   }
 
   <p class="txt-table-title">Completed leave requests</p>
-  @if(completedLeaveRequests.length === 0)
+  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
+  @if(filteredCompletedVacationRequests.length === 0)
   {
   <p class="txt-none">No completed leave requests</p>
   }@else {
@@ -51,13 +53,18 @@
         <th>Date</th>
         <th>Start time</th>
         <th>End time</th>
+        <th>Undo</th>
       </tr>
-      @for(leave of completedLeaveRequests; track leave){
+      @for(leave of filteredCompletedVacationRequests; track leave){
       <tr>
         <td><i [ngClass]="'fas fa-circle ' + leave.status" [title]="leave.status"></i></td>
         <td>{{leave.date | date: 'longDate'}}</td>
         <td>{{leave.startTime | date: 'hh:mm a'}}</td>
         <td>{{leave.endTime | date: 'hh:mm a'}}</td>
+        <td><button [class]="!disabled(leave) ?  'btn-icon' : 'btn-icon-disabled'" [disabled]="disabled(leave)"
+            (click)="onUndo(leave)"><i class="fas fa-undo"
+              [title]="!disabled(leave) ?  'Undo leave' : 'Past date'"></i></button>
+        </td>
       </tr>
       }
     </tbody>

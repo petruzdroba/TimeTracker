@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Vacation } from '../model/vacation.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {

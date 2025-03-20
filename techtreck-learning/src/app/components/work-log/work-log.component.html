@@ -32,7 +32,7 @@
         <th class="txt-head">Action</th>
       </tr>
 
-      @for(session of filteredWorkLog; track session){
+      @for(session of paginatedData; track session){
       <tr>
         <td class="log-session">{{session.date | date : 'mediumDate'}}</td>
         <td>{{session.date | date: 'mediumTime'}}</td>
@@ -49,4 +49,8 @@
       </tr>
     </tbody>
   </table>
+  <mat-paginator [length]="filteredWorkLog.length" [pageSize]="pageSize"
+    [pageSizeOptions]="[5, 10, filteredWorkLog.length]" (page)="onPageChange($event)"
+    showFirstLastButtons></mat-paginator>
+  <app-graph [workLog]="workLog" />
 </div>

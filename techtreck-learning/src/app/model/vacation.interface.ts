@@ -2,5 +2,5 @@ export interface Vacation {
   startDate: Date;
   endDate: Date;
   description: string;
-  status: 'pending' | 'accepted' | 'denied';
+  status: 'pending' | 'accepted' | 'denied' | 'ignored';
 }

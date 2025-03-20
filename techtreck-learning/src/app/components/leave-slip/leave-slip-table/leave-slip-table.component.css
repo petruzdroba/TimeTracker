@@ -45,6 +45,10 @@
   color: red;
 }
 
+.ignored{
+  color:grey;
+}
+
 .sort-group
 {
   display: flex;

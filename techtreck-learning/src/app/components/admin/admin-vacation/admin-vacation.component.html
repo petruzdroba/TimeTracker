@@ -3,11 +3,11 @@
 <div class="admin-tables">
   <button (click)="onToggleList()" class="btn-toggle">Leaves</button>
   <p class="txt-table-title">Pending vacation requests</p>
-  @if(pendingVacationRequests.length === 0)
+  <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
+  @if(filteredPendingVacationRequests.length === 0)
   {
   <p class="txt-none">No pending vacation requests</p>
   }@else {
-  <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
   <table class="pending-table">
     <tbody>
       <tr>
@@ -40,23 +40,28 @@
   }
 
   <p class="txt-table-title">Completed vacation requests</p>
-  @if(completedVacationRequests.length === 0)
+  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
+  @if(filteredCompletedVacationRequests.length === 0)
   {
   <p class="txt-none">No completed vacation requests</p>
   }@else {
-  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
   <table class="completed-table">
     <tbody>
       <tr>
         <th>Status</th>
         <th>Start Date</th>
         <th>End Date</th>
+        <th>Undo</th>
       </tr>
       @for(vacation of filteredCompletedVacationRequests; track vacation){
       <tr>
         <td><i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i></td>
         <td>{{vacation.startDate | date: 'longDate'}}</td>
         <td>{{vacation.endDate | date: 'longDate'}}</td>
+        <td><button [class]="!disabled(vacation) ?  'btn-icon' : 'btn-icon-disabled'" [disabled]="disabled(vacation)"
+            (click)="onUndo(vacation)"><i class="fas fa-undo"
+              [title]="!disabled(vacation) ?  'Undo vacation' : 'Past date'"></i></button>
+        </td>
       </tr>
       }
     </tbody>

@@ -3,5 +3,5 @@ export interface LeaveSlip {
   startTime: Date;
   endTime: Date;
   description: string;
-  status: 'pending' | 'accepted' | 'denied';
+  status: 'pending' | 'accepted' | 'denied' | 'ignored';
 }

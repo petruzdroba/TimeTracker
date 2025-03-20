@@ -4,11 +4,19 @@ import { DateFilterComponent } from '../../shared/date-filter/date-filter.compon
 import { WorkLogService } from '../../service/work-log.service';
 import { DateFilter } from '../../model/date-filter.interface';
 import { Session } from '../../model/session.interface';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { GraphComponent } from './graph/graph.component';
 
 @Component({
   selector: 'app-work-log',
   standalone: true,
-  imports: [DatePipe, CommonModule, DateFilterComponent],
+  imports: [
+    DatePipe,
+    CommonModule,
+    DateFilterComponent,
+    MatPaginatorModule,
+    GraphComponent,
+  ],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
 })
@@ -21,10 +29,15 @@ export class WorkLogComponent implements OnInit {
   protected workLog!: Session[];
   protected sortBy: 'date' | 'time' = 'date';
   protected sortType: 'asc' | 'dsc' = 'asc';
-  protected showMore: boolean = false;
+
+  protected paginatedData: Session[] = [];
+  protected pageSize = 10;
+  protected pageIndex = 0;
 
   ngOnInit(): void {
     this.workLog = this.workLogService.getWorkLog;
+    this.pageSize = 5;
+    this.updatePaginatedData();
   }
 
   get sortedWorkLog() {
@@ -86,15 +99,20 @@ export class WorkLogComponent implements OnInit {
       this.sortType = 'asc';
     }
     this.sortBy = clicker;
+    this.pageIndex = 0;
+    this.updatePaginatedData();
   }
 
   onSortTypeChange() {
     this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
+    this.pageIndex = 0;
+    this.updatePaginatedData();
   }
 
   onDeleteSession(session: Session) {
     this.workLogService.deleteSession(session);
     this.workLog = this.workLogService.getWorkLog;
+    this.updatePaginatedData();
   }
 
   onChangeDateFilter(newDateFilter: DateFilter) {
@@ -106,5 +124,19 @@ export class WorkLogComponent implements OnInit {
     } else {
       this.dateFilter = newDateFilter;
     }
+    this.pageIndex = 0;
+    this.updatePaginatedData();
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.pageIndex = event.pageIndex;
+    this.updatePaginatedData();
+  }
+
+  updatePaginatedData() {
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedData = this.filteredWorkLog.slice(startIndex, endIndex);
   }
 }

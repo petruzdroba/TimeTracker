@@ -30,12 +30,14 @@ export class WorkLogService {
 
   addSession(newSession: Session) {
     const index = this.workLog.findIndex((session) => {
-      const dateA = new Date(session.date);
-      return (
-        dateA.getDay() == newSession.date.getDay() &&
-        dateA.getMonth() == newSession.date.getMonth() &&
-        dateA.getFullYear() == newSession.date.getFullYear()
-      );
+      const currentTime = new Date();
+      const dateLastSession = new Date(session.date);
+      currentTime.setHours(0, 0, 0, 0);
+      dateLastSession.setHours(0, 0, 0, 0);
+      if (currentTime.getTime() === dateLastSession.getTime()) {
+        return true;
+      }
+      return false;
     });
 
     if (index !== -1) {
@@ -59,12 +61,14 @@ export class WorkLogService {
 
   getFirstClockIn(date: Date) {
     return this.workLog.find((session) => {
-      const dateA = new Date(session.date);
-      return (
-        dateA.getDay() == date.getDay() &&
-        dateA.getMonth() == date.getMonth() &&
-        dateA.getFullYear() == date.getFullYear()
-      );
+      const currentTime = new Date();
+      const dateLastSession = new Date(session.date);
+      currentTime.setHours(0, 0, 0, 0);
+      dateLastSession.setHours(0, 0, 0, 0);
+      if (currentTime.getTime() === dateLastSession.getTime()) {
+        return true;
+      }
+      return false;
     });
   }
 }
