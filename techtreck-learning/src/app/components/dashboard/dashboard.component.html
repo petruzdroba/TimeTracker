@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="dashboard">
+  <button (click)="onRefresh()" class="btn-refresh"><i class="fas fa-sync"></i></button>
+  <div class="info">
+    <div class="timer-info" (click)="onClick('timetrack')">
+      <app-timer-info />
+    </div>
+    <div class="days-info" (click)="onClick('vacationdays')">
+      <app-days-info />
+    </div>
+  </div>
+  <div class="work-log-graph" (click)="onClick('worklog')">
+    <app-graph />
+  </div>
+</div>

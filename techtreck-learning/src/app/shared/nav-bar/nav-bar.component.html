@@ -11,6 +11,10 @@
   <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
       <div class="nav-bar-item">
+        <i class="fas fa-chart-bar"></i>
+        <button class="btn-txt" (click)="navPress('home')">Dashboard</button>
+      </div>
+      <div class="nav-bar-item">
         <i class="fas fa-clock"></i>
         <button class="btn-txt" (click)="navPress('timetrack')">Time track</button>
       </div>

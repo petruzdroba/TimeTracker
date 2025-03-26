@@ -11,6 +11,6 @@ import { Router } from '@angular/router';
 export class NotFoundComponent {
   private routerService = inject(Router);
   onReturnClick() {
-    this.routerService.navigate(['/timetrack'], { replaceUrl: true });
+    this.routerService.navigate(['/home'], { replaceUrl: true });
   }
 }

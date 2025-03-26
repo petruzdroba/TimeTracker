@@ -1,0 +1,11 @@
+<div class="spinner-info">
+  <mat-progress-spinner class="spinner-container" [mode]="'determinate'"
+    [value]="procentageValue"></mat-progress-spinner>
+  <p class="spinner-text">{{procentageValue}}%</p>
+</div>
+<div class="log-info">
+  <p>Date: {{today | date: 'EEE, MMMM d, y'}}</p>
+  <p>Time: {{today | date: 'HH:mm a'}}</p>
+  <p>Timer state: {{timerType}}</p>
+  <p>Logged in: {{firstLogIn === '-' || firstLogIn === undefined ? '-': firstLogIn | date: 'HH:mm a'}}</p>
+</div>

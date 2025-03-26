@@ -5,18 +5,11 @@ import { WorkLogService } from '../../service/work-log.service';
 import { DateFilter } from '../../model/date-filter.interface';
 import { Session } from '../../model/session.interface';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { GraphComponent } from './graph/graph.component';
 
 @Component({
   selector: 'app-work-log',
   standalone: true,
-  imports: [
-    DatePipe,
-    CommonModule,
-    DateFilterComponent,
-    MatPaginatorModule,
-    GraphComponent,
-  ],
+  imports: [DatePipe, CommonModule, DateFilterComponent, MatPaginatorModule],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
 })
@@ -28,7 +21,7 @@ export class WorkLogComponent implements OnInit {
   };
   protected workLog!: Session[];
   protected sortBy: 'date' | 'time' = 'date';
-  protected sortType: 'asc' | 'dsc' = 'asc';
+  protected sortType: 'asc' | 'dsc' = 'dsc';
 
   protected paginatedData: Session[] = [];
   protected pageSize = 10;

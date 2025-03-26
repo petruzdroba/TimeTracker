@@ -13,7 +13,7 @@
 <div class="info-group">
   <div class="info-el">
     <i class="fas fa-sign-in-alt"></i>
-    <p>First entrance of today: {{ firstClockIn !== undefined? (firstClockIn | date: "HH:mm:ss") : '-'}}</p>
+    <p>First entrance of today: {{ firstClockIn === undefined ?'-' :(firstClockIn | date: "HH:mm:ss")}}</p>
   </div>
   <div class="info-el">
     <i class="far fa-hourglass"></i>

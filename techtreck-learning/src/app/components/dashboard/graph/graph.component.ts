@@ -1,5 +1,5 @@
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
+import { Chart, registerables, TooltipItem } from 'chart.js';
 import { Session } from '../../../model/session.interface';
 import { WorkLogService } from '../../../service/work-log.service';
 
@@ -34,7 +34,7 @@ export class GraphComponent implements OnInit {
     this.workLog.forEach((session) => {
       const dateA = new Date(session.date);
       if (dateA.getMonth() === today.getMonth()) {
-        data[dateA.getDate()] += session.timeWorked / 3600000;
+        data[dateA.getDate() - 1] += session.timeWorked;
       }
     });
     return data;
@@ -45,7 +45,7 @@ export class GraphComponent implements OnInit {
       type: 'bar',
       data: {
         labels: Object.keys(this.getSortedData()).map(
-          (index) => parseInt(index) + 1
+          (index) => `${parseInt(index) + 1}/${new Date().getMonth() + 1}`
         ),
         datasets: [
           {
@@ -70,12 +70,41 @@ export class GraphComponent implements OnInit {
       },
       options: {
         responsive: true,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function (tooltipItem: TooltipItem<'bar'>) {
+                const value = tooltipItem.raw as number;
+                return formatMilliseconds(value);
+              },
+            },
+          },
+        },
         scales: {
           y: {
-            beginAtZero: true,
+            ticks: {
+              callback: function (label) {
+                const value = label as number;
+                return formatMilliseconds(value);
+              },
+            },
+          },
+          x: {
+            ticks: {
+              callback: function (label) {
+                const value = label as string;
+                return `${parseInt(value) + 1}`;
+              },
+            },
           },
         },
       },
     });
   }
+}
+
+function formatMilliseconds(ms: number): string {
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  return `0${hours}:${minutes.toString().padStart(2, '0')}`;
 }

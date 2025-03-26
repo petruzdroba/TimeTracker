@@ -5,12 +5,18 @@ import { TimerComponent } from './components/timer/timer.component';
 import { VacationComponent } from './components/vacation/vacation.component';
 import { WorkLogComponent } from './components/work-log/work-log.component';
 import { LeaveSlipComponent } from './components/leave-slip/leave-slip.component';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'timetrack',
+    redirectTo: 'home',
     pathMatch: 'full',
+  },
+  {
+    path: 'home',
+    component: DashboardComponent,
+    title: 'Dashboard',
   },
   {
     path: 'timetrack',

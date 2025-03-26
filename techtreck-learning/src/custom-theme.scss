@@ -14,6 +14,7 @@
 // hue. Available color palettes: https://material.io/design/color/
 $techtreck-learning-primary: mat.define-palette(mat.$indigo-palette);
 $techtreck-learning-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
+$techtreck-learning-secondary: mat.define-palette(mat.$pink-palette);
 
 // The warn palette is optional (defaults to red).
 $techtreck-learning-warn: mat.define-palette(mat.$red-palette);
@@ -23,6 +24,7 @@ $techtreck-learning-warn: mat.define-palette(mat.$red-palette);
 $techtreck-learning-theme: mat.define-light-theme((
   color: (
     primary: $techtreck-learning-primary,
+    secondary: $techtreck-learning-secondary,
     accent: $techtreck-learning-accent,
     warn: $techtreck-learning-warn,
   ),
