@@ -8,20 +8,22 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: var(--text-color);
 }
 
 .btn-return
 {
-  color: azure;
+  color: var(--background-color);
   font-size: 110%;
-  background-color: darkblue;
+  background-color: var(--primary-color);
   border-radius: 6px;
   padding: 10px;
   margin-top: 5px;
   transition: all 0.6s ease;
+  box-shadow: 7px 7px 12px var(--shadow-color);
 }
 
 .btn-return:hover
 {
-  background-color: rgb(13, 13, 210)
+  background-color: var(--primary-hover-color)
 }

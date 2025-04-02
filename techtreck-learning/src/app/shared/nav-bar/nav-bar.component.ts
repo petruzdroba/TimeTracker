@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
+import { ThemeService } from '../../service/theme.service';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
@@ -11,6 +12,7 @@ import { Router } from '@angular/router';
 export class NavBarComponent {
   private routerService = inject(Router);
   protected navBarStatus: 'OPEN' | 'CLOSE' = 'CLOSE';
+  private themeService = inject(ThemeService);
 
   onToggle() {
     this.navBarStatus = this.navBarStatus === 'OPEN' ? 'CLOSE' : 'OPEN';
@@ -22,5 +24,17 @@ export class NavBarComponent {
     } else {
       window.location.replace(`/${routePath}`);
     }
+  }
+
+  get runningTheme() {
+    return this.themeService.runningTheme;
+  }
+
+  get currentRoute() {
+    return this.routerService.url;
+  }
+
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
 }

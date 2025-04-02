@@ -1,36 +1,45 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="nav-bar-group">
-  <button (click)="drawer.toggle(); onToggle()" class="btn-menu">
-    @if(navBarStatus==='CLOSE'){
-    <i class="fa fa-bars"></i>
-    }@else {
-    <i class="fa fa-hippo"></i>
-    }
-  </button>
-  <mat-drawer-container [hasBackdrop]="false" class="drawer-container">
+  <div class="option-group">
+    <button (click)="drawer.toggle(); onToggle()" class="btn-menu">
+      @if(navBarStatus==='CLOSE'){
+      <i class="fa fa-bars"></i>
+      }@else {
+      <i class="fas fa-mountain"></i>
+      }
+    </button>
+    <button (click)="toggleTheme()" class="btn-menu">
+      @if(runningTheme == 'light'){
+      <i class="fas fa-sun"></i>
+      }@else {
+      <i class="fas fa-moon"></i>
+      }
+    </button>
+  </div>
+  <mat-drawer-container [hasBackdrop]=" false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/home' ? 'selected' : '')">
         <i class="fas fa-chart-bar"></i>
         <button class="btn-txt" (click)="navPress('home')">Dashboard</button>
       </div>
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/timetrack' ? 'selected' : '')">
         <i class="fas fa-clock"></i>
         <button class="btn-txt" (click)="navPress('timetrack')">Time track</button>
       </div>
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/worklog' ? 'selected' : '')">
         <i class="fa-solid fa-business-time"></i>
         <button class="btn-txt" (click)="navPress('worklog')">Situatia la zi</button>
       </div>
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/vacationdays' ? 'selected' : '')">
         <i class="fas fa-umbrella-beach"></i>
         <button class="btn-txt" (click)="navPress('vacationdays')">Concediu</button>
       </div>
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/leaveslip' ? 'selected' : '')">
         <i class="fas fa-paper-plane"></i>
         <button class="btn-txt" (click)="navPress('leaveslip')">Bilet de voie</button>
       </div>
-      <div class="nav-bar-item">
+      <div [class]="'nav-bar-item ' + (currentRoute === '/admin' ? 'selected' : '')">
         <i class="fas fa-user-lock"></i>
         <button class="btn-txt" (click)="navPress('admin')">Admin</button>
       </div>

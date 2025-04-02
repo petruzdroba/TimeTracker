@@ -61,8 +61,8 @@ export class GraphComponent implements OnInit {
                 return 'rgba(75, 192, 192, 0.2)';
               }
             }),
-            borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 1.3,
+            borderColor: 'rgba(75, 192, 192, 1)',
             hoverBackgroundColor: 'rgba(75, 124, 192, 0.2)',
             normalized: true,
           },

@@ -1,5 +1,6 @@
 .log-info{
   margin-left: 25%;
+  color: var(--text-color);
 }
 
 .spinner-container {
@@ -14,4 +15,5 @@
   top: 17%;
   left: 6%;
   transform: translate(-50%, -50%);
+  color: var(--text-color);
 }

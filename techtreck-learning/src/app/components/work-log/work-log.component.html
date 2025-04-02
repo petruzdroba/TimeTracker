@@ -49,7 +49,6 @@
       </tr>
     </tbody>
   </table>
-  <mat-paginator [length]="filteredWorkLog.length" [pageSize]="pageSize"
-    [pageSizeOptions]="[5, 10, filteredWorkLog.length]" (page)="onPageChange($event)"
-    showFirstLastButtons></mat-paginator>
+  <mat-paginator [length]="filteredWorkLog.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)" showFirstLastButtons class="paginator"></mat-paginator>
 </div>

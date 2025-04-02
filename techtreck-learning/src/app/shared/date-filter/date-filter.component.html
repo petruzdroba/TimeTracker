@@ -2,7 +2,8 @@
 
 
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <p>Filter by date : {{this.form.value.startDate && this.form.value.endDate ? (this.form.value.startDate|date:
+  <p class="txt-filter">Filter by date : {{this.form.value.startDate && this.form.value.endDate ?
+    (this.form.value.startDate|date:
     'mediumDate') + ' to ' +
     (this.form.value.endDate| date: 'mediumDate') : 'all'}}</p>
   <div class="form-input">

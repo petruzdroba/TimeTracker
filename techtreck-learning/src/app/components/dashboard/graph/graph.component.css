@@ -2,6 +2,6 @@
 {
   margin-top: 5vh;
   margin-bottom: 5vh;
-  box-shadow: 5px 5px 7px rgba(0, 0, 0, 0.3);
+  box-shadow: 5px 5px 7px var(--shadow-color);
   padding: 5px;
 }

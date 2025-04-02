@@ -11,7 +11,7 @@
 }
 
 .btn-refresh{
-  color: darkblue;
+  color: var(--primary-color);
   border: none;
   background-color: transparent;
   font-size: 130%;
@@ -21,7 +21,7 @@
 }
 
 .btn-refresh:hover{
-  color: rgb(13, 13, 210);
+  color: var(--primary-hover-color);
 }
 
 .info
@@ -37,8 +37,8 @@
   padding: 3% 2%;
   width: 38%;
   cursor: pointer;
-  border-left: 1px ridge darkblue;
-  border-right: 1px ridge darkblue;
+  border-left: 1px ridge var(--primary-color);
+  border-right: 1px ridge var(--primary-color);
   /* margin-right: 5%; */
   /* background-color: magenta; */
 }
@@ -52,8 +52,8 @@
   margin-right: 9%;
   padding: 4%;
   cursor: pointer;
-  /* border-left: 1px ridge darkblue; */
-  border-right: 1px ridge darkblue;
+  /* border-left: 1px ridge var(--primary-color); */
+  border-right: 1px ridge var(--primary-color);
   /* background-color: aqua; */
 }
 

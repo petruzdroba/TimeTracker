@@ -8,6 +8,7 @@
   top: 65%;
   transform: translate(-50%, -50%);
   width: 60vw;
+  color: var(--text-color);
 }
 
 .progress-bar-group-vacation

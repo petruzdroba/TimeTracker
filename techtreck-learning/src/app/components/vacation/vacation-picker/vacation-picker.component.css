@@ -1,9 +1,9 @@
 .form-box
 {
-  border: 1px black solid;
+  border: 1px var(--text-color) solid;
   width: fit-content;
   padding: 50px 30px;
-  box-shadow: 10px 10px 15px rgba(0, 0, 0, 0.3);
+  box-shadow: 7px 7px 12px var(--shadow-color);
 }
 
 .form-input
@@ -17,11 +17,16 @@
   margin-right: 5px;
 }
 
+#description{
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
 .btn-submit
 {
-  color: azure;
+  color: var(--background-color);
   font-size: 90%;
-  background-color: darkblue;
+  background-color: var(--primary-color);
   border-radius: 6px;
   padding: 5px;
   margin-top: 3vh;
@@ -31,6 +36,6 @@
 
 .btn-submit:hover
 {
-  background-color: rgb(13, 13, 210)
+  background-color: var(--primary-hover-color)
 }
 

@@ -20,28 +20,31 @@
   left: 60%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: var(--text-color);
 }
 
 .btn-timer
 {
-  color: azure;
+  color: var(--background-color);
   font-size: 120%;
-  background-color: darkblue;
+  background-color: var(--primary-color);
   border-radius: 6px;
   width: 150px;
   height: 100px;
   margin-bottom: 30px;
   transition: all 0.6s ease;
+  box-shadow: 7px 7px 12px var(--shadow-color);
 }
 
 .btn-timer:hover{
   font-size: 125%;
-  background-color: rgb(13, 13, 210)
+  background-color: var(--primary-hover-color)
 }
 
 .txt-timer
 {
   text-align: center;
+  color: var(--text-color);
 }
 
 .info-el
