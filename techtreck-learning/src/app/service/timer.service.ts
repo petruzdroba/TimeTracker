@@ -1,72 +1,75 @@
-import { Injectable } from '@angular/core';
-import { Vacation } from '../model/vacation.interface';
+import { computed, Injectable, signal } from '@angular/core';
+import { TimerData } from '../model/timer-data.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {
-  private _requiredTime!: number;
-  private _startTime!: Date;
-  private _endTime!: Date;
-  private _timerType!: 'ON' | 'OFF';
+  private timerData = signal<TimerData>({
+    startTime: new Date(),
+    endTime: new Date(),
+    requiredTime: 7200000,
+    timerType: 'OFF',
+  });
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const storedTimerDataString = window.localStorage.getItem('timerData');
-      if (storedTimerDataString) {
-        const storedTimerDataObject = JSON.parse(storedTimerDataString);
+      const storedData = window.localStorage.getItem('timerData');
 
-        this._timerType = storedTimerDataObject.timerType;
+      if (storedData) {
+        const parsed = JSON.parse(storedData);
+        const today = new Date();
+        const lastSessionDate = new Date(parsed.startTime);
 
-        this._startTime = new Date(storedTimerDataObject.startTime);
-        this._endTime = new Date(storedTimerDataObject.endTime);
-
-        //compares if start time is today
-        const currentTime = new Date();
-        const dateLastSession = new Date(this._startTime);
-        currentTime.setHours(0, 0, 0, 0);
-        dateLastSession.setHours(0, 0, 0, 0);
-        if (currentTime.getTime() === dateLastSession.getTime()) {
-          if (storedTimerDataObject.remainingTime) {
-            this._requiredTime = storedTimerDataObject.remainingTime;
+        if (this.isSameDay(today, lastSessionDate)) {
+          // If timer was running, calculate elapsed time
+          if (parsed.timerType === 'ON') {
+            const elapsedTime =
+              new Date().getTime() - new Date(parsed.startTime).getTime();
+            parsed.remainingTime -= elapsedTime;
           }
-        } else {
-          //reset required hours
-          this._requiredTime = 7200000;
 
-          //no sessions for today so we set a marker to tell us that
-          this._startTime = new Date();
-          this._endTime = new Date();
-        }
-
-        if (this._timerType === 'ON') {
-          const elapsedTime = new Date().getTime() - this._startTime.getTime();
-          this._requiredTime -= elapsedTime;
+          this.timerData.set({
+            startTime: new Date(parsed.startTime),
+            endTime: new Date(parsed.endTime),
+            requiredTime: parsed.remainingTime,
+            timerType: parsed.timerType,
+          });
         }
       }
     }
   }
 
+  private isSameDay(date1: Date, date2: Date): boolean {
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    d1.setHours(0, 0, 0, 0);
+    d2.setHours(0, 0, 0, 0);
+    return d1.getTime() === d2.getTime();
+  }
+
+  readonly _requiredTime = computed(() => this.timerData().requiredTime);
+  readonly _startTime = computed(() => this.timerData().startTime);
+  readonly _endTime = computed(() => this.timerData().endTime);
+  readonly _timerType = computed(() => this.timerData().timerType);
+
   public get requiredTime(): number {
-    return this._requiredTime;
+    return this._requiredTime();
   }
 
   public get startTime(): Date {
-    return this._startTime;
+    return this._startTime();
   }
 
   public get endTime(): Date {
-    return this._endTime;
+    return this._endTime();
   }
 
   public get timerType(): 'ON' | 'OFF' {
-    return this._timerType;
+    return this._timerType();
   }
 
-  updateTimerData(timerData: {
-    startTime: Date;
-    endTime: Date;
-    requiredTime: number;
-    timerType: 'ON' | 'OFF';
-  }) {
+  updateTimerData(timerData: TimerData) {
+    // Update both signal and localStorage
+    this.timerData.set(timerData);
     window.localStorage.setItem(
       'timerData',
       JSON.stringify({
@@ -79,15 +82,26 @@ export class TimerService {
   }
 
   resetData() {
+    // Create default data
+    const defaultData: TimerData = {
+      startTime: new Date(),
+      endTime: new Date(),
+      requiredTime: 7200000,
+      timerType: 'OFF',
+    };
+
+    // Update both signal and localStorage
+    this.timerData.set(defaultData);
     window.localStorage.setItem(
       'timerData',
       JSON.stringify({
-        startTime: 0,
-        endTime: 0,
-        remainingTime: 7200000,
-        timerType: 'OFF',
+        startTime: defaultData.startTime,
+        endTime: defaultData.endTime,
+        remainingTime: defaultData.requiredTime,
+        timerType: defaultData.timerType,
       })
     );
+
     window.location.reload();
   }
 }
