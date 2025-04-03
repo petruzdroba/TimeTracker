@@ -46,8 +46,8 @@ export class TimerInfoComponent implements OnInit {
   }
 
   get firstLogIn() {
-    return this.workLogService.getFirstClockIn(this.today)?.date === undefined
+    return this.workLogService.firstClockIn?.date === undefined
       ? '-'
-      : this.workLogService.getFirstClockIn(this.today)?.date;
+      : this.workLogService.firstClockIn?.date;
   }
 }

@@ -28,7 +28,7 @@ export class WorkLogComponent implements OnInit {
   protected pageIndex = 0;
 
   ngOnInit(): void {
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog = this.workLogService.getWorkLog();
     this.pageSize = 5;
     this.updatePaginatedData();
   }
@@ -104,7 +104,7 @@ export class WorkLogComponent implements OnInit {
 
   onDeleteSession(session: Session) {
     this.workLogService.deleteSession(session);
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog = this.workLogService.getWorkLog();
     this.updatePaginatedData();
   }
 

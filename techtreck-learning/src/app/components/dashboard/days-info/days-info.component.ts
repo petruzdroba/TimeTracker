@@ -36,7 +36,7 @@ export class DaysInfoComponent {
       }
     }
     unworkedDays -= weekends;
-    this.workLogService.getWorkLog.forEach((session) => {
+    this.workLogService.getWorkLog().forEach((session) => {
       const dateA = new Date(session.date);
       if (
         dateA.getMonth() === today.getMonth() &&

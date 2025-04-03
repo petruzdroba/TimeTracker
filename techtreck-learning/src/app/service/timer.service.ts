@@ -33,7 +33,7 @@ export class TimerService {
             requiredTime: parsed.remainingTime,
             timerType: parsed.timerType,
           });
-        }
+        } //else remains the same as default data for new day
       }
     }
   }

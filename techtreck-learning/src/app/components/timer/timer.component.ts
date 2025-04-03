@@ -32,7 +32,7 @@ export class TimerComponent implements OnInit {
     this.startTime = this.timerService.startTime;
     this.endTime = this.timerService.endTime;
     this.timerType = this.timerService.timerType;
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog = this.workLogService.getWorkLog();
     if (this.timerType === 'ON') {
       this.startTimer();
     }
@@ -44,13 +44,11 @@ export class TimerComponent implements OnInit {
   }
 
   get firstClockIn(): Date | undefined {
-    return this.workLogService.getFirstClockIn(this.startTime)?.date;
+    return this.workLogService.firstClockIn?.date;
   }
 
   get workedTimeToday(): Date | undefined {
-    const timeWorked = this.workLogService.getFirstClockIn(
-      this.startTime
-    )?.timeWorked;
+    const timeWorked = this.workLogService.firstClockIn?.timeWorked;
     if (timeWorked) {
       return new Date(timeWorked);
     }

@@ -1,25 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { Session } from '../model/session.interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WorkLogService {
-  private workLog: Session[] = [];
+  private workLog = signal<Session[]>([]);
 
   constructor() {
     if (typeof window !== 'undefined') {
       const storedWorkLogString = window.localStorage.getItem('workLog');
-      if (storedWorkLogString) {
+      if (storedWorkLogString === null || storedWorkLogString === 'undefined') {
+        this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+        this.updateWorkLog();
+      } else {
         const storedWorkLog = JSON.parse(storedWorkLogString);
         if (Array.isArray(storedWorkLog)) {
-          this.workLog = storedWorkLog;
+          this.workLog.set(storedWorkLog);
         } else {
-          this.workLog = [{ date: new Date(), timeWorked: 0 }];
+          this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+          this.updateWorkLog();
         }
-      } else {
-        this.workLog = [{ date: new Date(), timeWorked: 0 }];
-        this.updateWorkLog();
       }
     }
   }
@@ -29,38 +30,42 @@ export class WorkLogService {
   }
 
   addSession(newSession: Session) {
-    const index = this.workLog.findIndex((session) => {
-      const currentTime = new Date();
-      const dateLastSession = new Date(session.date);
-      currentTime.setHours(0, 0, 0, 0);
-      dateLastSession.setHours(0, 0, 0, 0);
-      if (currentTime.getTime() === dateLastSession.getTime()) {
-        return true;
-      }
-      return false;
-    });
+    this.workLog.update((sessions) => {
+      const currentSessions = [...sessions];
+      const index = currentSessions.findIndex((session) => {
+        const currentTime = new Date();
+        const dateLastSession = new Date(session.date);
+        currentTime.setHours(0, 0, 0, 0);
+        dateLastSession.setHours(0, 0, 0, 0);
+        return currentTime.getTime() === dateLastSession.getTime();
+      });
 
-    if (index !== -1) {
-      this.workLog[index].timeWorked = newSession.timeWorked;
-    } else {
-      this.workLog.push(newSession);
-    }
+      if (index !== -1) {
+        currentSessions[index] = {
+          ...currentSessions[index],
+          timeWorked: newSession.timeWorked,
+        };
+      } else {
+        currentSessions.push(newSession);
+      }
+      return currentSessions;
+    });
     this.updateWorkLog();
   }
 
   deleteSession(erasedSession: Session) {
-    this.workLog = [
-      ...this.workLog.filter((session) => session !== erasedSession),
-    ];
+    this.workLog.update((sessions) =>
+      sessions.filter((session) => session !== erasedSession)
+    );
     this.updateWorkLog();
   }
 
   updateWorkLog() {
-    window.localStorage.setItem('workLog', JSON.stringify(this.workLog));
+    window.localStorage.setItem('workLog', JSON.stringify(this.workLog()));
   }
 
-  getFirstClockIn(date: Date) {
-    return this.workLog.find((session) => {
+  get firstClockIn() {
+    return this.workLog().find((session) => {
       const currentTime = new Date();
       const dateLastSession = new Date(session.date);
       currentTime.setHours(0, 0, 0, 0);
