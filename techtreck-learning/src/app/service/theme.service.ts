@@ -1,32 +1,32 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, signal } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  private currentTheme: 'light' | 'dark' = 'light';
+  private themeData = signal<'light' | 'dark'>('light');
 
   constructor() {
     if (typeof window !== 'undefined') {
       const storedThemeObject = window.localStorage.getItem('themeData');
       if (storedThemeObject) {
-        this.currentTheme = JSON.parse(storedThemeObject);
-        document.documentElement.setAttribute('data-theme', this.currentTheme);
+        this.themeData.set(JSON.parse(storedThemeObject));
+        document.documentElement.setAttribute('data-theme', this.themeData());
       }
     }
   }
 
-  get runningTheme() {
-    return this.currentTheme;
+  get runningTheme(): 'light' | 'dark' {
+    return this.themeData();
   }
 
   toggleTheme() {
-    this.currentTheme = this.currentTheme === 'light' ? 'dark' : 'light';
-    document.documentElement.setAttribute('data-theme', this.currentTheme);
+    this.themeData.set(this.themeData() === 'light' ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', this.themeData());
     this.updateTheme();
   }
 
   updateTheme() {
-    window.localStorage.setItem('themeData', JSON.stringify(this.currentTheme));
+    window.localStorage.setItem('themeData', JSON.stringify(this.themeData()));
   }
 }
