@@ -57,7 +57,7 @@ export class DaysInfoComponent {
     const today = new Date();
     let vacations = 0;
 
-    this.vacationService.getPastVacations.forEach((vacation) => {
+    this.vacationService.pastVacations.forEach((vacation) => {
       const dateA = new Date(vacation.startDate);
       const dateB = new Date(vacation.endDate);
       if (
@@ -73,11 +73,11 @@ export class DaysInfoComponent {
   }
 
   get remainingVacationDays() {
-    return this.vacationService.getRemainingDays;
+    return this.vacationService.remainingDays;
   }
 
   get nextVacation() {
-    const newArr = this.vacationService.getFutureVacations.sort((a, b) => {
+    const newArr = this.vacationService.futureVacations.sort((a, b) => {
       const dateA = new Date(a.startDate).getTime();
       const dateB = new Date(b.startDate).getTime();
       return dateA - dateB;

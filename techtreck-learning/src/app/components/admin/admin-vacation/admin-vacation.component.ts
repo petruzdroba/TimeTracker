@@ -31,8 +31,8 @@ export class AdminVacationComponent implements OnInit {
   protected futureVacations!: Vacation[];
 
   ngOnInit(): void {
-    this.futureVacations = this.vacationService.getFutureVacations;
-    this.pastVacations = this.vacationService.getPastVacations;
+    this.futureVacations = this.vacationService.futureVacations;
+    this.pastVacations = this.vacationService.pastVacations;
   }
 
   private get completedVacationRequests() {
@@ -114,14 +114,14 @@ export class AdminVacationComponent implements OnInit {
 
   getValidVacation(vacation: Vacation): boolean {
     return (
-      this.vacationService.getRemainingDays >=
+      this.vacationService.remainingDays >=
       getDaysBetweenDates(vacation.startDate, vacation.endDate)
     );
   }
 
   onAccept(vacation: Vacation) {
     if (
-      this.vacationService.getRemainingDays >=
+      this.vacationService.remainingDays >=
       getDaysBetweenDates(vacation.startDate, vacation.endDate)
     ) {
       vacation.status = 'accepted';

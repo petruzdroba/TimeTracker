@@ -1,137 +1,145 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { Vacation } from '../model/vacation.interface';
+import { VacationData } from '../model/vacation-data.interface';
 
 @Injectable({ providedIn: 'root' })
 export class VacationService {
-  private futureVacations: Vacation[] = [];
-  private pastVacations: Vacation[] = [];
-  private remainingVacationDays: number = 0;
+  private vacationData = signal<VacationData>({
+    futureVacations: [],
+    pastVacations: [],
+    remainingVacationDays: 14,
+  });
 
   constructor() {
     if (typeof window !== 'undefined') {
       const storedVacationData = window.localStorage.getItem('vacationData');
-
       if (storedVacationData) {
-        const storedVacationDataObject = JSON.parse(storedVacationData);
-
-        if (storedVacationDataObject.remainingVacationDays) {
-          this.remainingVacationDays =
-            storedVacationDataObject.remainingVacationDays;
-        } else {
-          this.remainingVacationDays = 0;
-        }
-
-        if (storedVacationDataObject.futureVacations) {
-          this.futureVacations = storedVacationDataObject.futureVacations;
-        } else {
-          this.futureVacations = [];
-        }
-
-        if (storedVacationDataObject.pastVacations) {
-          this.pastVacations = storedVacationDataObject.pastVacations;
-          const today = new Date();
-
-          this.futureVacations = this.futureVacations.filter((vacation) => {
-            if (new Date(vacation.startDate) <= today) {
-              if (vacation.status === 'pending') {
-                vacation.status = 'ignored';
-              }
-              this.pastVacations.push(vacation); //removes the ones that are past their due time and not accepted, pending or denied
-              return false; // Remove
-            }
-            return true; // Keep
-          });
-          this.updateVacationData();
-        } else {
-          this.pastVacations = [];
-        }
+        const data = JSON.parse(storedVacationData);
+        const processedData = this.processExpiredVacations(data);
+        this.vacationData.set(processedData);
+        this.updateVacationData();
       }
     }
   }
 
-  get getFutureVacations() {
-    return this.futureVacations;
+  private processExpiredVacations(data: VacationData): VacationData {
+    const today = new Date();
+    let futureVacations = data.futureVacations || [];
+    let pastVacations = data.pastVacations || [];
+
+    futureVacations = futureVacations.filter((vacation) => {
+      if (new Date(vacation.startDate) <= today) {
+        if (vacation.status === 'pending') {
+          vacation.status = 'ignored';
+        }
+        pastVacations.push(vacation);
+        return false; // Remove from future
+      }
+      return true; // Keep in future
+    });
+
+    return {
+      futureVacations,
+      pastVacations,
+      remainingVacationDays: data.remainingVacationDays || 0,
+    };
   }
 
-  get getPastVacations() {
-    return this.pastVacations;
+  readonly _futureVacations = computed(
+    () => this.vacationData().futureVacations
+  );
+  readonly _pastVacations = computed(() => this.vacationData().pastVacations);
+  readonly _remainingDays = computed(
+    () => this.vacationData().remainingVacationDays
+  );
+
+  get futureVacations() {
+    return this._futureVacations();
   }
 
-  get getRemainingDays() {
-    return this.remainingVacationDays;
+  get pastVacations() {
+    return this._pastVacations();
+  }
+
+  get remainingDays() {
+    return this._remainingDays();
   }
 
   updateVacationData() {
     window.localStorage.setItem(
       'vacationData',
-      JSON.stringify({
-        remainingVacationDays: this.remainingVacationDays,
-        pastVacations: this.pastVacations,
-        futureVacations: this.futureVacations,
-      })
+      JSON.stringify(this.vacationData())
     );
   }
 
   getVacationIndex(vacation: Vacation): number {
-    return this.futureVacations.findIndex(
+    return this.vacationData().futureVacations.findIndex(
       (vacations) => vacation === vacations
     );
   }
 
   addVacation(vacationData: Vacation) {
-    this.futureVacations.push(vacationData);
+    const currentData = this.vacationData();
+    currentData.futureVacations.push(vacationData);
     this.acceptedVacation(vacationData);
+    this.vacationData.set(currentData);
     this.updateVacationData();
   }
 
   acceptedVacation(vacationData: Vacation) {
     if (vacationData.status === 'accepted') {
-      this.remainingVacationDays -= getDaysBetweenDates(
+      const currentData = this.vacationData();
+      currentData.remainingVacationDays -= getDaysBetweenDates(
         vacationData.startDate,
         vacationData.endDate
       );
+      this.vacationData.set(currentData);
     }
   }
 
   deleteVacation(index: number, tableType: string) {
+    const currentData = this.vacationData();
     if (tableType === 'future') {
       this.restoreVacationDays(index);
-      //since vacation day is in the future, removing them should restore remaining vacation days
-      this.futureVacations = [
-        ...this.futureVacations.slice(0, index),
-        ...this.futureVacations.slice(index + 1),
+      currentData.futureVacations = [
+        ...currentData.futureVacations.slice(0, index),
+        ...currentData.futureVacations.slice(index + 1),
       ];
     } else {
-      this.pastVacations = [
-        ...this.pastVacations.slice(0, index),
-        ...this.pastVacations.slice(index + 1),
+      currentData.pastVacations = [
+        ...currentData.pastVacations.slice(0, index),
+        ...currentData.pastVacations.slice(index + 1),
       ];
     }
+    this.vacationData.set(currentData);
     this.updateVacationData();
   }
 
   restoreVacationDays(index: number) {
-    if (this.futureVacations[index].status === 'accepted') {
-      this.remainingVacationDays += getDaysBetweenDates(
-        this.futureVacations[index].startDate,
-        this.futureVacations[index].endDate
+    const currentData = this.vacationData();
+    if (currentData.futureVacations[index].status === 'accepted') {
+      currentData.remainingVacationDays += getDaysBetweenDates(
+        currentData.futureVacations[index].startDate,
+        currentData.futureVacations[index].endDate
       );
+      this.vacationData.set(currentData);
     }
   }
 
   modifyStatus(index: number, newStatus: 'pending' | 'accepted' | 'denied') {
-    this.futureVacations[index].status = newStatus;
+    const currentData = this.vacationData();
+    currentData.futureVacations[index].status = newStatus;
+    this.vacationData.set(currentData);
     this.updateVacationData();
   }
 
   resetData() {
-    window.localStorage.setItem(
-      'vacationData',
-      JSON.stringify({
-        remainingVacationDays: 14,
-        pastVacations: [],
-      })
-    );
+    this.vacationData.set({
+      remainingVacationDays: 14,
+      pastVacations: [],
+      futureVacations: [],
+    });
+    this.updateVacationData();
     window.location.reload();
   }
 }

@@ -27,15 +27,15 @@ export class VacationComponent implements OnInit {
   protected vacationService = inject(VacationService);
 
   ngOnInit(): void {
-    this.futureVacations = this.vacationService.getFutureVacations;
-    this.pastVacations = this.vacationService.getPastVacations;
-    this.remainingVacationDays = this.vacationService.getRemainingDays;
+    this.futureVacations = this.vacationService.futureVacations;
+    this.pastVacations = this.vacationService.pastVacations;
+    this.remainingVacationDays = this.vacationService.remainingDays;
   }
 
   private updateMethod() {
-    this.futureVacations = this.vacationService.getFutureVacations;
-    this.pastVacations = this.vacationService.getPastVacations;
-    this.remainingVacationDays = this.vacationService.getRemainingDays;
+    this.futureVacations = this.vacationService.futureVacations;
+    this.pastVacations = this.vacationService.pastVacations;
+    this.remainingVacationDays = this.vacationService.remainingDays;
   }
 
   updateVacationData() {
