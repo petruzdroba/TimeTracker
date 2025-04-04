@@ -1,67 +1,74 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { LeaveSlip } from '../model/leave-slip.interface';
+import { LeaveSlipData } from '../model/leaveslip-data.interface';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveSlipService {
-  private _remainingTime: number = 21600000;
-  private _pastLeaves: LeaveSlip[] = [];
-  private _futureLeaves: LeaveSlip[] = [];
+  private leaveSlipData = signal<LeaveSlipData>({
+    futureLeaves: [],
+    pastLeaves: [],
+    remainingTime: 21600000, // 6 hours (21600000ms = 6h × 60m × 60s × 1000ms)
+  });
 
   constructor() {
     if (typeof window !== 'undefined') {
-      const storedLeaveDataString = window.localStorage.getItem('leaveData');
-
-      if (storedLeaveDataString) {
-        const storedLeaveDataObject = JSON.parse(storedLeaveDataString);
-
-        if (storedLeaveDataObject.remainingTime) {
-          this._remainingTime = storedLeaveDataObject.remainingTime;
-        } else {
-          this._remainingTime = 0;
-        }
-
-        if (storedLeaveDataObject.futureLeaves) {
-          this._futureLeaves = storedLeaveDataObject.futureLeaves;
-        } else {
-          this._futureLeaves = [];
-        }
-
-        if (storedLeaveDataObject.pastLeaves) {
-          this._pastLeaves = storedLeaveDataObject.pastLeaves;
-          const today = new Date();
-
-          this._futureLeaves = this._futureLeaves.filter((leave) => {
-            if (new Date(leave.date) < today) {
-              if (leave.status === 'pending') {
-                leave.status = 'ignored';
-              }
-              this._pastLeaves.push(leave); //removes the ones that are past their due time and not accepted, pending or denied
-              return false; // Remove
-            }
-            return true; // Keep
-          });
-          this.updateLeaveData();
-        } else {
-          this._pastLeaves = [];
-        }
+      const storedData = window.localStorage.getItem('leaveData');
+      if (storedData) {
+        const data = JSON.parse(storedData);
+        const processedData = this.processExpiredLeaves(data);
+        this.leaveSlipData.set(processedData);
+        this.updateLeaveData();
       }
     }
   }
 
-  public get remainingTime(): number {
-    return this._remainingTime;
+  private processExpiredLeaves(data: LeaveSlipData): LeaveSlipData {
+    const today = new Date();
+    let futureLeaves = data.futureLeaves || [];
+    let pastLeaves = data.pastLeaves || [];
+
+    futureLeaves = futureLeaves.filter((leave) => {
+      if (new Date(leave.date) < today) {
+        if (leave.status === 'pending') {
+          leave.status = 'ignored';
+        }
+        pastLeaves.push(leave);
+        return false; // Remove from future
+      }
+      return true; // Keep in future
+    });
+
+    return {
+      futureLeaves,
+      pastLeaves,
+      remainingTime: data.remainingTime ?? 21600000,
+    };
   }
 
-  public get pastLeaves(): LeaveSlip[] {
-    return this._pastLeaves;
+  readonly remainingTimeSignal = computed(
+    () => this.leaveSlipData().remainingTime
+  );
+  readonly pastLeavesSignal = computed(() => this.leaveSlipData().pastLeaves);
+  readonly futureLeavesSignal = computed(
+    () => this.leaveSlipData().futureLeaves
+  );
+
+  get remainingTime(): number {
+    return this.remainingTimeSignal();
   }
 
-  public get futureLeaves(): LeaveSlip[] {
-    return this._futureLeaves;
+  get pastLeaves(): LeaveSlip[] {
+    return this.pastLeavesSignal();
+  }
+
+  get futureLeaves(): LeaveSlip[] {
+    return this.futureLeavesSignal();
   }
 
   getLeaveIndex(leave: LeaveSlip): number {
-    return this._futureLeaves.findIndex((leaves) => leaves === leave);
+    return this.leaveSlipData().futureLeaves.findIndex(
+      (leaves) => leave === leaves
+    );
   }
 
   updateLeaveData() {
@@ -76,8 +83,10 @@ export class LeaveSlipService {
   }
 
   addLeave(leaveData: LeaveSlip) {
-    this.futureLeaves.push(leaveData);
+    const currentData = this.leaveSlipData();
+    currentData.futureLeaves.push(leaveData);
     this.acceptedVacation(leaveData);
+    this.leaveSlipData.set(currentData);
     this.updateLeaveData();
   }
 
@@ -85,45 +94,47 @@ export class LeaveSlipService {
     if (leaveData.status === 'accepted') {
       const dateA = new Date(leaveData.startTime);
       const dateB = new Date(leaveData.endTime);
-      this._remainingTime -= dateB.getTime() - dateA.getTime();
+      const currentData = this.leaveSlipData();
+      currentData.remainingTime -= dateB.getTime() - dateA.getTime();
+      this.leaveSlipData.set(currentData);
     }
   }
 
   restoreLeaveTime(index: number) {
-    if (this._futureLeaves[index].status === 'accepted') {
-      const dateA = new Date(this._futureLeaves[index].startTime);
-      const dateB = new Date(this._futureLeaves[index].endTime);
-
-      this._remainingTime += dateB.getTime() - dateA.getTime();
+    const currentData = this.leaveSlipData();
+    if (currentData.futureLeaves[index].status === 'accepted') {
+      const dateA = new Date(currentData.futureLeaves[index].startTime);
+      const dateB = new Date(currentData.futureLeaves[index].endTime);
+      currentData.remainingTime += dateB.getTime() - dateA.getTime();
+      this.leaveSlipData.set(currentData);
     }
   }
 
   deleteLeave(index: number, tableType: 'future' | 'past') {
+    const currentData = this.leaveSlipData();
     if (tableType === 'future') {
       this.restoreLeaveTime(index);
-
-      this._futureLeaves = [
-        ...this._futureLeaves.slice(0, index),
-        ...this._futureLeaves.slice(index + 1),
+      currentData.futureLeaves = [
+        ...currentData.futureLeaves.slice(0, index),
+        ...currentData.futureLeaves.slice(index + 1),
       ];
     } else {
-      this._pastLeaves = [
-        ...this._pastLeaves.slice(0, index),
-        ...this._pastLeaves.slice(index + 1),
+      currentData.pastLeaves = [
+        ...currentData.pastLeaves.slice(0, index),
+        ...currentData.pastLeaves.slice(index + 1),
       ];
     }
+    this.leaveSlipData.set(currentData);
     this.updateLeaveData();
   }
 
   resetData() {
-    window.localStorage.setItem(
-      'leaveData',
-      JSON.stringify({
-        remainingTime: 21600000,
-        pastLeaves: [],
-        futureLeaves: [],
-      })
-    );
+    this.leaveSlipData.set({
+      remainingTime: 21600000,
+      pastLeaves: [],
+      futureLeaves: [],
+    });
+    this.updateLeaveData();
     window.location.reload();
   }
 }
