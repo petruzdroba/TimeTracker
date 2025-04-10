@@ -7,8 +7,7 @@
   </div>
 
   <div class="vacation-plan">
-    <app-vacation-picker (addVacationEvent)=" addVacation($event)" [remainingVacation]="remainingVacationDays"
-      [futureVacations]="futureVacations" />
+    <app-vacation-picker />
     <div class="table">
       <button (click)="onToggle()" class="btn-toggle-table">{{ tableShowToggle === 'past' ? 'Past vacations' :'Upcoming'
         +' vacations'}}</button>

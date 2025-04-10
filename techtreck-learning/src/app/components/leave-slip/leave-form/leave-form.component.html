@@ -1,0 +1,50 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-form-field>
+    <mat-label>Choose a date</mat-label>
+    <div class="form-input">
+      <input matInput [matDatepicker]="picker" [matDatepickerFilter]="myFilter" formControlName="date">
+    </div>
+    <mat-hint>MM/DD/YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+  </mat-form-field>
+
+
+  <div class="form-input">
+    <label for="startTime">Start Time </label>
+    <input id="startTime" type="time" min="09:00:00" max="10:00:00" step="1800" formControlName="startTime">
+  </div>
+  <div class="form-input">
+    <label for="endTime">End Time </label>
+    <input id="endTime" type="time" min="09:00:00" max="10:00:00" step="1800" formControlName="endTime">
+  </div>
+  <div class="form-input">
+    <label for="description">Description</label>
+    <input id="description" type="text" formControlName="description" />
+  </div>
+
+  @if (this.form.controls['startTime'].invalid && this.form.touched) {
+  <mat-error class="txt-error">*Start time required</mat-error>
+  }
+
+  @if (this.form.controls['endTime'].invalid && this.form.touched) {
+  <mat-error class="txt-error">*End time required</mat-error>
+  }
+
+  @if (this.form.controls['date'].invalid && this.form.touched) {
+  <mat-error class="txt-error">*Date invalid</mat-error>
+  }
+
+  @if (this.form.controls['description'].invalid && this.form.touched) {
+  <mat-error class="txt-error">
+    {{descriptionLength > 20 ? "*Description max lenght 20" : "*Description required"}}
+  </mat-error>
+  }
+
+  <button type="button" class="btn-form" (click)="onReset()">Reset</button>
+  @if(this.form.invalid){
+  <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>
+  }@else {
+  <button type="submit" class="btn-form">Submit</button>
+  }
+</form>

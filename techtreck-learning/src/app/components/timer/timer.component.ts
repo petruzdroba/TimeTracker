@@ -32,7 +32,7 @@ export class TimerComponent implements OnInit {
     this.startTime = this.timerService.startTime;
     this.endTime = this.timerService.endTime;
     this.timerType = this.timerService.timerType;
-    this.workLog = this.workLogService.getWorkLog();
+    this.workLog = this.workLogService.getWorkLog;
     if (this.timerType === 'ON') {
       this.startTimer();
     }

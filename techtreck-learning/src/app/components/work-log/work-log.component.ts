@@ -5,11 +5,18 @@ import { WorkLogService } from '../../service/work-log.service';
 import { DateFilter } from '../../model/date-filter.interface';
 import { Session } from '../../model/session.interface';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { EditSessionComponent } from './edit-session/edit-session.component';
 
 @Component({
   selector: 'app-work-log',
   standalone: true,
-  imports: [DatePipe, CommonModule, DateFilterComponent, MatPaginatorModule],
+  imports: [
+    DatePipe,
+    CommonModule,
+    DateFilterComponent,
+    MatPaginatorModule,
+    EditSessionComponent,
+  ],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
 })
@@ -27,8 +34,11 @@ export class WorkLogComponent implements OnInit {
   protected pageSize = 10;
   protected pageIndex = 0;
 
+  protected isOpen: boolean = false;
+  protected selectedSession: Session | null = null;
+
   ngOnInit(): void {
-    this.workLog = this.workLogService.getWorkLog();
+    this.workLog = this.workLogService.getWorkLog;
     this.pageSize = 5;
     this.updatePaginatedData();
   }
@@ -53,6 +63,11 @@ export class WorkLogComponent implements OnInit {
         }
       });
     }
+  }
+
+  private updateMethod() {
+    this.workLog = this.workLogService.getWorkLog;
+    this.updatePaginatedData();
   }
 
   get filteredWorkLog() {
@@ -104,8 +119,19 @@ export class WorkLogComponent implements OnInit {
 
   onDeleteSession(session: Session) {
     this.workLogService.deleteSession(session);
-    this.workLog = this.workLogService.getWorkLog();
+    this.workLog = this.workLogService.getWorkLog;
     this.updatePaginatedData();
+  }
+
+  openEditWindow(session: Session) {
+    this.isOpen = true;
+    this.selectedSession = session;
+  }
+
+  closeEditWindow() {
+    this.isOpen = false;
+    this.selectedSession = null;
+    this.updateMethod();
   }
 
   onChangeDateFilter(newDateFilter: DateFilter) {

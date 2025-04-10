@@ -6,7 +6,7 @@
     <app-progress-bar [currentValue]="21600000 - remainingTime" [totalValue]="21600000" class="vacation" />
   </div>
   <div class="leave-plan">
-    <app-leave-slip-picker [remainingTime]="remainingTime" (addLeaveEvent)="addLeave($event)" />
+    <app-leave-slip-picker />
     <div class="table">
       <button (click)="onToggle()">{{tableShowToggle === 'future' ? "Upcoming" : "Past"}}</button>
       @if(tableShowToggle === 'future')

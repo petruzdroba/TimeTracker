@@ -1,6 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { Vacation } from '../model/vacation.interface';
 import { VacationData } from '../model/vacation-data.interface';
+import { getDaysBetweenDates } from '../shared/utils/time.utils';
 
 @Injectable({ providedIn: 'root' })
 export class VacationService {
@@ -79,57 +80,114 @@ export class VacationService {
   }
 
   addVacation(vacationData: Vacation) {
-    const currentData = this.vacationData();
-    currentData.futureVacations.push(vacationData);
+    this.vacationData.update((currentData) => ({
+      ...currentData,
+      futureVacations: [...currentData.futureVacations, vacationData],
+    }));
     this.acceptedVacation(vacationData);
-    this.vacationData.set(currentData);
     this.updateVacationData();
   }
 
   acceptedVacation(vacationData: Vacation) {
     if (vacationData.status === 'accepted') {
-      const currentData = this.vacationData();
-      currentData.remainingVacationDays -= getDaysBetweenDates(
-        vacationData.startDate,
-        vacationData.endDate
-      );
-      this.vacationData.set(currentData);
+      this.vacationData.update((currentData) => ({
+        ...currentData,
+        remainingVacationDays:
+          currentData.remainingVacationDays -
+          getDaysBetweenDates(vacationData.startDate, vacationData.endDate),
+      }));
+      this.updateVacationData();
     }
   }
 
   deleteVacation(index: number, tableType: string) {
-    const currentData = this.vacationData();
     if (tableType === 'future') {
       this.restoreVacationDays(index);
-      currentData.futureVacations = [
-        ...currentData.futureVacations.slice(0, index),
-        ...currentData.futureVacations.slice(index + 1),
-      ];
-    } else {
-      currentData.pastVacations = [
-        ...currentData.pastVacations.slice(0, index),
-        ...currentData.pastVacations.slice(index + 1),
-      ];
     }
-    this.vacationData.set(currentData);
+
+    this.vacationData.update((currentData) => ({
+      ...currentData,
+      [tableType === 'future' ? 'futureVacations' : 'pastVacations']: [
+        ...currentData[
+          tableType === 'future' ? 'futureVacations' : 'pastVacations'
+        ].slice(0, index),
+        ...currentData[
+          tableType === 'future' ? 'futureVacations' : 'pastVacations'
+        ].slice(index + 1),
+      ],
+    }));
     this.updateVacationData();
   }
 
   restoreVacationDays(index: number) {
-    const currentData = this.vacationData();
-    if (currentData.futureVacations[index].status === 'accepted') {
-      currentData.remainingVacationDays += getDaysBetweenDates(
-        currentData.futureVacations[index].startDate,
-        currentData.futureVacations[index].endDate
-      );
-      this.vacationData.set(currentData);
-    }
+    this.vacationData.update((currentData) => {
+      if (currentData.futureVacations[index].status === 'accepted') {
+        return {
+          ...currentData,
+          remainingVacationDays:
+            currentData.remainingVacationDays +
+            getDaysBetweenDates(
+              currentData.futureVacations[index].startDate,
+              currentData.futureVacations[index].endDate
+            ),
+        };
+      }
+      return currentData;
+    });
+  }
+
+  editVacation(oldVacation: Vacation, newVacationData: Vacation) {
+    this.vacationData.update((currentData) => {
+      const index = currentData.futureVacations.findIndex((vacation) => {
+        const dateA = new Date(oldVacation.startDate);
+        const dateB = new Date(vacation.startDate);
+        return (
+          dateA.getTime() === dateB.getTime() &&
+          vacation.description === oldVacation.description
+        );
+      });
+
+      if (index !== -1) {
+        const updatedVacations = [...currentData.futureVacations];
+
+        // Restore vacation days if it was accepted
+        let remainingDays = currentData.remainingVacationDays;
+        if (currentData.futureVacations[index].status === 'accepted') {
+          remainingDays += getDaysBetweenDates(
+            currentData.futureVacations[index].startDate,
+            currentData.futureVacations[index].endDate
+          );
+        }
+
+        updatedVacations[index] = {
+          ...newVacationData,
+          status: 'pending',
+        };
+
+        return {
+          ...currentData,
+          futureVacations: updatedVacations,
+          remainingVacationDays: remainingDays,
+        };
+      }
+      return currentData;
+    });
+    this.updateVacationData();
   }
 
   modifyStatus(index: number, newStatus: 'pending' | 'accepted' | 'denied') {
-    const currentData = this.vacationData();
-    currentData.futureVacations[index].status = newStatus;
-    this.vacationData.set(currentData);
+    this.vacationData.update((currentData) => {
+      const updatedVacations = [...currentData.futureVacations];
+      updatedVacations[index] = {
+        ...updatedVacations[index],
+        status: newStatus,
+      };
+
+      return {
+        ...currentData,
+        futureVacations: updatedVacations,
+      };
+    });
     this.updateVacationData();
   }
 
@@ -142,20 +200,4 @@ export class VacationService {
     this.updateVacationData();
     window.location.reload();
   }
-}
-
-export function getDaysBetweenDates(startDate: Date, endDate: Date): number {
-  let currentDate = new Date(startDate);
-  const end = new Date(endDate);
-  let count = 0;
-
-  while (currentDate <= end) {
-    const dayOfWeek = currentDate.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-      count++;
-    }
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  return count;
 }

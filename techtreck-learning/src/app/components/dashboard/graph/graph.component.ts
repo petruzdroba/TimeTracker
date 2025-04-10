@@ -16,7 +16,7 @@ export class GraphComponent implements OnInit {
   public chart: any;
 
   ngOnInit(): void {
-    this.workLog = this.workLogService.getWorkLog();
+    this.workLog = this.workLogService.getWorkLog;
     Chart.register(...registerables);
     this.createChart();
   }

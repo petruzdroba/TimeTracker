@@ -1,10 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { WorkLogService } from '../../../service/work-log.service';
-import {
-  getDaysBetweenDates,
-  VacationService,
-} from '../../../service/vacation.service';
+import { VacationService } from '../../../service/vacation.service';
 import { DatePipe } from '@angular/common';
+import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
 
 @Component({
   selector: 'app-days-info',
@@ -36,7 +34,7 @@ export class DaysInfoComponent {
       }
     }
     unworkedDays -= weekends;
-    this.workLogService.getWorkLog().forEach((session) => {
+    this.workLogService.getWorkLog.forEach((session) => {
       const dateA = new Date(session.date);
       if (
         dateA.getMonth() === today.getMonth() &&
@@ -55,21 +53,38 @@ export class DaysInfoComponent {
 
   get vacationsPastThisMonth() {
     const today = new Date();
-    let vacations = 0;
+    let vacationDays = 0;
 
-    this.vacationService.pastVacations.forEach((vacation) => {
-      const dateA = new Date(vacation.startDate);
-      const dateB = new Date(vacation.endDate);
-      if (
-        dateA.getMonth() === today.getMonth() &&
-        dateA.getFullYear() === today.getFullYear() &&
-        dateA.getDate() <= today.getDate() &&
-        vacation.status === 'accepted'
-      ) {
-        vacations += getDaysBetweenDates(dateA, dateB);
-      }
-    });
-    return vacations;
+    // Combine past and future vacations and process them
+    const allVacations = [
+      ...this.vacationService.pastVacations,
+      ...this.vacationService.futureVacations,
+    ];
+
+    allVacations
+      .filter((vacation) => vacation.status === 'accepted')
+      .forEach((vacation) => {
+        const startDate = new Date(vacation.startDate);
+        const endDate = new Date(vacation.endDate);
+
+        // Check if vacation is in current month and year
+        if (
+          startDate.getMonth() === today.getMonth() &&
+          startDate.getFullYear() === today.getFullYear()
+        ) {
+          // If vacation ends after this month, cap it at month end
+          const monthEnd = new Date(
+            today.getFullYear(),
+            today.getMonth() + 1,
+            0
+          );
+          const effectiveEndDate = endDate > monthEnd ? monthEnd : endDate;
+
+          vacationDays += getDaysBetweenDates(startDate, effectiveEndDate);
+        }
+      });
+
+    return vacationDays;
   }
 
   get remainingVacationDays() {

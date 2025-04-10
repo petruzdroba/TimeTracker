@@ -29,7 +29,8 @@
             }
           </div>
         </th>
-        <th class="txt-head">Action</th>
+        <th class="txt-head">Edit</th>
+        <th class="txt-head">Delete</th>
       </tr>
 
       @for(session of paginatedData; track session){
@@ -38,6 +39,8 @@
         <td>{{session.date | date: 'mediumTime'}}</td>
         <td>{{endSessionTime(session)| date: 'mediumTime'}}</td>
         <td>{{milisecondsToDate(session.timeWorked) | date: 'HH:mm:ss':'UTC'}}</td>
+        <td><button class="btn-icon-primary" (click)="openEditWindow(session)"><i class="fa-solid fa-pen"
+              title="Edit session"></i></button></td>
         <td><button class="btn-icon" (click)="onDeleteSession(session)"><i class="fas fa-trash"
               title="Delete session"></i></button></td>
       </tr>
@@ -52,3 +55,5 @@
   <mat-paginator [length]="filteredWorkLog.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
     (page)="onPageChange($event)" showFirstLastButtons class="paginator"></mat-paginator>
 </div>
+
+<app-edit-session [isOpen]="isOpen" [session]="selectedSession" (closeWindow)="closeEditWindow()" />

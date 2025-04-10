@@ -71,7 +71,7 @@
 .accept:disabled{
   cursor: not-allowed;
   box-shadow: none;
-  background-color: grey;
+  background-color: var(--text-disabled-color);
   color: var(--text-color);
   border-color: var(--text-color);
 }

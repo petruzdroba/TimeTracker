@@ -102,7 +102,7 @@ export class AdminLeaveComponent implements OnInit {
 
   onAccept(leave: LeaveSlip) {
     leave.status = 'accepted';
-    this.leaveService.acceptedVacation(leave);
+    this.leaveService.acceptedLeaveSlip(leave);
     this.leaveService.updateLeaveData();
   }
 

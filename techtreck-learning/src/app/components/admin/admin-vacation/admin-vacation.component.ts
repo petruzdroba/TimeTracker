@@ -1,12 +1,10 @@
 import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
-import {
-  getDaysBetweenDates,
-  VacationService,
-} from '../../../service/vacation.service';
+import { VacationService } from '../../../service/vacation.service';
 import { DateFilter } from '../../../model/date-filter.interface';
 import { Vacation } from '../../../model/vacation.interface';
 import { DateFilterComponent } from '../../../shared/date-filter/date-filter.component';
 import { CommonModule, DatePipe } from '@angular/common';
+import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
 
 @Component({
   selector: 'app-admin-vacation',

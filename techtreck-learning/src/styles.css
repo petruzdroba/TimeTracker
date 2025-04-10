@@ -7,6 +7,7 @@
   --text-color: #000000;
   --text-warn-color: #fa0000;
   --shadow-color: #0000004d;
+  --text-disabled-color: #00000040;
 }
 
 [data-theme="dark"] {
@@ -17,6 +18,7 @@
   --background-hover-color: #1B1B22;
   --text-color: #93a6ad;
   --shadow-color: #e2609428;
+  --text-disabled-color: #93a6ad40;
 }
 
 html, body {

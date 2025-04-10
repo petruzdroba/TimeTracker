@@ -1,0 +1,32 @@
+<app-edit-box [isOpen]="isOpen" [title]="'Edit session - ' + (session?.date | date:'fullDate')"
+  (close)="onCloseWindow()">
+  <form class="form-box" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="form-input">
+      <label for="startTime">Start Time </label>
+      <input id="startTime" type="time" formControlName="startTime">
+    </div>
+    <div class="form-input">
+      <label for="endTime">End Time </label>
+      <input id="endTime" type="time" formControlName="endTime">
+    </div>
+    <div class="info">
+      <label for="display">Edited Work Time</label>
+      <p>{{editedWorkTime| date: "HH:mm:ss":"UTC"}}</p>
+    </div>
+
+    @if (form.get('startTime')?.errors?.['required'] && form.get('startTime')?.touched) {
+    <p class="txt-error">*Start time required</p>
+    }
+
+    @if (form.get('endTime')?.errors?.['required'] && form.get('endTime')?.touched) {
+    <p class="txt-error">*End time required</p>
+    }
+
+    @if (form.get('endTime')?.errors?.['invalidTimeRange']) {
+    <p class="txt-error">*End time must be after start time</p>
+    }
+
+    <button type="button" class="btn-form" (click)="onReset()">Reset</button>
+    <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>
+  </form>
+</app-edit-box>

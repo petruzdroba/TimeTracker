@@ -15,7 +15,8 @@
         <th class="txt-filter">End time</th>
         <th class="txt-filter">Reason</th>
         <th class="txt-filter">Status</th>
-        <th class="txt-filter">Action</th>
+        <th class="txt-filter">Edit</th>
+        <th class="txt-filter">Delete</th>
       </tr>
 
       @for(leave of list; track leave){
@@ -27,6 +28,8 @@
         <td>
           <i [ngClass]="'fas fa-circle ' + leave.status" [title]="leave.status"></i>
         </td>
+        <td><button class="btn-icon-primary" (click)="openEditWindow(leave)" [disabled]="disabledEdit(leave)"><i
+              class="fa-solid fa-pen" title="Edit session"></i></button></td>
         <td><button class="btn-icon" (click)="onDelete(leaveList.indexOf(leave))"><i class="fas fa-trash"
               title="Delete leave entry"></i></button>
         </td>
@@ -35,3 +38,9 @@
     </tbody>
   </table>
 </div>
+
+<app-edit-box [isOpen]="isOpen"
+  [title]="selectedLeaveSlip ? 'Edit leave slip - ' + (selectedLeaveSlip.date | date:'mediumDate') : 'Edit leave slip'"
+  (close)="closeEditWindow()">
+  <app-leave-form [leaveSlip]="selectedLeaveSlip"></app-leave-form>
+</app-edit-box>

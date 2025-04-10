@@ -41,15 +41,17 @@ export class LeaveSlipService {
     return {
       futureLeaves,
       pastLeaves,
-      remainingTime: data.remainingTime ?? 21600000,
+      remainingTime: data.remainingTime,
     };
   }
 
-  readonly remainingTimeSignal = computed(
+  private readonly remainingTimeSignal = computed(
     () => this.leaveSlipData().remainingTime
   );
-  readonly pastLeavesSignal = computed(() => this.leaveSlipData().pastLeaves);
-  readonly futureLeavesSignal = computed(
+  private readonly pastLeavesSignal = computed(
+    () => this.leaveSlipData().pastLeaves
+  );
+  private readonly futureLeavesSignal = computed(
     () => this.leaveSlipData().futureLeaves
   );
 
@@ -74,57 +76,69 @@ export class LeaveSlipService {
   updateLeaveData() {
     window.localStorage.setItem(
       'leaveData',
-      JSON.stringify({
-        remainingTime: this.remainingTime,
-        pastLeaves: this.pastLeaves,
-        futureLeaves: this.futureLeaves,
-      })
+      JSON.stringify(this.leaveSlipData())
     );
   }
 
   addLeave(leaveData: LeaveSlip) {
-    const currentData = this.leaveSlipData();
-    currentData.futureLeaves.push(leaveData);
-    this.acceptedVacation(leaveData);
-    this.leaveSlipData.set(currentData);
+    this.leaveSlipData.update((currentData) => ({
+      ...currentData,
+      futureLeaves: [...currentData.futureLeaves, leaveData],
+    }));
+    this.acceptedLeaveSlip(leaveData);
     this.updateLeaveData();
   }
 
-  acceptedVacation(leaveData: LeaveSlip) {
+  acceptedLeaveSlip(leaveData: LeaveSlip) {
     if (leaveData.status === 'accepted') {
       const dateA = new Date(leaveData.startTime);
       const dateB = new Date(leaveData.endTime);
-      const currentData = this.leaveSlipData();
-      currentData.remainingTime -= dateB.getTime() - dateA.getTime();
-      this.leaveSlipData.set(currentData);
+      this.leaveSlipData.update((currentData) => ({
+        ...currentData,
+        remainingTime:
+          currentData.remainingTime - (dateB.getTime() - dateA.getTime()),
+      }));
+      this.updateLeaveData();
     }
   }
 
   restoreLeaveTime(index: number) {
-    const currentData = this.leaveSlipData();
-    if (currentData.futureLeaves[index].status === 'accepted') {
-      const dateA = new Date(currentData.futureLeaves[index].startTime);
-      const dateB = new Date(currentData.futureLeaves[index].endTime);
-      currentData.remainingTime += dateB.getTime() - dateA.getTime();
-      this.leaveSlipData.set(currentData);
-    }
+    this.leaveSlipData.update((currentData) => {
+      if (currentData.futureLeaves[index].status === 'accepted') {
+        const dateA = new Date(currentData.futureLeaves[index].startTime);
+        const dateB = new Date(currentData.futureLeaves[index].endTime);
+        return {
+          ...currentData,
+          remainingTime:
+            currentData.remainingTime + (dateB.getTime() - dateA.getTime()),
+        };
+      }
+      return currentData;
+    });
+    this.updateLeaveData();
   }
 
   deleteLeave(index: number, tableType: 'future' | 'past') {
-    const currentData = this.leaveSlipData();
-    if (tableType === 'future') {
-      this.restoreLeaveTime(index);
-      currentData.futureLeaves = [
-        ...currentData.futureLeaves.slice(0, index),
-        ...currentData.futureLeaves.slice(index + 1),
-      ];
-    } else {
-      currentData.pastLeaves = [
-        ...currentData.pastLeaves.slice(0, index),
-        ...currentData.pastLeaves.slice(index + 1),
-      ];
-    }
-    this.leaveSlipData.set(currentData);
+    this.leaveSlipData.update((currentData) => {
+      if (tableType === 'future') {
+        this.restoreLeaveTime(index);
+        return {
+          ...currentData,
+          futureLeaves: [
+            ...currentData.futureLeaves.slice(0, index),
+            ...currentData.futureLeaves.slice(index + 1),
+          ],
+        };
+      } else {
+        return {
+          ...currentData,
+          pastLeaves: [
+            ...currentData.pastLeaves.slice(0, index),
+            ...currentData.pastLeaves.slice(index + 1),
+          ],
+        };
+      }
+    });
     this.updateLeaveData();
   }
 
@@ -136,5 +150,33 @@ export class LeaveSlipService {
     });
     this.updateLeaveData();
     window.location.reload();
+  }
+
+  editLeaveSlip(oldLeave: LeaveSlip, newLeaveData: LeaveSlip) {
+    this.leaveSlipData.update((currentData) => {
+      const index = currentData.futureLeaves.findIndex((leave) => {
+        const dateA = new Date(oldLeave.date);
+        const dateB = new Date(leave.date);
+        return (
+          dateA.getTime() === dateB.getTime() &&
+          leave.description === oldLeave.description
+        );
+      });
+
+      if (index !== -1) {
+        this.restoreLeaveTime(index);
+        const updatedLeaves = [...currentData.futureLeaves];
+        updatedLeaves[index] = {
+          ...newLeaveData,
+          status: 'pending',
+        };
+        return {
+          ...currentData,
+          futureLeaves: updatedLeaves,
+        };
+      }
+      return currentData;
+    });
+    this.updateLeaveData();
   }
 }

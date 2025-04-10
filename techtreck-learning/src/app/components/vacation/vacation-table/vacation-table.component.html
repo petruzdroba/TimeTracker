@@ -15,7 +15,8 @@
         <th class="txt-filter">End</th>
         <th class="txt-filter">Descriere</th>
         <th class="txt-filter">Status</th>
-        <th class="txt-filter">Action</th>
+        <th class="txt-filter">Edit</th>
+        <th class="txt-filter">Delete</th>
       </tr>
       @for(vacation of list; track vacation){
       <tr>
@@ -25,6 +26,8 @@
         <td>
           <i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i>
         </td>
+        <td><button class="btn-icon-primary" (click)="openEditWindow(vacation)" [disabled]="disabledEdit(vacation)"><i
+              class="fa-solid fa-pen" title="Edit session"></i></button></td>
         <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
               title="Delete vacation entry"></i></button>
         </td>
@@ -33,3 +36,11 @@
     </tbody>
   </table>
 </div>
+
+<!-- <app-edit-vacation [isOpen]="isOpen" [vacation]="selectedVacation" (closeWindow)="closeEditWindow()" /> -->
+
+<app-edit-box [isOpen]="isOpen"
+  [title]="'Edit vacation ' + (selectedVacation == null ? 'Loading date' : ((selectedVacation.startDate ? (selectedVacation.startDate | date: 'mediumDate') : '') + ' - ' + (selectedVacation.endDate ? (selectedVacation.endDate | date: 'mediumDate') : '')))"
+  (close)="closeEditWindow()">
+  <app-vacation-form [vacation]="selectedVacation" (closeEditWindow)="closeEditWindow()" />
+</app-edit-box>

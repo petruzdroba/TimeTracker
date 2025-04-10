@@ -24,7 +24,7 @@
   background-color: var(--background-hover-color);
 }
 
-.btn-icon{
+.btn-icon, .btn-icon-primary{
   border:none;
   background-color: transparent;
   color: var(--text-color);
@@ -33,6 +33,10 @@
 
 .btn-icon:hover{
   color: red;
+}
+
+.btn-icon-primary:hover{
+  color: var(--primary-hover-color);
 }
 
 .txt-head

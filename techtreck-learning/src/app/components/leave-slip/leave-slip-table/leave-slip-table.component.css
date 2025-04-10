@@ -25,7 +25,7 @@
   
 }
 
-.btn-icon{
+.btn-icon, .btn-icon-primary{
   border:none;
   background-color: transparent;
   color: var(--text-color);
@@ -34,6 +34,15 @@
 
 .btn-icon:hover{
   color: red;
+}
+
+.btn-icon-primary:hover{
+  color: var(--primary-hover-color);
+}
+
+.btn-icon-primary:disabled{
+  color: var(--text-disabled-color);
+  cursor: not-allowed;
 }
 
 .pending{

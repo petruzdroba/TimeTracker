@@ -1,0 +1,43 @@
+.form-box
+{
+  border: 1px var(--text-color) solid;
+  width: fit-content;
+  padding: 50px 30px;
+  box-shadow: 7px 7px 12px var(--shadow-color);
+}
+
+.form-input
+{
+  display: flex;
+  padding: 10px 0;
+  /* justify-content: space-between; */
+}
+
+.form-input label{
+  margin-right: 5px;
+}
+
+#description{
+  color: var(--text-color);
+  background-color: var(--background-color);
+  width: 70%;
+  margin-left: 5%;
+}
+
+.btn-submit
+{
+  color: var(--background-color);
+  font-size: 90%;
+  background-color: var(--primary-color);
+  border-radius: 6px;
+  padding: 5px;
+  margin-top: 3vh;
+  transition: all 0.6s ease;
+  margin-right: 5px;
+}
+
+.btn-submit:hover
+{
+  background-color: var(--primary-hover-color)
+}
+
