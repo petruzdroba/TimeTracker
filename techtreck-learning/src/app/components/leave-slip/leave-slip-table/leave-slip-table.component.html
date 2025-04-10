@@ -42,5 +42,5 @@
 <app-edit-box [isOpen]="isOpen"
   [title]="selectedLeaveSlip ? 'Edit leave slip - ' + (selectedLeaveSlip.date | date:'mediumDate') : 'Edit leave slip'"
   (close)="closeEditWindow()">
-  <app-leave-form [leaveSlip]="selectedLeaveSlip"></app-leave-form>
+  <app-leave-form [leaveSlip]="selectedLeaveSlip" (closeEditWindow)="closeEditWindow()"></app-leave-form>
 </app-edit-box>

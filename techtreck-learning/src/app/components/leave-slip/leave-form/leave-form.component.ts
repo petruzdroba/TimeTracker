@@ -1,9 +1,11 @@
 import {
   Component,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
+  Output,
   SimpleChanges,
 } from '@angular/core';
 import { provideNativeDateAdapter } from '@angular/material/core';
@@ -39,6 +41,7 @@ import {
 })
 export class LeaveFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) leaveSlip!: LeaveSlip | null;
+  @Output() closeEditWindow = new EventEmitter<void>();
   private leaveSlipService = inject(LeaveSlipService);
   private remainingTime!: number;
   protected form = new FormGroup({
@@ -128,6 +131,7 @@ export class LeaveFormComponent implements OnInit, OnChanges {
             status: 'pending',
           }
         );
+        this.closeEditWindow.emit();
       } else {
         this.leaveSlipService.addLeave({
           startTime: transformTimeStringToDate(
