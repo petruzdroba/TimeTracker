@@ -1,11 +1,5 @@
 import { Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
-import { AdminComponent } from './components/admin/admin.component';
-import { TimerComponent } from './components/timer/timer.component';
-import { VacationComponent } from './components/vacation/vacation.component';
-import { WorkLogComponent } from './components/work-log/work-log.component';
-import { LeaveSlipComponent } from './components/leave-slip/leave-slip.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -15,32 +9,46 @@ export const routes: Routes = [
   },
   {
     path: 'home',
-    component: DashboardComponent,
+    loadChildren: () =>
+      import('./components/dashboard/dashboard.routes').then(
+        (m) => m.DASHBOARD_ROUTES
+      ),
     title: 'Dashboard',
   },
   {
     path: 'timetrack',
-    component: TimerComponent,
+    loadChildren: () =>
+      import('./components/timer/timer.routes').then((m) => m.TIMER_ROUTES),
     title: 'TimeTrack',
   },
   {
     path: 'vacationdays',
-    component: VacationComponent,
+    loadChildren: () =>
+      import('./components/vacation/vacation.routes').then(
+        (m) => m.VACATION_ROUTES
+      ),
     title: 'VacationDays',
   },
   {
     path: 'worklog',
-    component: WorkLogComponent,
+    loadChildren: () =>
+      import('./components/work-log/work-log.routes').then(
+        (m) => m.WORKLOG_ROUTES
+      ),
     title: 'Work Log',
   },
   {
     path: 'admin',
-    component: AdminComponent,
+    loadChildren: () =>
+      import('./components/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
     title: 'Admin',
   },
   {
     path: 'leaveslip',
-    component: LeaveSlipComponent,
+    loadChildren: () =>
+      import('./components/leave-slip/leave-slip.routes').then(
+        (m) => m.LEAVESLIP_ROUTES
+      ),
     title: 'Leave Slips',
   },
   {
