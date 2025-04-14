@@ -62,3 +62,9 @@ export function validateDateRange(
 
   return count <= maxDays;
 } //function validates the number of vacation days taken and if they have enough remaining
+
+export function formatMilliseconds(ms: number): string {
+  const hours = Math.floor(ms / 3600000);
+  const minutes = Math.floor((ms % 3600000) / 60000);
+  return `0${hours}:${minutes.toString().padStart(2, '0')}`;
+}
