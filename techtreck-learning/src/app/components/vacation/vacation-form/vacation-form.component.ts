@@ -40,6 +40,7 @@ import { validateDateRange } from '../../../shared/utils/time.utils';
 export class VacationFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) vacation!: Vacation | null;
   @Output() closeEditWindow = new EventEmitter<void>();
+  @Output() vacationAdded = new EventEmitter<Vacation>();
 
   private futureVacations: Vacation[] = [];
   private remainingDays: number = 0;
@@ -147,12 +148,13 @@ export class VacationFormComponent implements OnInit, OnChanges {
         );
         this.closeEditWindow.emit();
       } else {
-        this.vacationService.addVacation({
-          startDate: new Date(this.form.value.startDate),
-          endDate: new Date(this.form.value.endDate),
-          description: this.form.value.description,
+        const newVacation: Vacation = {
+          startDate: new Date(this.form.value.startDate!),
+          endDate: new Date(this.form.value.endDate!),
+          description: this.form.value.description!,
           status: 'pending',
-        });
+        };
+        this.vacationAdded.emit(newVacation);
       }
     }
     this.form.reset();

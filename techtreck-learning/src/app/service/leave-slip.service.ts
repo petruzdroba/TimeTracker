@@ -55,6 +55,8 @@ export class LeaveSlipService {
     () => this.leaveSlipData().futureLeaves
   );
 
+  private readonly _leaveSlipData = computed(() => this.leaveSlipData());
+
   get remainingTime(): number {
     return this.remainingTimeSignal();
   }
@@ -65,6 +67,10 @@ export class LeaveSlipService {
 
   get futureLeaves(): LeaveSlip[] {
     return this.futureLeavesSignal();
+  }
+
+  get leaveSlip(): LeaveSlipData {
+    return this._leaveSlipData();
   }
 
   getLeaveIndex(leave: LeaveSlip): number {

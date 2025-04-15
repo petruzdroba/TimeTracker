@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { DateFilterComponent } from '../../shared/date-filter/date-filter.component';
 import { WorkLogService } from '../../service/work-log.service';
@@ -26,9 +26,9 @@ export class WorkLogComponent implements OnInit {
     startDate: new Date(0),
     endDate: new Date(0),
   };
-  protected workLog!: Session[];
-  protected sortBy: 'date' | 'time' = 'date';
-  protected sortType: 'asc' | 'dsc' = 'dsc';
+  protected workLog = signal<Session[]>([]);
+  protected sortBy = signal<'date' | 'time'>('date');
+  protected sortType = signal<'asc' | 'dsc'>('dsc');
 
   protected paginatedData: Session[] = [];
   protected pageSize = 10;
@@ -38,25 +38,25 @@ export class WorkLogComponent implements OnInit {
   protected selectedSession: Session | null = null;
 
   ngOnInit(): void {
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog.set(this.workLogService.getWorkLog);
     this.pageSize = 5;
     this.updatePaginatedData();
   }
 
   get sortedWorkLog() {
-    if (this.sortBy === 'date') {
-      return this.workLog.sort((a, b) => {
+    if (this.sortBy() === 'date') {
+      return this.workLog().sort((a, b) => {
         const dateA = new Date(a.date);
         const dateB = new Date(b.date);
-        if (this.sortType === 'asc') {
+        if (this.sortType() === 'asc') {
           return dateA.getTime() - dateB.getTime();
         } else {
           return dateB.getTime() - dateA.getTime();
         }
       });
     } else {
-      return this.workLog.sort((a, b) => {
-        if (this.sortType === 'asc') {
+      return this.workLog().sort((a, b) => {
+        if (this.sortType() === 'asc') {
           return a.timeWorked - b.timeWorked;
         } else {
           return b.timeWorked - a.timeWorked;
@@ -66,7 +66,7 @@ export class WorkLogComponent implements OnInit {
   }
 
   private updateMethod() {
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog.set(this.workLogService.getWorkLog);
     this.updatePaginatedData();
   }
 
@@ -103,23 +103,23 @@ export class WorkLogComponent implements OnInit {
   }
 
   onSortByChange(clicker: 'date' | 'time') {
-    if (this.sortBy !== clicker) {
-      this.sortType = 'asc';
+    if (this.sortBy() !== clicker) {
+      this.sortType.set('asc');
     }
-    this.sortBy = clicker;
+    this.sortBy.set(clicker);
     this.pageIndex = 0;
     this.updatePaginatedData();
   }
 
   onSortTypeChange() {
-    this.sortType = this.sortType === 'asc' ? 'dsc' : 'asc';
+    this.sortType.set(this.sortType() === 'asc' ? 'dsc' : 'asc');
     this.pageIndex = 0;
     this.updatePaginatedData();
   }
 
   onDeleteSession(session: Session) {
     this.workLogService.deleteSession(session);
-    this.workLog = this.workLogService.getWorkLog;
+    this.workLog.set(this.workLogService.getWorkLog);
     this.updatePaginatedData();
   }
 

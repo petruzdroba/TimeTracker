@@ -41,6 +41,7 @@ import {
 })
 export class LeaveFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) leaveSlip!: LeaveSlip | null;
+  @Output() leaveAdded = new EventEmitter<LeaveSlip>();
   @Output() closeEditWindow = new EventEmitter<void>();
   private leaveSlipService = inject(LeaveSlipService);
   private remainingTime!: number;
@@ -110,38 +111,21 @@ export class LeaveFormComponent implements OnInit, OnChanges {
         this.form.get('endTime')?.reset();
         return;
       }
+
+      const newLeaveSlip: LeaveSlip = {
+        startTime: transformTimeStringToDate(this.form.value.startTime + ':00'),
+        endTime: transformTimeStringToDate(this.form.value.endTime + ':00'),
+        description: this.form.value.description,
+        date: new Date(this.form.value.date),
+        status: 'pending',
+      };
+
       if (this.leaveSlip !== null) {
-        this.leaveSlipService.editLeaveSlip(
-          this.leaveSlip
-            ? this.leaveSlip
-            : {
-                startTime: new Date(),
-                endTime: new Date(),
-                description: '',
-                date: new Date(),
-                status: 'pending',
-              },
-          {
-            startTime: transformTimeStringToDate(
-              this.form.value.startTime + ':00'
-            ),
-            endTime: transformTimeStringToDate(this.form.value.endTime + ':00'),
-            description: this.form.value.description,
-            date: new Date(this.form.value.date),
-            status: 'pending',
-          }
-        );
+        this.leaveSlipService.editLeaveSlip(this.leaveSlip, newLeaveSlip);
         this.closeEditWindow.emit();
       } else {
-        this.leaveSlipService.addLeave({
-          startTime: transformTimeStringToDate(
-            this.form.value.startTime + ':00'
-          ),
-          endTime: transformTimeStringToDate(this.form.value.endTime + ':00'),
-          description: this.form.value.description,
-          date: new Date(this.form.value.date),
-          status: 'pending',
-        });
+        this.leaveAdded.emit(newLeaveSlip);
+        this.form.reset();
       }
     }
   }

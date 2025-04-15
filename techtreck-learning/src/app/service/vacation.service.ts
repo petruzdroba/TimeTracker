@@ -53,6 +53,7 @@ export class VacationService {
   readonly _remainingDays = computed(
     () => this.vacationData().remainingVacationDays
   );
+  readonly _vacationData = computed(() => this.vacationData());
 
   get futureVacations() {
     return this._futureVacations();
@@ -64,6 +65,10 @@ export class VacationService {
 
   get remainingDays() {
     return this._remainingDays();
+  }
+
+  get vacation(): VacationData {
+    return this._vacationData();
   }
 
   updateVacationData() {
@@ -80,11 +85,11 @@ export class VacationService {
   }
 
   addVacation(vacationData: Vacation) {
+    this.acceptedVacation(vacationData);
     this.vacationData.update((currentData) => ({
       ...currentData,
       futureVacations: [...currentData.futureVacations, vacationData],
     }));
-    this.acceptedVacation(vacationData);
     this.updateVacationData();
   }
 

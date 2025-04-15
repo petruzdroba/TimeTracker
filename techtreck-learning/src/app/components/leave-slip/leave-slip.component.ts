@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { LeaveSlipPickerComponent } from './leave-slip-picker/leave-slip-picker.component';
 import { LeaveSlipService } from '../../service/leave-slip.service';
 import { LeaveSlip } from '../../model/leave-slip.interface';
@@ -6,6 +6,7 @@ import { LeaveSlipTableComponent } from './leave-slip-table/leave-slip-table.com
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { DatePipe } from '@angular/common';
 import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
+import { LeaveSlipData } from '../../model/leaveslip-data.interface';
 
 @Component({
   selector: 'app-leave-slip',
@@ -20,28 +21,17 @@ import { ResetButtonComponent } from '../../shared/reset-button/reset-button.com
   templateUrl: './leave-slip.component.html',
   styleUrl: './leave-slip.component.sass',
 })
-export class LeaveSlipComponent implements OnInit {
+export class LeaveSlipComponent {
+  protected leaveData = signal<LeaveSlipData>({} as LeaveSlipData);
+  protected tableShowToggle: 'past' | 'future' = 'future';
   protected leaveSlipService = inject(LeaveSlipService);
 
-  protected remainingTime!: number;
-  protected pastLeaves!: LeaveSlip[];
-  protected futureLeaves!: LeaveSlip[];
-  protected tableShowToggle: 'past' | 'future' = 'future';
-
-  ngOnInit(): void {
-    this.remainingTime = this.leaveSlipService.remainingTime;
-    this.pastLeaves = this.leaveSlipService.pastLeaves;
-    this.futureLeaves = this.leaveSlipService.futureLeaves;
-  }
-
-  private updateMethod() {
-    this.remainingTime = this.leaveSlipService.remainingTime;
-    this.pastLeaves = this.leaveSlipService.pastLeaves;
-    this.futureLeaves = this.leaveSlipService.futureLeaves;
+  constructor() {
+    this.leaveData.set(this.leaveSlipService.leaveSlip);
   }
 
   get leaveTime() {
-    return new Date(this.remainingTime);
+    return new Date(this.leaveData().remainingTime);
   }
 
   onToggle() {
@@ -51,11 +41,11 @@ export class LeaveSlipComponent implements OnInit {
 
   addLeave(leaveData: LeaveSlip) {
     this.leaveSlipService.addLeave(leaveData);
-    this.updateMethod();
+    this.leaveData.set(this.leaveSlipService.leaveSlip);
   }
 
   deleteLeave(index: number, tableType: 'future' | 'past') {
     this.leaveSlipService.deleteLeave(index, tableType);
-    this.updateMethod();
+    this.leaveData.set(this.leaveSlipService.leaveSlip);
   }
 }

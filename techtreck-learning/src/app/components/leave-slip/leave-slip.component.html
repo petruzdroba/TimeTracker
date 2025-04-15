@@ -1,32 +1,28 @@
 <app-reset-button [service]="leaveSlipService" />
 <div class="leave">
-
   <div class="info">
     <h1>You have {{leaveTime | date: "HH:mm" : 'UTC'}} paid leave time</h1>
-    <app-progress-bar [currentValue]="21600000 - remainingTime" [totalValue]="21600000" class="vacation" />
+    <app-progress-bar [currentValue]="21600000 - leaveData().remainingTime" [totalValue]="21600000" class="vacation" />
   </div>
+
   <div class="leave-plan">
-    <app-leave-slip-picker />
+    <app-leave-slip-picker (addLeave)="addLeave($event)" />
     <div class="table">
       <button (click)="onToggle()">{{tableShowToggle === 'future' ? "Upcoming" : "Past"}}</button>
-      @if(tableShowToggle === 'future')
-      {
-      @if(futureLeaves.length)
-      {
-      <app-leave-slip-table [leaveList]="futureLeaves" (onDeleteLeaveEvent)="deleteLeave($event, 'future')" />
-      }@else {
+      @if(tableShowToggle === 'future') {
+      @if(leaveData().futureLeaves.length) {
+      <app-leave-slip-table [leaveList]="leaveData().futureLeaves"
+        (onDeleteLeaveEvent)="deleteLeave($event, 'future')" />
+      } @else {
       <p>There's no upcoming leave tickets</p>
       }
-      }@else{
-      @if(pastLeaves.length)
-      {
-      <app-leave-slip-table [leaveList]="pastLeaves" (onDeleteLeaveEvent)="deleteLeave($event, 'past')" />
-      }
-      @else {
+      } @else {
+      @if(leaveData().pastLeaves.length) {
+      <app-leave-slip-table [leaveList]="leaveData().pastLeaves" (onDeleteLeaveEvent)="deleteLeave($event, 'past')" />
+      } @else {
       <p>There's no past leave tickets</p>
       }
       }
     </div>
   </div>
-
 </div>

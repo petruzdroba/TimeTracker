@@ -1,4 +1,4 @@
 <h3 style="color: var(--text-color);">Request a leave</h3>
 <div class="form-box">
-  <app-leave-form [leaveSlip]="null"></app-leave-form>
+  <app-leave-form [leaveSlip]="null" (leaveAdded)="onLeaveAdded($event)" />
 </div>

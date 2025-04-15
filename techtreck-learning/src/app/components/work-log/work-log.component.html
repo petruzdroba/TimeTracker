@@ -8,8 +8,8 @@
         <th (click)="[onSortByChange('date'), onSortTypeChange()]">
           <div class="head-group">
             <p class="txt-head">Session Dates</p>
-            @if(sortBy === 'date'){
-            <i [ngClass]="sortType==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            @if(sortBy() === 'date'){
+            <i [ngClass]="sortType()==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
             }@else {
             <i class="fas fa-history"></i>
             }
@@ -22,8 +22,8 @@
         <th (click)="[onSortByChange('time'), onSortTypeChange()]">
           <div class="head-group">
             <p class="txt-head">Time Worked</p>
-            @if(sortBy === 'time'){
-            <i [ngClass]="sortType==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            @if(sortBy() === 'time'){
+            <i [ngClass]="sortType()==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
             }@else {
             <i class="fas fa-stopwatch"></i>
             }
