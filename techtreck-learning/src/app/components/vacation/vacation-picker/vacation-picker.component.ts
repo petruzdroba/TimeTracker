@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 
 import { VacationFormComponent } from '../vacation-form/vacation-form.component';
+import { Vacation } from '../../../model/vacation.interface';
 
 @Component({
   selector: 'app-vacation-picker',
@@ -9,4 +10,10 @@ import { VacationFormComponent } from '../vacation-form/vacation-form.component'
   templateUrl: './vacation-picker.component.html',
   styleUrl: './vacation-picker.component.sass',
 })
-export class VacationPickerComponent {}
+export class VacationPickerComponent {
+  @Output() addVacation = new EventEmitter<Vacation>();
+
+  onVacationAdded(vacation: Vacation) {
+    this.addVacation.emit(vacation);
+  }
+}

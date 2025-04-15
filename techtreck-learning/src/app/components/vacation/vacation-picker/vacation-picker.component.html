@@ -1,4 +1,4 @@
 <h3 class="txt-title"> Plan your next vacation day</h3>
 <div class="form-box">
-  <app-vacation-form [vacation]="null"></app-vacation-form>
+  <app-vacation-form [vacation]="null" (vacationAdded)="onVacationAdded($event)" />
 </div>

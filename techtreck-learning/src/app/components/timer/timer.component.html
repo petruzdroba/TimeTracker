@@ -4,7 +4,7 @@
 <div class="timer-group">
   <h1 class="txt-timer">{{ elapsedTime | date:'HH:mm:ss':'UTC' }}
   </h1>
-  @if(timerType === 'ON'){
+  @if(timerData().timerType === 'ON'){
   <button (click)="pauseTimer()" class="btn-timer">Stop</button>
   }@else {
   <button (click)="startTimer()" class="btn-timer">Start</button>
@@ -13,11 +13,11 @@
 <div class="info-group">
   <div class="info-el">
     <i class="fas fa-sign-in-alt"></i>
-    <p>First entrance of today: {{ firstClockIn === undefined ?'-' :(firstClockIn | date: "HH:mm:ss")}}</p>
+    <p>First entrance of today: {{ firstClockIn === undefined ? '-' : (firstClockIn | date: "HH:mm:ss")}}</p>
   </div>
   <div class="info-el">
     <i class="far fa-hourglass"></i>
-    <p>Remaining work time : {{ requiredTime | date: 'HH:mm:ss':'UTC' }}</p>
+    <p>Remaining work time : {{ timerData().requiredTime | date: 'HH:mm:ss':'UTC' }}</p>
   </div>
   <div class="info-el">
     <i class="fas fa-calendar"></i>

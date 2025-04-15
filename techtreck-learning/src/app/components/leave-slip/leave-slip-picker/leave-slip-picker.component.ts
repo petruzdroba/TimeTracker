@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-
+import { Component, Output, EventEmitter } from '@angular/core';
 import { LeaveFormComponent } from '../leave-form/leave-form.component';
+import { LeaveSlip } from '../../../model/leave-slip.interface';
 
 @Component({
   selector: 'app-leave-slip-picker',
@@ -9,4 +9,10 @@ import { LeaveFormComponent } from '../leave-form/leave-form.component';
   templateUrl: './leave-slip-picker.component.html',
   styleUrl: './leave-slip-picker.component.sass',
 })
-export class LeaveSlipPickerComponent {}
+export class LeaveSlipPickerComponent {
+  @Output() addLeave = new EventEmitter<LeaveSlip>();
+
+  onLeaveAdded(leaveData: LeaveSlip) {
+    this.addLeave.emit(leaveData);
+  }
+}

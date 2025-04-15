@@ -50,6 +50,7 @@ export class TimerService {
   readonly _startTime = computed(() => this.timerData().startTime);
   readonly _endTime = computed(() => this.timerData().endTime);
   readonly _timerType = computed(() => this.timerData().timerType);
+  readonly _timerData = computed(() => this.timerData());
 
   public get requiredTime(): number {
     return this._requiredTime();
@@ -65,6 +66,10 @@ export class TimerService {
 
   public get timerType(): 'ON' | 'OFF' {
     return this._timerType();
+  }
+
+  public get timer(): TimerData {
+    return this._timerData();
   }
 
   updateTimerData(timerData: TimerData) {
