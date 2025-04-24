@@ -41,3 +41,15 @@
   background-color: var(--primary-hover-color)
 }
 
+.btn-submit:disabled
+{
+  background-color: var(--text-disabled-color);
+  color: var(--text-disabled-color);
+  border-radius: 6px;
+  padding: 5px;
+  margin-top: 5px;
+  margin-right: 5px;
+  font-size: 90%;
+
+}
+

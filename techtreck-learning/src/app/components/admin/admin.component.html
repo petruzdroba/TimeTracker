@@ -1,8 +1,14 @@
 <div class="admin">
-  @if(toggleType === 'vacation')
-  {
-  <app-admin-vacation (switchListEvent)="onToggle()" />
-  }@else {
-  <app-admin-leave (switchListEvent)="onToggle()" />
-  }
+  <mat-tab-group>
+    <mat-tab label="Vacations">
+      <div class="tab-box">
+        <app-admin-vacation />
+      </div>
+    </mat-tab>
+    <mat-tab label="Leaves">
+      <div class="tab-box">
+        <app-admin-leave />
+      </div>
+    </mat-tab>
+  </mat-tab-group>
 </div>

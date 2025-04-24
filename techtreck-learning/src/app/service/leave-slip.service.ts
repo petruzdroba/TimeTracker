@@ -73,12 +73,6 @@ export class LeaveSlipService {
     return this._leaveSlipData();
   }
 
-  getLeaveIndex(leave: LeaveSlip): number {
-    return this.leaveSlipData().futureLeaves.findIndex(
-      (leaves) => leave === leaves
-    );
-  }
-
   updateLeaveData() {
     window.localStorage.setItem(
       'leaveData',
@@ -159,30 +153,27 @@ export class LeaveSlipService {
   }
 
   editLeaveSlip(oldLeave: LeaveSlip, newLeaveData: LeaveSlip) {
-    this.leaveSlipData.update((currentData) => {
-      const index = currentData.futureLeaves.findIndex((leave) => {
-        const dateA = new Date(oldLeave.date);
-        const dateB = new Date(leave.date);
-        return (
-          dateA.getTime() === dateB.getTime() &&
-          leave.description === oldLeave.description
-        );
-      });
+    const currentData = this.leaveSlipData();
+    const index = this.findLeaveIndex(oldLeave);
 
-      if (index !== -1) {
-        this.restoreLeaveTime(index);
-        const updatedLeaves = [...currentData.futureLeaves];
-        updatedLeaves[index] = {
-          ...newLeaveData,
-          status: 'pending',
-        };
-        return {
-          ...currentData,
-          futureLeaves: updatedLeaves,
-        };
-      }
-      return currentData;
-    });
-    this.updateLeaveData();
+    if (index !== -1) {
+      this.restoreLeaveTime(index);
+      const updatedLeaves = [...currentData.futureLeaves];
+      updatedLeaves[index] = { ...newLeaveData, status: 'pending' };
+
+      this.leaveSlipData.set({
+        ...currentData,
+        futureLeaves: updatedLeaves,
+      });
+      this.updateLeaveData();
+    }
+  }
+
+  findLeaveIndex(leave: LeaveSlip): number {
+    return this.leaveSlipData().futureLeaves.findIndex(
+      (item) =>
+        new Date(item.date).getTime() === new Date(leave.date).getTime() &&
+        item.description === leave.description
+    );
   }
 }

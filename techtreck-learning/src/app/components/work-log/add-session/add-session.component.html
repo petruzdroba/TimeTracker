@@ -1,0 +1,44 @@
+<app-edit-box [isOpen]="isOpen" title="Create a work session" (close)="onCloseWindow()">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <mat-form-field [hideRequiredMarker]="true">
+      <mat-label>Choose a date</mat-label>
+      <div class="form-input">
+        <input matInput [matDatepicker]="picker" [matDatepickerFilter]="myFilter" formControlName="date">
+      </div>
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <div class="form-input">
+      <label for="startTime">Start Time </label>
+      <input id="startTime" type="time" min="09:00:00" max="10:00:00" step="1800" formControlName="startTime">
+    </div>
+    <div class="form-input">
+      <label for="endTime">End Time </label>
+      <input id="endTime" type="time" min="09:00:00" max="10:00:00" step="1800" formControlName="endTime">
+    </div>
+    <div class="info">
+      <label for="display">Edited Work Time</label>
+      <p>{{editedWorkTime| date: "HH:mm:ss":"UTC"}}</p>
+    </div>
+
+    @if (form.get('date')?.errors?.['required'] && form.get('date')?.touched) {
+    <p class="txt-error">*Date required</p>
+    }
+
+    @if (form.get('startTime')?.errors?.['required'] && form.get('startTime')?.touched) {
+    <p class="txt-error">*Start time required</p>
+    }
+
+    @if (form.get('endTime')?.errors?.['required'] && form.get('endTime')?.touched) {
+    <p class="txt-error">*End time required</p>
+    }
+
+    @if (form.get('endTime')?.errors?.['invalidTimeRange']) {
+    <p class="txt-error">*End time must be after start time</p>
+    }
+
+    <button type="button" class="btn-form" (click)="onReset()">Reset</button>
+    <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>
+  </form>
+</app-edit-box>

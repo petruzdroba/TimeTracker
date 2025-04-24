@@ -143,40 +143,32 @@ export class VacationService {
 
   editVacation(oldVacation: Vacation, newVacationData: Vacation) {
     this.vacationData.update((currentData) => {
-      const index = currentData.futureVacations.findIndex((vacation) => {
-        const dateA = new Date(oldVacation.startDate);
-        const dateB = new Date(vacation.startDate);
-        return (
-          dateA.getTime() === dateB.getTime() &&
+      const index = currentData.futureVacations.findIndex(
+        (vacation) =>
+          new Date(vacation.startDate).getTime() ===
+            new Date(oldVacation.startDate).getTime() &&
           vacation.description === oldVacation.description
-        );
-      });
+      );
 
-      if (index !== -1) {
-        const updatedVacations = [...currentData.futureVacations];
+      if (index === -1) return currentData;
 
-        // Restore vacation days if it was accepted
-        let remainingDays = currentData.remainingVacationDays;
-        if (currentData.futureVacations[index].status === 'accepted') {
-          remainingDays += getDaysBetweenDates(
-            currentData.futureVacations[index].startDate,
-            currentData.futureVacations[index].endDate
-          );
-        }
+      const oldVacationDays = getDaysBetweenDates(
+        currentData.futureVacations[index].startDate,
+        currentData.futureVacations[index].endDate
+      );
 
-        updatedVacations[index] = {
-          ...newVacationData,
-          status: 'pending',
-        };
-
-        return {
-          ...currentData,
-          futureVacations: updatedVacations,
-          remainingVacationDays: remainingDays,
-        };
-      }
-      return currentData;
+      return {
+        ...currentData,
+        futureVacations: currentData.futureVacations.map((vacation, i) =>
+          i === index ? { ...newVacationData, status: 'pending' } : vacation
+        ),
+        remainingVacationDays:
+          currentData.futureVacations[index].status === 'accepted'
+            ? currentData.remainingVacationDays + oldVacationDays
+            : currentData.remainingVacationDays,
+      };
     });
+
     this.updateVacationData();
   }
 

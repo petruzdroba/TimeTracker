@@ -14,7 +14,7 @@ import { VacationFormComponent } from '../vacation-form/vacation-form.component'
 export class VacationTableComponent {
   @Input({ required: true }) vacationList!: Vacation[];
   @Output() deleteVacation = new EventEmitter<number>();
-  @Output() editVacation = new EventEmitter<Vacation>();
+  @Output() editVacation = new EventEmitter<[Vacation, Vacation]>();
   protected sortType: 'asc' | 'dsc' = 'asc';
   protected isOpen: boolean = false;
   protected selectedVacation: Vacation | null = null;
@@ -43,6 +43,11 @@ export class VacationTableComponent {
 
   onDelete(index: number) {
     this.deleteVacation.emit(index);
+  }
+
+  onEdit([oldLeave, newLeave]: [Vacation, Vacation]) {
+    this.editVacation.emit([oldLeave, newLeave]);
+    // this.closeEditWindow();
   }
 
   openEditWindow(vacation: Vacation) {

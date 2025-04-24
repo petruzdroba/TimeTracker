@@ -14,6 +14,7 @@ import { LeaveFormComponent } from '../leave-form/leave-form.component';
 export class LeaveSlipTableComponent {
   @Input({ required: true }) leaveList!: LeaveSlip[];
   @Output() onDeleteLeaveEvent = new EventEmitter<number>();
+  @Output() onEditLeaveEvent = new EventEmitter<[LeaveSlip, LeaveSlip]>();
   protected sortType: 'asc' | 'dsc' = 'asc';
   protected isOpen: boolean = false;
   protected selectedLeaveSlip: LeaveSlip | null = null;
@@ -42,6 +43,11 @@ export class LeaveSlipTableComponent {
 
   onDelete(index: number) {
     this.onDeleteLeaveEvent.emit(index);
+  }
+
+  onEdit([oldLeave, newLeave]: [LeaveSlip, LeaveSlip]) {
+    this.onEditLeaveEvent.emit([oldLeave, newLeave]);
+    // this.closeEditWindow();
   }
 
   openEditWindow(leaveSlip: LeaveSlip) {

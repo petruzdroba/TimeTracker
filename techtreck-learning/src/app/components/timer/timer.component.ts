@@ -24,6 +24,7 @@ export class TimerComponent implements OnInit, OnDestroy {
   protected workLog = signal<Session[]>([]);
 
   private interval!: NodeJS.Timeout;
+  protected TIME_REQ: number = 7200000; // 2 hours in milliseconds
 
   ngOnInit(): void {
     this.timerData.set(this.timerService.timer);
@@ -40,7 +41,10 @@ export class TimerComponent implements OnInit, OnDestroy {
   }
 
   get elapsedTime() {
-    const elapsed = 7200000 - this.timerData().requiredTime;
+    const elapsed = this.TIME_REQ - this.timerData().requiredTime;
+    if (elapsed <= 0) {
+      return this.timerData().requiredTime;
+    }
     return elapsed;
   }
 
@@ -78,19 +82,11 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.workLogService.addSession(newSession);
 
     this.interval = setInterval(() => {
-      if (this.timerData().requiredTime > 0) {
-        const updatedTimer = {
-          ...this.timerData(),
-          requiredTime: this.timerData().requiredTime - 1000,
-        };
-        this.timerData.set(updatedTimer);
-      } else {
-        const updatedTimer = {
-          ...this.timerData(),
-          requiredTime: 0,
-        };
-        this.timerData.set(updatedTimer);
-      }
+      const updatedTimer = {
+        ...this.timerData(),
+        requiredTime: this.timerData().requiredTime - 1000,
+      };
+      this.timerData.set(updatedTimer);
     }, 1000);
   }
 

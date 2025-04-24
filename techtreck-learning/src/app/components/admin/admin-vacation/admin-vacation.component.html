@@ -1,7 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="admin-tables">
-  <button (click)="onToggleList()" class="btn-toggle">Leaves</button>
   <p class="txt-table-title">Pending vacation requests</p>
   <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
   @if(filteredPendingVacationRequests.length === 0)

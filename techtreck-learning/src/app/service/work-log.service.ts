@@ -45,14 +45,14 @@ export class WorkLogService {
   addSession(newSession: Session) {
     this.workLog.update((sessions) => {
       const currentSessions = [...sessions];
+
       const index = currentSessions.findIndex((session) => {
-        const currentTime = new Date();
+        const currentTime = new Date(newSession.date);
         const dateLastSession = new Date(session.date);
         currentTime.setHours(0, 0, 0, 0);
         dateLastSession.setHours(0, 0, 0, 0);
         return currentTime.getTime() === dateLastSession.getTime();
       });
-
       if (index !== -1) {
         return [
           ...currentSessions.slice(0, index),

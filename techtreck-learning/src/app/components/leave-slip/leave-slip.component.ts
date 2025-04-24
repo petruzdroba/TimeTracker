@@ -7,6 +7,7 @@ import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.com
 import { DatePipe } from '@angular/common';
 import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 import { LeaveSlipData } from '../../model/leaveslip-data.interface';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-leave-slip',
@@ -17,13 +18,13 @@ import { LeaveSlipData } from '../../model/leaveslip-data.interface';
     ProgressBarComponent,
     DatePipe,
     ResetButtonComponent,
+    MatTabsModule,
   ],
   templateUrl: './leave-slip.component.html',
   styleUrl: './leave-slip.component.sass',
 })
 export class LeaveSlipComponent {
   protected leaveData = signal<LeaveSlipData>({} as LeaveSlipData);
-  protected tableShowToggle: 'past' | 'future' = 'future';
   protected leaveSlipService = inject(LeaveSlipService);
 
   constructor() {
@@ -34,11 +35,6 @@ export class LeaveSlipComponent {
     return new Date(this.leaveData().remainingTime);
   }
 
-  onToggle() {
-    this.tableShowToggle =
-      this.tableShowToggle === 'future' ? 'past' : 'future';
-  }
-
   addLeave(leaveData: LeaveSlip) {
     this.leaveSlipService.addLeave(leaveData);
     this.leaveData.set(this.leaveSlipService.leaveSlip);
@@ -46,6 +42,11 @@ export class LeaveSlipComponent {
 
   deleteLeave(index: number, tableType: 'future' | 'past') {
     this.leaveSlipService.deleteLeave(index, tableType);
+    this.leaveData.set(this.leaveSlipService.leaveSlip);
+  }
+
+  editLeave([oldLeave, newLeave]: [LeaveSlip, LeaveSlip]) {
+    this.leaveSlipService.editLeaveSlip(oldLeave, newLeave);
     this.leaveData.set(this.leaveSlipService.leaveSlip);
   }
 }

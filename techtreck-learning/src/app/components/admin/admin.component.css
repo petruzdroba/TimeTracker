@@ -1,7 +1,17 @@
 .admin
 {
-  display: flex;
-  flex-direction:column ;
+  top: 0;
+  list-style-type: none;
+  position: fixed;
+  margin-left: 12%;
+  width: 88%;
+  height: 95%;
+}
+
+.tab-box {
+  /* position: flex; */
+  height: 92vh;
+  width: 88vw;
 }
 
 

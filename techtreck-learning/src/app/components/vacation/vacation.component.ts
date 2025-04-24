@@ -6,6 +6,7 @@ import { VacationService } from '../../service/vacation.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 import { VacationData } from '../../model/vacation-data.interface';
+import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
   selector: 'app-vacation',
@@ -15,13 +16,13 @@ import { VacationData } from '../../model/vacation-data.interface';
     VacationTableComponent,
     ProgressBarComponent,
     ResetButtonComponent,
+    MatTabsModule,
   ],
   templateUrl: './vacation.component.html',
   styleUrl: './vacation.component.css',
 })
 export class VacationComponent implements OnInit {
   protected vacationData = signal<VacationData>({} as VacationData);
-  protected tableShowToggle: 'past' | 'future' = 'future';
 
   protected vacationService = inject(VacationService);
 
@@ -41,8 +42,9 @@ export class VacationComponent implements OnInit {
     this.vacationData.set(this.vacationService.vacation);
   }
 
-  onToggle() {
-    this.tableShowToggle =
-      this.tableShowToggle === 'future' ? 'past' : 'future';
+  editVacation([oldLeave, newLeave]: [Vacation, Vacation]) {
+    this.vacationService.editVacation(oldLeave, newLeave);
+    this.vacationService.updateVacationData();
+    this.vacationData.set(this.vacationService.vacation);
   }
 }

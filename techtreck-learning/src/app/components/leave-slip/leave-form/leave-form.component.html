@@ -1,5 +1,5 @@
 <form [formGroup]="form" (ngSubmit)="onSubmit()">
-  <mat-form-field>
+  <mat-form-field [hideRequiredMarker]="true">
     <mat-label>Choose a date</mat-label>
     <div class="form-input">
       <input matInput [matDatepicker]="picker" [matDatepickerFilter]="myFilter" formControlName="date">
@@ -18,10 +18,27 @@
     <label for="endTime">End Time </label>
     <input id="endTime" type="time" min="09:00:00" max="10:00:00" step="1800" formControlName="endTime">
   </div>
-  <div class="form-input">
-    <label for="description">Description</label>
+
+  <mat-form-field class="form-input" [hideRequiredMarker]="true">
+    <mat-label>Reason</mat-label>
+    <mat-select formControlName="description">
+      <mat-option>None</mat-option>
+      <mat-option value="Medical">Medical Appointment</mat-option>
+      <mat-option value="Personal">Personal</mat-option>
+      <mat-option value="Family">Family Emergency</mat-option>
+      <mat-option value="Other">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- <div class="form-input">
     <input id="description" type="text" formControlName="description" />
-  </div>
+  </div> -->
+
+  <mat-form-field class="form-input" [ngClass]="!customDescription ? 'hidden':''" [hideRequiredMarker]="true">
+    <mat-label>Description</mat-label>
+    <input matInput maxlength="15" formControlName="reason" placeholder="Custom reason">
+    <mat-hint align="end">{{form.value.reason?.length !== null ? form.value.reason?.length : 0 }}/15</mat-hint>
+  </mat-form-field>
 
   @if (this.form.controls['startTime'].invalid && this.form.touched) {
   <mat-error class="txt-error">*Start time required</mat-error>
@@ -37,7 +54,7 @@
 
   @if (this.form.controls['description'].invalid && this.form.touched) {
   <mat-error class="txt-error">
-    {{descriptionLength > 20 ? "*Description max lenght 20" : "*Description required"}}
+    {{descriptionLength > 15 ? "*Description max lenght 10" : "*Description required"}}
   </mat-error>
   }
 

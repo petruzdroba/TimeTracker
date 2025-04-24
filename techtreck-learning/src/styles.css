@@ -35,6 +35,7 @@ html, body {
 
 .mat-mdc-progress-bar{
   --mdc-linear-progress-active-indicator-color: var(--primary-color) !important;
+  --mdc-linear-progress-track-color: var(--primary-opacity-color) !important;
 }
 
 .mat-mdc-progress-spinner
@@ -50,6 +51,7 @@ html, body {
   --mat-select-enabled-trigger-text-color: var(--text-color) !important;
   --mat-select-enabled-arrow-color: var(--text-color) !important;
   --mat-select-focused-arrow-color: var(--primary-color) !important;
+
 }
 
 .mat-mdc-form-field-flex{
@@ -57,7 +59,14 @@ html, body {
   --mdc-outlined-text-field-caret-color: var(--primary-color) !important;
   --mdc-outlined-text-field-focus-outline-color: var(--primary-color) !important;
   --mdc-outlined-text-field-hover-outline-color: var(--primary-color) !important;
-
+  --mdc-filled-text-field-caret-color : var(--primary-color) !important;
+  --mdc-filled-text-field-focus-active-indicator-color: var(--primary-color) !important;
+  --mdc-filled-text-field-focus-label-text-color: var(--primary-color) !important;
+  --mdc-filled-text-field-hover-active-indicator-color: var(--primary-hover-color) !important;
+  --mdc-filled-text-field-focus-active-indicator-color: var(--primary-color) !important;
+  --mdc-filled-text-field-focus-label-text-color: var(--primary-color) !important; 
+  --mdc-text-field-focus-label-text-color: var(--primary-hover-color) !important;
+  --mdc-filled-text-field-input-text-placeholder-color: var(--text-disabled-color) !important;
 }
 
 .mdc-text-field--filled
@@ -73,6 +82,8 @@ html, body {
   --mdc-filled-text-field-hover-label-text-color: var(--text-color) !important;
 
   --mat-datepicker-range-input-separator-color: var(--text-color) !important;
+  --mdc-filled-text-field-focus-active-indicator-color: var(--primary-hover-color) !important;
+
  }
 
 .mat-datepicker-popup{
@@ -103,8 +114,23 @@ html, body {
   --mat-option-label-text-color: var(--text-color) !important;
   --mat-option-hover-state-layer-color: var(--background-hover-color) !important;
   --mat-option-selected-state-layer-color: var(--background-hover-color) !important;
+  background-color: var(--background-color) !important;
  }
 
  div.mat-mdc-select-panel{
   background-color: transparent !important;
+ }
+
+ .mat-mdc-tab, .mat-mdc-tab-nav-bar
+ {
+  --mdc-tab-indicator-active-indicator-color: var(--primary-color) !important;
+  --mat-tab-header-inactive-label-text-color: var(--text-color) !important;
+  --mat-tab-header-active-label-text-color: var(--primary-color) !important;
+  --mat-tab-header-active-ripple-color: var(--primary-color) !important;
+  --mat-tab-header-inactive-ripple-color: var(--primary-color) !important;
+  --mat-tab-header-inactive-hover-label-text-color: var(--primary-color) !important;
+  --mat-tab-header-active-focus-label-text-color: var(--primary-color) !important;
+  --mat-tab-header-active-focus-indicator-color: var(--primary-color) !important;
+  --mat-tab-header-active-hover-label-text-color: var(--primary-hover-color) !important;
+  --mat-tab-header-active-hover-indicator-color: var(--primary-hover-color) !important;
  }

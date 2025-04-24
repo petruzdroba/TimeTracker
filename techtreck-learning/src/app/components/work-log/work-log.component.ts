@@ -6,6 +6,7 @@ import { DateFilter } from '../../model/date-filter.interface';
 import { Session } from '../../model/session.interface';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { EditSessionComponent } from './edit-session/edit-session.component';
+import { AddSessionComponent } from './add-session/add-session.component';
 
 @Component({
   selector: 'app-work-log',
@@ -16,6 +17,7 @@ import { EditSessionComponent } from './edit-session/edit-session.component';
     DateFilterComponent,
     MatPaginatorModule,
     EditSessionComponent,
+    AddSessionComponent,
   ],
   templateUrl: './work-log.component.html',
   styleUrl: './work-log.component.sass',
@@ -34,12 +36,13 @@ export class WorkLogComponent implements OnInit {
   protected pageSize = 10;
   protected pageIndex = 0;
 
-  protected isOpen: boolean = false;
+  protected isOpenEdit: boolean = false;
   protected selectedSession: Session | null = null;
+  protected isOpenAdd: boolean = false;
 
   ngOnInit(): void {
     this.workLog.set(this.workLogService.getWorkLog);
-    this.pageSize = 5;
+    this.pageSize = 10;
     this.updatePaginatedData();
   }
 
@@ -93,6 +96,26 @@ export class WorkLogComponent implements OnInit {
     ];
   }
 
+  openEditWindow(session: Session) {
+    this.isOpenEdit = true;
+    this.selectedSession = session;
+  }
+
+  closeEditWindow() {
+    this.isOpenEdit = false;
+    this.selectedSession = null;
+    this.updateMethod();
+  }
+
+  openAddWindow() {
+    this.isOpenAdd = true;
+  }
+
+  closeAddWindow() {
+    this.isOpenAdd = false;
+    this.updateMethod();
+  }
+
   endSessionTime(session: Session) {
     const copyDate = new Date(session.date);
     return new Date(copyDate.getTime() + session.timeWorked);
@@ -121,17 +144,6 @@ export class WorkLogComponent implements OnInit {
     this.workLogService.deleteSession(session);
     this.workLog.set(this.workLogService.getWorkLog);
     this.updatePaginatedData();
-  }
-
-  openEditWindow(session: Session) {
-    this.isOpen = true;
-    this.selectedSession = session;
-  }
-
-  closeEditWindow() {
-    this.isOpen = false;
-    this.selectedSession = null;
-    this.updateMethod();
   }
 
   onChangeDateFilter(newDateFilter: DateFilter) {

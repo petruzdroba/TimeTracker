@@ -29,21 +29,9 @@
   font-weight: bold;
 }
 
-.btn-toggle-table
-{
-  color: var(--background-color);
-  font-size: 100%;
-  background-color: var(--primary-color);
-  width: 12vw;
-  padding: 7px;
-  border-radius: 6px;
-  left: 0%;
-  transition: all 0.6s ease;
-  box-shadow: 7px 7px 12px var(--shadow-color);
-}
-
-.btn-toggle-table:hover{
-  background-color: var(--primary-hover-color);
+.tab-box {
+  height: 55vh;
+  width: 55vw;
 }
 
 

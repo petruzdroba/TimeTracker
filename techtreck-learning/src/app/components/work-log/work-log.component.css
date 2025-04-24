@@ -11,11 +11,11 @@
 
 .log-table {
   margin-top: 2%;
-  width: 90%;
+  width: 100%;
 }
 
 .log-table th, .log-table td {
-  padding: 8px;
+  padding-top: 8px;
   text-align: center;
 }
 
@@ -71,5 +71,31 @@
 {
   color: var(--primary-color);
   font-size: small;
+  display: flex;
+  justify-content: center;
+}
+
+.header
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+}
+
+.btn-add{
+  color: var(--background-color);
+  font-size: large;
+  padding: 10px 14px;
+  background-color: var(--primary-color);
+  border-radius: 6px;
+  transition: all 0.6s ease;
+  box-shadow: 7px 7px 12px var(--shadow-color);
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-add:hover
+{
+  background-color: var(--primary-hover-color)
 }
 
