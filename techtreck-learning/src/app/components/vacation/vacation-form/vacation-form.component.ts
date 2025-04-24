@@ -41,6 +41,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) vacation!: Vacation | null;
   @Output() closeEditWindow = new EventEmitter<void>();
   @Output() vacationAdded = new EventEmitter<Vacation>();
+  @Output() vacationEdited = new EventEmitter<[Vacation, Vacation]>();
 
   private futureVacations: Vacation[] = [];
   private remainingDays: number = 0;
@@ -54,7 +55,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
       validators: Validators.required,
     }),
     description: new FormControl<string>('', {
-      validators: [Validators.required, Validators.maxLength(70)],
+      validators: [Validators.required, Validators.maxLength(40)],
     }),
   });
 
@@ -128,32 +129,16 @@ export class VacationFormComponent implements OnInit, OnChanges {
         this.form.get('endDate')?.reset();
         return;
       }
-
+      const newVacation: Vacation = {
+        startDate: new Date(this.form.value.startDate!),
+        endDate: new Date(this.form.value.endDate!),
+        description: this.form.value.description!,
+        status: 'pending',
+      };
       if (this.vacation !== null) {
-        this.vacationService.editVacation(
-          this.vacation
-            ? this.vacation
-            : {
-                startDate: new Date(),
-                endDate: new Date(),
-                description: '',
-                status: 'ignored',
-              },
-          {
-            startDate: new Date(this.form.value.startDate),
-            endDate: new Date(this.form.value.endDate),
-            description: this.form.value.description,
-            status: 'pending',
-          }
-        );
+        this.vacationEdited.emit([this.vacation, newVacation]);
         this.closeEditWindow.emit();
       } else {
-        const newVacation: Vacation = {
-          startDate: new Date(this.form.value.startDate!),
-          endDate: new Date(this.form.value.endDate!),
-          description: this.form.value.description!,
-          status: 'pending',
-        };
         this.vacationAdded.emit(newVacation);
       }
     }

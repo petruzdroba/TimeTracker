@@ -1,8 +1,12 @@
 .vacation-list {
   list-style-type: none;
-  width: 80vh;
+  width: 55vw;
   padding: 0;
   margin-bottom: 30px;
+}
+
+.vacation-list td, .vacation-list th {
+  text-align: center;
 }
 
 .txt-past-vacations

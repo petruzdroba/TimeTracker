@@ -1,5 +1,4 @@
 <div class="admin-tables">
-  <button (click)="onToggleList()" class="btn-toggle">Vacations</button>
   <p class="txt-table-title">Pending leave requests</p>
   <app-date-filter (dateFilter)="onChangeDateFilterPending($event)" calendarPicker="future" />
   @if(filteredPendingVacationRequests.length === 0)

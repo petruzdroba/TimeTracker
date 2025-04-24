@@ -10,23 +10,28 @@
   <div class="vacation-plan">
     <app-vacation-picker (addVacation)="addVacation($event)" />
     <div class="table">
-      <button (click)="onToggle()" class="btn-toggle-table">{{ tableShowToggle === 'past' ? 'Past vacations' : 'Upcoming
-        vacations'}}</button>
-      @if(tableShowToggle === 'past'){
-      @if(vacationData().pastVacations.length === 0){
-      <p>You have no vacations on record</p>
-      }@else {
-      <app-vacation-table [vacationList]="vacationData().pastVacations"
-        (deleteVacation)="deleteVacation($event, 'past')" />
-      }
-      }@else {
-      @if(vacationData().futureVacations.length === 0){
-      <p>You have no planned vacations</p>
-      }@else {
-      <app-vacation-table [vacationList]="vacationData().futureVacations"
-        (deleteVacation)="deleteVacation($event, 'future')" />
-      }
-      }
+      <mat-tab-group>
+        <mat-tab label="Upcoming Vacations">
+          <div class="tab-box">
+            @if(vacationData().futureVacations.length === 0){
+            <p>You have no planned vacations</p>
+            }@else {
+            <app-vacation-table [vacationList]="vacationData().futureVacations"
+              (deleteVacation)="deleteVacation($event, 'future')" (editVacation)="editVacation($event)" />
+            }
+          </div>
+        </mat-tab>
+        <mat-tab label="Past Vacations">
+          <div class="tab-box">
+            @if(vacationData().pastVacations.length === 0){
+            <p>You have no vacations on record</p>
+            }@else {
+            <app-vacation-table [vacationList]="vacationData().pastVacations"
+              (deleteVacation)="deleteVacation($event, 'past')" />
+            }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
     </div>
   </div>
 </div>

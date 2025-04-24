@@ -15,7 +15,6 @@ import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
 })
 export class AdminVacationComponent implements OnInit {
   private vacationService = inject(VacationService);
-  @Output() switchListEvent = new EventEmitter<void>();
   private dateFilterPending: DateFilter = {
     startDate: new Date(0),
     endDate: new Date(0),
@@ -153,9 +152,5 @@ export class AdminVacationComponent implements OnInit {
     } else {
       this.dateFilterCompleted = newDateFilter;
     }
-  }
-
-  onToggleList() {
-    this.switchListEvent.emit();
   }
 }

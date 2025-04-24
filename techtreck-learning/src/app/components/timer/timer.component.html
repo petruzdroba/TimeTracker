@@ -17,11 +17,13 @@
   </div>
   <div class="info-el">
     <i class="far fa-hourglass"></i>
-    <p>Remaining work time : {{ timerData().requiredTime | date: 'HH:mm:ss':'UTC' }}</p>
+    <p>Remaining work time : {{ timerData().requiredTime >= 0 ?(timerData().requiredTime | date: 'HH:mm:ss':'UTC'):
+      (0|date: 'HH:mm:ss':'UTC') }}
+    </p>
   </div>
   <div class="info-el">
     <i class="fas fa-calendar"></i>
     <p>Current date : {{currentDate | date : "dd/MM/YYYY"}}</p>
   </div>
 </div>
-<app-progress-bar [currentValue]="elapsedTime" [totalValue]="7200000" class="progress-bar-group-timer" />
+<app-progress-bar [currentValue]="elapsedTime" [totalValue]="TIME_REQ" class="progress-bar-group-timer" />

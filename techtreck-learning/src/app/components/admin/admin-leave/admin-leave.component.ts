@@ -14,7 +14,6 @@ import { DateFilterComponent } from '../../../shared/date-filter/date-filter.com
 })
 export class AdminLeaveComponent implements OnInit {
   private leaveService = inject(LeaveSlipService);
-  @Output() switchListEvent = new EventEmitter<void>();
   private dateFilterPending: DateFilter = {
     startDate: new Date(0),
     endDate: new Date(0),
@@ -107,12 +106,12 @@ export class AdminLeaveComponent implements OnInit {
   }
 
   disabled(leave: LeaveSlip): boolean {
-    const index = this.leaveService.getLeaveIndex(leave);
+    const index = this.leaveService.findLeaveIndex(leave);
     return index === -1;
   }
 
   onUndo(leave: LeaveSlip) {
-    const index = this.leaveService.getLeaveIndex(leave);
+    const index = this.leaveService.findLeaveIndex(leave);
     if (index !== -1) {
       this.leaveService.restoreLeaveTime(index);
       leave.status = 'pending';
@@ -140,9 +139,5 @@ export class AdminLeaveComponent implements OnInit {
     } else {
       this.dateFilterCompleted = newDateFilter;
     }
-  }
-
-  onToggleList() {
-    this.switchListEvent.emit();
   }
 }

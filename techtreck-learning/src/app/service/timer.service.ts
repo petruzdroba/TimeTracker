@@ -87,7 +87,6 @@ export class TimerService {
   }
 
   resetData() {
-    // Create default data
     const defaultData: TimerData = {
       startTime: new Date(),
       endTime: new Date(),
@@ -95,7 +94,6 @@ export class TimerService {
       timerType: 'OFF',
     };
 
-    // Update both signal and localStorage
     this.timerData.set(defaultData);
     window.localStorage.setItem(
       'timerData',

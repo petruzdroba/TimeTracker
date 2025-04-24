@@ -25,16 +25,20 @@ import {
   transformTimeStringToDate,
   validateTimeRangeString,
 } from '../../../shared/utils/time.utils';
+import { MatSelectModule } from '@angular/material/select';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-leave-form',
   standalone: true,
   providers: [provideNativeDateAdapter()],
   imports: [
+    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
     MatDatepickerModule,
+    MatSelectModule,
   ],
   templateUrl: './leave-form.component.html',
   styleUrl: './leave-form.component.sass',
@@ -42,6 +46,7 @@ import {
 export class LeaveFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) leaveSlip!: LeaveSlip | null;
   @Output() leaveAdded = new EventEmitter<LeaveSlip>();
+  @Output() leaveEdited = new EventEmitter<[LeaveSlip, LeaveSlip]>();
   @Output() closeEditWindow = new EventEmitter<void>();
   private leaveSlipService = inject(LeaveSlipService);
   private remainingTime!: number;
@@ -56,7 +61,10 @@ export class LeaveFormComponent implements OnInit, OnChanges {
       validators: Validators.required,
     }),
     description: new FormControl<string>('', {
-      validators: [Validators.required, Validators.maxLength(20)],
+      validators: [Validators.required, Validators.maxLength(10)],
+    }),
+    reason: new FormControl<string>('', {
+      validators: [Validators.maxLength(40)],
     }),
   });
 
@@ -71,8 +79,17 @@ export class LeaveFormComponent implements OnInit, OnChanges {
           startTime: transformDateToTimeString(this.leaveSlip.startTime),
           endTime: transformDateToTimeString(this.leaveSlip.endTime),
           date: new Date(this.leaveSlip.date),
-          description: this.leaveSlip.description,
         });
+        if (this.leaveSlip.description.includes('Other')) {
+          this.form.patchValue({
+            description: 'Other',
+            reason: this.leaveSlip.description.replace('Other ', ''),
+          });
+        } else {
+          this.form.patchValue({
+            description: this.leaveSlip.description,
+          });
+        }
       } else {
         this.form.reset();
       }
@@ -87,6 +104,10 @@ export class LeaveFormComponent implements OnInit, OnChanges {
 
   get descriptionLength(): number {
     return this.form.value.description?.length || 0;
+  }
+
+  get customDescription(): boolean {
+    return this.form.value.description === 'Other';
   }
 
   onSubmit() {
@@ -111,17 +132,23 @@ export class LeaveFormComponent implements OnInit, OnChanges {
         this.form.get('endTime')?.reset();
         return;
       }
+      if (this.form.value.reason === null) {
+        this.form.get('reason')?.setValue('');
+      }
 
       const newLeaveSlip: LeaveSlip = {
         startTime: transformTimeStringToDate(this.form.value.startTime + ':00'),
         endTime: transformTimeStringToDate(this.form.value.endTime + ':00'),
-        description: this.form.value.description,
+        description: this.customDescription
+          ? 'Other ' + this.form.value.reason
+          : this.form.value.description,
         date: new Date(this.form.value.date),
         status: 'pending',
       };
 
       if (this.leaveSlip !== null) {
-        this.leaveSlipService.editLeaveSlip(this.leaveSlip, newLeaveSlip);
+        // this.leaveSlipService.editLeaveSlip(this.leaveSlip, newLeaveSlip);
+        this.leaveEdited.emit([this.leaveSlip, newLeaveSlip]);
         this.closeEditWindow.emit();
       } else {
         this.leaveAdded.emit(newLeaveSlip);

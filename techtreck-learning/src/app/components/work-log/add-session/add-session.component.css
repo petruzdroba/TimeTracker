@@ -1,27 +1,47 @@
-.form-box
-{
-  padding: 5px;
-}
-
 .form-input
 {
   display: flex;
   padding: 10px 0;
   justify-content: space-between;
 }
-
-#description, #startTime, #endTime
+#startTime, #endTime
 {
   color: var(--text-color);
   background-color : var(--background-color); 
 }
 
-#description{
-  width: 100%;
+.form-input label
+{
+  margin-right: 5%px;
+  color: var(--text-color);
+  font-size: 120%;
 }
 
-.form-input label{
-  margin-right: 5px;
+.info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 10%;
+}
+
+.info label {
+  margin-right: 5%;
+  color: var(--text-color);
+  font-size: 120%;
+}
+
+.info p {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin: 0;
+  font-size: 120%;
+}
+
+.txt-error
+{
+  font-size: 70%;
+  color: var(--text-warn-color);
 }
 
 .btn-form
@@ -51,14 +71,4 @@
   margin-right: 5px;
   font-size: 90%;
 
-}
-
-.txt-error
-{
-  font-size: 70%;
-  color: var(--text-warn-color);
-}
-
-.hidden {
-  display: none;
 }

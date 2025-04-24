@@ -3,14 +3,14 @@
   list-style-type: none;
   position: absolute;
   top: 0;
-  margin-left: 12%;
-  width: 80%;
+  /* margin-left: 12%; */
+  width: 100%;
 }
 
 .pending-table
 {
   width: 90%;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
 }
 
 .completed-table
@@ -125,32 +125,7 @@
   color:grey;
 }
 
-.btn-toggle
-{
-  margin-top: 3vh;
-  font-size: 110%;
-  color: var(--background-color);
-  background-color: var(--primary-color) ;
-  width: 6vw;
-  box-shadow: 7px 7px 12px var(--shadow-color);
-}
 
-.btn-toggle
-{
-  color: var(--background-color);
-  font-size: 110%;
-  background-color: var(--primary-color);
-  border-radius: 6px;
-  padding: 5px;
-  margin-top: 3vh;
-  width: 6vw;
-  transition: all 0.6s ease;
-}
-
-.btn-toggle:hover
-{
-  background-color: var(--primary-hover-color)
-}
 
 .txt-none
 {

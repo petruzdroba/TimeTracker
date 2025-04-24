@@ -1,7 +1,7 @@
 .table-group
 {
   width: max-content;
-  margin-left: 3vw;
+  /* margin-left: 3vw; */
 }
 
 .txt-filter
@@ -16,11 +16,12 @@
 {
   list-style-type: none;
   position: absolute;
-  margin-left: 5%;
+  /* margin-left: 5%; */
+  width: 50vw;
 }
 
 .leave-table th, .leave-table td {
-  padding: 8px;
+  padding-top: 8px;
   text-align: center;
   
 }
@@ -75,7 +76,7 @@
 
 .btn-sort
 {
-  
+  color: var(--text-color);
   border: none;
   background-color: transparent;
   font-size: 110%;

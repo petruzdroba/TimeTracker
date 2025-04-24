@@ -42,5 +42,6 @@
 <app-edit-box [isOpen]="isOpen"
   [title]="'Edit vacation ' + (selectedVacation == null ? 'Loading date' : ((selectedVacation.startDate ? (selectedVacation.startDate | date: 'mediumDate') : '') + ' - ' + (selectedVacation.endDate ? (selectedVacation.endDate | date: 'mediumDate') : '')))"
   (close)="closeEditWindow()">
-  <app-vacation-form [vacation]="selectedVacation" (closeEditWindow)="closeEditWindow()" />
+  <app-vacation-form [vacation]="selectedVacation" (closeEditWindow)="closeEditWindow()"
+    (vacationEdited)="onEdit($event)" />
 </app-edit-box>

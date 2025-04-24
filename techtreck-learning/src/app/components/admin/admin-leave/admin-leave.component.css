@@ -3,8 +3,7 @@
   list-style-type: none;
   position: absolute;
   top: 0;
-  margin-left: 12%;
-  width: 80%;
+  width: 100%;
 }
 
 .pending-table
@@ -124,24 +123,6 @@
 
 .ignored{
   color:grey;
-}
-
-.btn-toggle
-{
-  color: var(--background-color);
-  font-size: 110%;
-  background-color: var(--primary-color);
-  border-radius: 6px;
-  padding: 5px;
-  margin-top: 3vh;
-  width: 6vw;
-  transition: all 0.6s ease;
-  box-shadow: 7px 7px 12px var(--shadow-color);
-}
-
-.btn-toggle:hover
-{
-  background-color: var(--primary-hover-color)
 }
 
 .txt-none
