@@ -2,13 +2,22 @@
 
 <div class="table-group">
   <div class="sort-group">
-    <p class="txt-sort">Sorty by date</p>
-    <button class="btn-sort" (click)="onSortType()">
-      <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
-    </button>
+    <app-date-filter calendarPicker="all" (dateFilter)="onChangeDateFilter($event)" />
+    <app-status-filter (statusFilter)="onChangeStatusFilter($event)"
+      [omitted]="tableType === 'future' ? [{status: 'ignored'}] : [{status: 'pending'}]" />
+    <div class="sort-date">
+      <p class="txt-sort">Sorty by date</p>
+      <button class="btn-sort" (click)="onSortType()">
+        <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+      </button>
+    </div>
   </div>
   <table class="leave-table">
     <tbody>
+      @if(list.length === 0){
+      <tr class="table-row">
+        <td colspan="7" class="no-data">No leave slips available</td>
+        }@else {
       <tr class="table-row">
         <th class="txt-filter">Date</th>
         <th class="txt-filter">Start time</th>
@@ -34,6 +43,7 @@
               title="Delete leave entry"></i></button>
         </td>
       </tr>
+      }
       }
     </tbody>
   </table>

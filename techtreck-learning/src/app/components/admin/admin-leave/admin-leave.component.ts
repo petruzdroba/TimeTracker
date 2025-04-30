@@ -4,11 +4,13 @@ import { LeaveSlip } from '../../../model/leave-slip.interface';
 import { CommonModule, DatePipe } from '@angular/common';
 import { DateFilter } from '../../../model/date-filter.interface';
 import { DateFilterComponent } from '../../../shared/date-filter/date-filter.component';
+import { StatusFilterComponent } from '../../../shared/status-filter/status-filter.component';
+import { StatusFilter } from '../../../model/status-filter.interface';
 
 @Component({
   selector: 'app-admin-leave',
   standalone: true,
-  imports: [DatePipe, CommonModule, DateFilterComponent],
+  imports: [DatePipe, CommonModule, DateFilterComponent, StatusFilterComponent],
   templateUrl: './admin-leave.component.html',
   styleUrl: './admin-leave.component.sass',
 })
@@ -23,6 +25,7 @@ export class AdminLeaveComponent implements OnInit {
     startDate: new Date(0),
     endDate: new Date(0),
   };
+  private statusFilter: StatusFilter = { status: 'all' };
   protected futureLeaves!: LeaveSlip[];
   protected pastLeaves!: LeaveSlip[];
 
@@ -49,7 +52,7 @@ export class AdminLeaveComponent implements OnInit {
         const dateC = new Date(this.dateFilterPending.endDate);
         if (
           dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() <= dateC.getTime() + 86400000
+          dateA.getTime() < dateC.getTime() + 86400000
         ) {
           return true;
         }
@@ -65,12 +68,21 @@ export class AdminLeaveComponent implements OnInit {
     ];
   }
 
+  private get statusFiltered() {
+    if (this.statusFilter.status === 'all') return this.completedLeaveRequests;
+    else {
+      return this.completedLeaveRequests.filter((leave) => {
+        return this.statusFilter.status === leave.status;
+      });
+    }
+  }
+
   get filteredCompletedVacationRequests() {
     if (
       !this.dateFilterCompleted.startDate.getTime() &&
       !this.dateFilterCompleted.endDate.getTime()
     ) {
-      return this.completedLeaveRequests;
+      return this.statusFiltered;
     }
     return [
       ...this.completedLeaveRequests.filter((leave) => {
@@ -79,7 +91,7 @@ export class AdminLeaveComponent implements OnInit {
         const dateC = new Date(this.dateFilterCompleted.endDate);
         if (
           dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() <= dateC.getTime() + 86400000
+          dateA.getTime() < dateC.getTime() + 86400000
         ) {
           return true;
         }
@@ -139,5 +151,9 @@ export class AdminLeaveComponent implements OnInit {
     } else {
       this.dateFilterCompleted = newDateFilter;
     }
+  }
+
+  onChangeStatusFilter(newStatusFilter: StatusFilter) {
+    this.statusFilter = newStatusFilter;
   }
 }

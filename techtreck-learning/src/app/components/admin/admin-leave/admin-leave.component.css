@@ -159,3 +159,11 @@
   cursor: not-allowed;
   font-size: medium;
 }
+
+.filter
+{
+  display: flex;
+  width: 90%;
+  justify-content: space-between;
+  align-items: start;
+}

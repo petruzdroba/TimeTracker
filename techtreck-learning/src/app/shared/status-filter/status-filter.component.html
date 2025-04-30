@@ -1,0 +1,11 @@
+<mat-button-toggle-group class="sort-status" [(ngModel)]="status.status" (change)="emitter()">
+  <mat-button-toggle value="accepted" title="Accepted" [hidden]="isOmitted({status: 'accepted'})"><i
+      class="fas fa-circle accepted"></i></mat-button-toggle>
+  <mat-button-toggle value="denied" title="Denied" [hidden]="isOmitted({status: 'denied'})"><i
+      class="fas fa-circle denied"></i></mat-button-toggle>
+  <mat-button-toggle value="pending" title="Pending" [hidden]="isOmitted({status: 'pending'})"><i
+      class="fas fa-circle pending"></i></mat-button-toggle>
+  <mat-button-toggle value="ignored" title="Ignored" [hidden]="isOmitted({status: 'ignored'})"><i class=" fas fa-circle
+    ignored"></i></mat-button-toggle>
+  <mat-button-toggle value="all">All</mat-button-toggle>
+</mat-button-toggle-group>

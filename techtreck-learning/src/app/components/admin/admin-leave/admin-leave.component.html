@@ -40,7 +40,10 @@
   }
 
   <p class="txt-table-title">Completed leave requests</p>
-  <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
+  <div class="filter">
+    <app-date-filter (dateFilter)="onChangeDateFilterCompleted($event)" calendarPicker="all" />
+    <app-status-filter (statusFilter)="onChangeStatusFilter($event)" [omitted]="[{status: 'pending'}]" />
+  </div>
   @if(filteredCompletedVacationRequests.length === 0)
   {
   <p class="txt-none">No completed leave requests</p>

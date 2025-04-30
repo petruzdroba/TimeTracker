@@ -1,8 +1,8 @@
 .vacation-list {
   list-style-type: none;
-  width: 55vw;
+  width: 57vw;
   padding: 0;
-  margin-bottom: 30px;
+  margin-bottom: 10%;
 }
 
 .vacation-list td, .vacation-list th {
@@ -47,8 +47,9 @@
 {
   display: flex;
   flex-direction: row;
-  justify-content: left;
-  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3%;
+  padding: 0% 1%;
 }
 
 .txt-sort
@@ -87,6 +88,14 @@
 
 .ignored{
   color:grey;
+}
+
+.sort-date
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
 }
 
 

@@ -5,11 +5,13 @@ import { Vacation } from '../../../model/vacation.interface';
 import { DateFilterComponent } from '../../../shared/date-filter/date-filter.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
+import { StatusFilterComponent } from '../../../shared/status-filter/status-filter.component';
+import { StatusFilter } from '../../../model/status-filter.interface';
 
 @Component({
   selector: 'app-admin-vacation',
   standalone: true,
-  imports: [DateFilterComponent, DatePipe, CommonModule],
+  imports: [DateFilterComponent, DatePipe, CommonModule, StatusFilterComponent],
   templateUrl: './admin-vacation.component.html',
   styleUrl: './admin-vacation.component.sass',
 })
@@ -24,6 +26,8 @@ export class AdminVacationComponent implements OnInit {
     startDate: new Date(0),
     endDate: new Date(0),
   };
+  private statusFilter: StatusFilter = { status: 'all' };
+
   protected pastVacations!: Vacation[];
   protected futureVacations!: Vacation[];
 
@@ -41,21 +45,31 @@ export class AdminVacationComponent implements OnInit {
     ];
   }
 
+  private get statusFiltered() {
+    if (this.statusFilter.status === 'all')
+      return this.completedVacationRequests;
+    else {
+      return this.completedVacationRequests.filter((vacation) => {
+        return vacation.status === this.statusFilter.status;
+      });
+    }
+  }
+
   get filteredCompletedVacationRequests() {
     if (
       !this.dateFilterCompleted.startDate.getTime() &&
       !this.dateFilterCompleted.endDate.getTime()
     ) {
-      return this.completedVacationRequests;
+      return this.statusFiltered;
     }
     return [
-      ...this.completedVacationRequests.filter((vacation) => {
+      ...this.statusFiltered.filter((vacation) => {
         const dateA = new Date(vacation.startDate);
         const dateB = new Date(this.dateFilterCompleted.startDate);
         const dateC = new Date(this.dateFilterCompleted.endDate);
         if (
           dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() <= dateC.getTime() + 86400000
+          dateA.getTime() < dateC.getTime() + 86400000
         ) {
           return true;
         }
@@ -86,7 +100,7 @@ export class AdminVacationComponent implements OnInit {
         const dateC = new Date(this.dateFilterPending.endDate);
         if (
           dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() <= dateC.getTime() + 86400000
+          dateA.getTime() < dateC.getTime() + 86400000
         ) {
           return true;
         }
@@ -152,5 +166,9 @@ export class AdminVacationComponent implements OnInit {
     } else {
       this.dateFilterCompleted = newDateFilter;
     }
+  }
+
+  onChangeStatusFilter(newStatusFilter: StatusFilter) {
+    this.statusFilter.status = newStatusFilter.status;
   }
 }

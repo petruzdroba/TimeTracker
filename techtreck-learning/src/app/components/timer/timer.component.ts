@@ -42,7 +42,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
   get elapsedTime() {
     const elapsed = this.TIME_REQ - this.timerData().requiredTime;
-    if (elapsed <= 0) {
+    if (elapsed < 0) {
       return this.timerData().requiredTime;
     }
     return elapsed;

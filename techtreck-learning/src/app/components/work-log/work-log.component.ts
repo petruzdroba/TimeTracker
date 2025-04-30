@@ -87,7 +87,7 @@ export class WorkLogComponent implements OnInit {
         const dateC = new Date(this.dateFilter.endDate);
         if (
           dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() <= dateC.getTime() + 86400000
+          dateA.getTime() < dateC.getTime() + 86400000
         ) {
           return true;
         }

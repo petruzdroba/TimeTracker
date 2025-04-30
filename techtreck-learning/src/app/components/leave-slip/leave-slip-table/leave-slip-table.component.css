@@ -1,9 +1,3 @@
-.table-group
-{
-  width: max-content;
-  /* margin-left: 3vw; */
-}
-
 .txt-filter
 {
   font-size: large;
@@ -64,8 +58,9 @@
 {
   display: flex;
   flex-direction: row;
-  justify-content: left;
-  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3%;
+  padding: 0% 1%;
 }
 
 .txt-sort
@@ -91,4 +86,12 @@
 .btn-sort:hover
 {
   color: var(--primary-hover-color);
+}
+
+.sort-date
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
 }
