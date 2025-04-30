@@ -134,3 +134,12 @@ html, body {
   --mat-tab-header-active-hover-label-text-color: var(--primary-hover-color) !important;
   --mat-tab-header-active-hover-indicator-color: var(--primary-hover-color) !important;
  }
+
+.mat-button-toggle-group
+{
+  --mat-standard-button-toggle-text-color :var(--text-color) !important;
+  --mat-standard-button-toggle-selected-state-text-color :var(--primary-hover-color) !important;
+  --mat-standard-button-toggle-background-color:var(--background-color) !important;
+  --mat-standard-button-toggle-selected-state-background-color:var(--background-hover-color) !important;
+  --mat-standard-button-toggle-divider-color: var(--primary-color) !important;
+}
