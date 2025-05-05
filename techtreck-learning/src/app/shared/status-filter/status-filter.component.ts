@@ -24,7 +24,6 @@ export class StatusFilterComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['status']) {
-      console.log('123', this.status);
       this.status = changes['status'].currentValue;
       this.emitter();
     }
