@@ -1,0 +1,59 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="log-group">
+  <div class="header">
+    <app-date-filter (dateFilter)="onChangeDateFilter($event)" calendarPicker="past" />
+    <button class="btn-add" (click)="openAddWindow()"><i class="fa-solid fa-plus"></i></button>
+  </div>
+  <table class="log-table">
+    <tbody>
+      <tr>
+        <th (click)="[onSortByChange('date'), onSortTypeChange()]">
+          <div class="head-group">
+            <p class="txt-head">Session Dates</p>
+            @if(sortBy() === 'date'){
+            <i [ngClass]="sortType()==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            }@else {
+            <i class="fas fa-history"></i>
+            }
+          </div>
+        </th>
+
+        <th class="txt-head">In</th>
+        <th class="txt-head">Out</th>
+
+        <th (click)="[onSortByChange('time'), onSortTypeChange()]">
+          <div class="head-group">
+            <p class="txt-head">Time Worked</p>
+            @if(sortBy() === 'time'){
+            <i [ngClass]="sortType()==='asc' ? 'fas fa-sort-up':'fas fa-sort-down'"></i>
+            }@else {
+            <i class="fas fa-stopwatch"></i>
+            }
+          </div>
+        </th>
+        <th class="txt-head">Edit</th>
+        <th class="txt-head">Delete</th>
+      </tr>
+
+      @for(session of paginatedData; track session){
+      <tr>
+        <td class="log-session">{{session.date | date : 'mediumDate'}}</td>
+        <td>{{session.date | date: 'mediumTime'}}</td>
+        <td>{{endSessionTime(session)| date: 'mediumTime'}}</td>
+        <td>{{milisecondsToDate(session.timeWorked) | date: 'HH:mm:ss':'UTC'}}</td>
+        <td><button class="btn-icon-primary" (click)="openEditWindow(session)"><i class="fa-solid fa-pen"
+              title="Edit session"></i></button></td>
+        <td><button class="btn-icon" (click)="onDeleteSession(session)"><i class="fas fa-trash"
+              title="Delete session"></i></button></td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  <!-- <p class="txt-info">*Deleting session does not change worked time</p> -->
+  <mat-paginator [length]="filteredWorkLog.length" [pageSize]="pageSize" [pageSizeOptions]="[5, 10, 20]"
+    (page)="onPageChange($event)" showFirstLastButtons class="paginator"></mat-paginator>
+</div>
+
+<app-edit-session [isOpen]="isOpenEdit" [session]="selectedSession" (closeWindow)="closeEditWindow()" />
+<app-add-session [isOpen]="isOpenAdd" (closeWindow)="closeAddWindow()" />

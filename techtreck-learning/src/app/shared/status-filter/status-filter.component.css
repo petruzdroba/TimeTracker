@@ -1,0 +1,20 @@
+.sort-status
+{
+  margin-top: 9%;
+  height: 45px;
+  box-shadow: 7px 7px 12px var(--shadow-color);
+}
+
+.pending{
+  color: yellow;
+}
+.accepted{
+  color: chartreuse;
+}
+.denied{
+  color: red;
+}
+
+.ignored{
+  color:grey;
+}

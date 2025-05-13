@@ -1,0 +1,7 @@
+.form-box
+{
+  border: 1px var(--text-color) solid;
+  width: fit-content;
+  padding: 50px 30px;
+  box-shadow: 7px 7px 12px var(--shadow-color);
+}

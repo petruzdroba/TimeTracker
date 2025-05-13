@@ -1,0 +1,101 @@
+.vacation-list {
+  list-style-type: none;
+  width: 57vw;
+  padding: 0;
+  margin-bottom: 10%;
+}
+
+.vacation-list td, .vacation-list th {
+  text-align: center;
+}
+
+.txt-past-vacations
+{
+  font-size: large;
+  text-align: center;
+}
+
+.txt-filter
+{
+  font-size: large;
+  color: var(--primary-color);
+  font-weight: bolder;
+  text-align: left;
+}
+
+.btn-icon, .btn-icon-primary{
+  border:none;
+  background-color: transparent;
+  color: var(--text-color);
+  transition: color 0.6s ease;
+}
+
+.btn-icon:hover{
+  color: red;
+}
+
+.btn-icon-primary:hover{
+  color: var(--primary-hover-color);
+}
+
+.btn-icon-primary:disabled{
+  color: var(--text-disabled-color);
+  cursor: not-allowed;
+}
+
+.sort-group
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 3%;
+  padding: 0% 1%;
+}
+
+.txt-sort
+{
+  margin-right: 15px;
+}
+
+.btn-sort
+{
+  color: var(--text-color);
+  border: none;
+  background-color: transparent;
+  font-size: 110%;
+  font-weight: 500;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  transition: all 0.6s ease;
+}
+
+.btn-sort:hover
+{
+  color: var(--primary-hover-color);
+}
+
+.pending{
+  color: yellow;
+}
+.accepted{
+  color: chartreuse;
+}
+.denied{
+  color: red;
+}
+
+.ignored{
+  color:grey;
+}
+
+.sort-date
+{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: start;
+}
+
+

@@ -1,0 +1,19 @@
+.progress-bar-group-timer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 50%;
+  top: 65%;
+  transform: translate(-50%, -50%);
+  width: 60vw;
+  color: var(--text-color);
+}
+
+.progress-bar-group-vacation
+{
+  width: 87vw;
+  margin-bottom: 10px;
+}
+

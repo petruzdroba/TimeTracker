@@ -1,0 +1,13 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+
+<div class="chart-container">
+  <div class="chart-controls">
+    <button class="btn-graph" (click)="previousMonth()"><i class=" fa-solid fa-angle-left"></i></button>
+    <button class="btn-graph" (click)="nextMonth()" [disabled]="disabledNext"><i
+        class="fa-solid fa-angle-right"></i></button>
+  </div>
+  <div class="graph">
+    <canvas id="MyChart"></canvas>
+  </div>
+</div>

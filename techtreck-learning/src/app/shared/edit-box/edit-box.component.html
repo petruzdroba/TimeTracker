@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+@if(isOpen){
+<div class="overlay" (click)="onClose()">
+  <div class="edit-box" (click)="$event.stopPropagation()">
+    <div class="edit-box-header">
+      <h2 class="txt">{{title}}</h2>
+      <button class="close-button" (click)="onClose()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="edit-box-content">
+      <ng-content></ng-content>
+    </div>
+  </div>
+</div>
+}

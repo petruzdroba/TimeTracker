@@ -1,0 +1,26 @@
+.graph
+{
+  margin-top: 5vh;
+  margin-bottom: 5vh;
+  box-shadow: 5px 5px 7px var(--shadow-color);
+  padding: 5px;
+}
+
+.btn-graph
+{
+  border: none;
+  background-color: transparent;
+  font-size: large;
+  color: var(--text-color);
+  transition: color 0.3s ease;
+}
+
+.btn-graph:hover{
+  color: var(--primary-hover-color);
+  cursor: pointer;
+}
+
+.btn-graph:disabled{
+  color: var(--text-disabled-color );
+  cursor: not-allowed;
+}

@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<app-reset-button [service]="timerService" />
+<div class="timer-group">
+  <h1 class="txt-timer">{{ elapsedTime | date:'HH:mm:ss':'UTC' }}
+  </h1>
+  @if(timerData().timerType === 'ON'){
+  <button (click)="pauseTimer()" class="btn-timer">Stop</button>
+  }@else {
+  <button (click)="startTimer()" class="btn-timer">Start</button>
+  }
+</div>
+<div class="info-group">
+  <div class="info-el">
+    <i class="fas fa-sign-in-alt"></i>
+    <p>First entrance of today: {{ firstClockIn === undefined ? '-' : (firstClockIn | date: "HH:mm:ss")}}</p>
+  </div>
+  <div class="info-el">
+    <i class="far fa-hourglass"></i>
+    <p>Remaining work time : {{ timerData().requiredTime >= 0 ?(timerData().requiredTime | date: 'HH:mm:ss':'UTC'):
+      (0|date: 'HH:mm:ss':'UTC') }}
+    </p>
+  </div>
+  <div class="info-el">
+    <i class="fas fa-calendar"></i>
+    <p>Current date : {{currentDate | date : "dd/MM/YYYY"}}</p>
+  </div>
+</div>
+<app-progress-bar [currentValue]="elapsedTime" [totalValue]="TIME_REQ" class="progress-bar-group-timer" />

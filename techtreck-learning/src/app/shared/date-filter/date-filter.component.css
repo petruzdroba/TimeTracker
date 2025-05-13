@@ -1,0 +1,31 @@
+
+.form-input
+{
+  display: flex;
+}
+
+.btn-submit
+{
+  color: var(--background-color);
+  font-size: 90%;
+  background-color: var(--primary-color);
+  border-radius: 6px;
+  padding: 5px;
+  margin-top: 5px;
+  transition: all 0.6s ease;
+  margin-right: 5px;
+  box-shadow: 7px 7px 12px var(--shadow-color);
+}
+
+.btn-submit:hover
+{
+  background-color: var(--primary-hover-color)
+}
+
+.hidden-input{
+  display: none;
+}
+
+.txt-filter{
+  color: var(--text-color);
+}

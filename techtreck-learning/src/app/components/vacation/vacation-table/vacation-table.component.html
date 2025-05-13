@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+<div class="vacation-list">
+  <div class="sort-group">
+    <app-date-filter calendarPicker="all" (dateFilter)="onChangeDateFilter($event)" />
+    <app-status-filter (statusFilter)="onChangeStatusFilter($event)"
+      [omitted]="tableType === 'future' ? [{status: 'ignored'}] : [{status: 'pending'}]" />
+    <div class="sort-date">
+      <p class="txt-sort">Sorty by date</p>
+      <button class="btn-sort" (click)="onSortType()">
+        <i [ngClass]="sortType==='asc'? 'fas fa-sort-up' : 'fas fa-sort-down'"></i>
+      </button>
+    </div>
+  </div>
+
+  <table class="vacation-list">
+    <tbody>
+      @if(list.length === 0){
+      <tr class="table-row">
+        <td colspan="7" class="no-data">No vacations available</td>
+        }@else {
+      <tr>
+        <th class="txt-filter">Start</th>
+        <th class="txt-filter">End</th>
+        <th class="txt-filter">Descriere</th>
+        <th class="txt-filter">Status</th>
+        <th class="txt-filter">Edit</th>
+        <th class="txt-filter">Delete</th>
+      </tr>
+
+
+      @for(vacation of list; track vacation){
+      <tr>
+        <td>{{vacation.startDate | date: 'mediumDate'}}</td>
+        <td>{{vacation.endDate | date: 'mediumDate'}}</td>
+        <td>{{vacation.description}}</td>
+        <td>
+          <i [ngClass]="'fas fa-circle ' + vacation.status" [title]="vacation.status"></i>
+        </td>
+        <td><button class="btn-icon-primary" (click)="openEditWindow(vacation)" [disabled]="disabledEdit(vacation)"><i
+              class="fa-solid fa-pen" title="Edit session"></i></button></td>
+        <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
+              title="Delete vacation entry"></i></button>
+        </td>
+      </tr>
+      }
+      }
+    </tbody>
+  </table>
+</div>
+
+<app-edit-box [isOpen]="isOpen"
+  [title]="'Edit vacation ' + (selectedVacation == null ? 'Loading date' : ((selectedVacation.startDate ? (selectedVacation.startDate | date: 'mediumDate') : '') + ' - ' + (selectedVacation.endDate ? (selectedVacation.endDate | date: 'mediumDate') : '')))"
+  (close)="closeEditWindow()">
+  <app-vacation-form [vacation]="selectedVacation" (closeEditWindow)="closeEditWindow()"
+    (vacationEdited)="onEdit($event)" />
+</app-edit-box>

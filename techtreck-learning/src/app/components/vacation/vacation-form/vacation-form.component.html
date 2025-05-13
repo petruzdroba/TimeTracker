@@ -1,0 +1,32 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="form-input">
+    <mat-form-field [hideRequiredMarker]="true">
+      <mat-label>Choose a date range</mat-label>
+      <mat-date-range-input [dateFilter]="myFilter" [rangePicker]="picker">
+        <input matStartDate formControlName="startDate">
+        <input matEndDate formControlName="endDate">
+      </mat-date-range-input>
+      <mat-hint>MM/DD/YYYY</mat-hint>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-date-range-picker #picker></mat-date-range-picker>
+      @if(!dateValidation && form.value.startDate){
+      <mat-error>You dont have enough vacation days!</mat-error>
+      }
+    </mat-form-field>
+  </div>
+
+  <!-- <div class="form-input">
+    <label for="description">Description</label>
+    <input id="description" type="text" formControlName="description" />
+  </div> -->
+
+  <mat-form-field class="form-input" [hideRequiredMarker]="true">
+    <mat-label>Description</mat-label>
+    <input maxlength="40" matInput formControlName="description">
+    <mat-hint align="end">{{form.value.description?.length !== null ? form.value.description?.length : 0
+      }}/40</mat-hint>
+  </mat-form-field>
+
+  <button type="button" class="btn-submit" (click)="onReset()">Reset</button>
+  <button type="submit" class="btn-submit" [disabled]="form.invalid">Submit</button>
+</form>

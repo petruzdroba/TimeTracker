@@ -1,0 +1,19 @@
+.log-info{
+  margin-left: 25%;
+  color: var(--text-color);
+}
+
+.spinner-container {
+  position: absolute;
+  top: 19%;
+  left: 6%;
+  transform: translate(-50%, -50%);
+}
+
+.spinner-text {
+  position: absolute;
+  top: 17%;
+  left: 6%;
+  transform: translate(-50%, -50%);
+  color: var(--text-color);
+}

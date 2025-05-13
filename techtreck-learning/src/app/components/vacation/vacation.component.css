@@ -1,0 +1,37 @@
+
+ .vacation
+ {
+  position: absolute;
+  top: 0;
+  margin-left: 12%;
+  width: 80%;
+  color: var(--text-color);
+ }
+
+ .vacation-plan
+ {
+  position: absolute;
+  margin-left: 5%;
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+ }
+
+.table{
+  margin-top: 5vh;
+  margin-left: 5vw;
+}
+
+ .table p
+{
+  color: var(--primary-color);
+  margin-left: 3vw;
+  font-weight: bold;
+}
+
+.tab-box {
+  height: 58vh;
+  width: 57vw;
+}
+
+
