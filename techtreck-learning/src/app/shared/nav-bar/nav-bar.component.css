@@ -36,6 +36,19 @@
   background-color: var(--primary-hover-color);
 }
 
+.btn-icon{
+  background-color: transparent;
+  border: none;
+  color: var(--text-color);
+  transition: all 0.3s ease;
+  font-size: 1.1vw;
+  transition: all 0.3s ease;
+}
+
+.btn-icon:hover{
+  color: var(--primary-hover-color);
+}
+
 .nav-bar-item{
   display: flex;
   align-items: center;

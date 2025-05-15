@@ -19,6 +19,16 @@
   </div>
   <mat-drawer-container [hasBackdrop]=" false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
+      <div class="option-group">
+        <button class="btn-icon" (click)="openLoginWindow()">Login</button>
+        <!-- <button class="btn-icon" (click)="toggleTheme()">
+          @if(runningTheme == 'light'){
+          <i class="fas fa-sun"></i>
+          }@else {
+          <i class="fas fa-moon"></i>
+          }
+        </button> -->
+      </div>
       <div [class]="'nav-bar-item ' + (currentRoute === '/home' ? 'selected' : '')">
         <i class="fas fa-chart-bar"></i>
         <button class="btn-txt" (click)="navPress('home')">Dashboard</button>
@@ -46,3 +56,5 @@
     </mat-drawer>
   </mat-drawer-container>
 </div>
+
+<app-edit-box [isOpen]="loginWindow" title="" (close)="closeLoginWindow()" />
