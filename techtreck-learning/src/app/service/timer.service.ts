@@ -1,12 +1,15 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { TimerData } from '../model/timer-data.interface';
+import { UserData } from '../model/user-data.interface';
+import { UserDataService } from './user-data.service';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService {
+  private userData = inject(UserDataService);
   private timerData = signal<TimerData>({
     startTime: new Date(),
     endTime: new Date(),
-    requiredTime: 7200000,
+    requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
     timerType: 'OFF',
   });
 
@@ -90,7 +93,7 @@ export class TimerService {
     const defaultData: TimerData = {
       startTime: new Date(),
       endTime: new Date(),
-      requiredTime: 7200000,
+      requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
       timerType: 'OFF',
     };
 
@@ -106,5 +109,9 @@ export class TimerService {
     );
 
     window.location.reload();
+  }
+
+  get workingHoursFull(): number {
+    return this.userData.user().workHours * 60 * 60 * 1000 || 7200000;
   }
 }

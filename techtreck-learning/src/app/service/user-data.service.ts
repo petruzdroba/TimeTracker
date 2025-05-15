@@ -1,5 +1,5 @@
 import { UserData } from '../model/user-data.interface';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
@@ -7,10 +7,12 @@ export class UserDataService {
     id: -1,
     name: 'NoUser',
     email: 'NoEmail',
-    workHours: 0,
+    workHours: 4,
     vacationDays: 0,
     personalTime: 0,
   });
+
+  public readonly user = computed(() => this.userData());
 
   saveUserData(user: UserData, rememberMe: boolean): void {
     this.userData.set(user);

@@ -24,11 +24,12 @@ export class TimerComponent implements OnInit, OnDestroy {
   protected workLog = signal<Session[]>([]);
 
   private interval!: NodeJS.Timeout;
-  protected TIME_REQ: number = 7200000; // 2 hours in milliseconds
+  protected TIME_REQ!: number;
 
   ngOnInit(): void {
     this.timerData.set(this.timerService.timer);
     this.workLog.set(this.workLogService.getWorkLog);
+    this.TIME_REQ = this.timerService.workingHoursFull;
     if (this.timerData().timerType === 'ON') {
       this.startTimer();
     }
@@ -103,7 +104,7 @@ export class TimerComponent implements OnInit, OnDestroy {
 
     const newSession: Session = {
       date: new Date(),
-      timeWorked: 7200000 - currentTimer.requiredTime,
+      timeWorked: this.TIME_REQ - currentTimer.requiredTime,
     };
 
     this.workLogService.addSession(newSession);
