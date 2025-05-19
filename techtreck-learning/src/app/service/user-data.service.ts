@@ -1,8 +1,12 @@
+import { HttpResponse, HttpClient } from '@angular/common/http';
 import { UserData } from '../model/user-data.interface';
 import { Injectable, signal, computed } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
+  private baseUrl =
+    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
   private userData = signal<UserData>({
     id: -1,
     name: 'NoUser',
@@ -12,6 +16,8 @@ export class UserDataService {
     personalTime: 0,
   });
 
+  constructor(private http: HttpClient) {}
+
   public readonly user = computed(() => this.userData());
 
   saveUserData(user: UserData, rememberMe: boolean): void {
@@ -20,6 +26,18 @@ export class UserDataService {
       localStorage.setItem('userData', JSON.stringify(user));
       localStorage.setItem('rememberMe', 'true');
     }
+  }
+
+  logIn(data: { email: string; password: string }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/login`, data);
+  }
+
+  signUp(data: {
+    name: string;
+    email: string;
+    password: string;
+  }): Observable<any> {
+    return this.http.post(`${this.baseUrl}/auth/signup`, data);
   }
 
   checkRememberedUser(): UserData | null {
