@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -13,6 +13,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { UserDataService } from '../../../service/user-data.service';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-signin',
@@ -28,11 +30,14 @@ import { UserDataService } from '../../../service/user-data.service';
   templateUrl: './signin.component.html',
   styleUrl: './signin.component.sass',
 })
-export class SigninComponent {
+export class SigninComponent implements OnDestroy {
   private authService = inject(UserDataService);
+  private router = inject(Router);
+  private subscription?: Subscription;
 
   hidePassword = true;
   hideConfirmPassword = true;
+  error: string | null = null;
 
   protected form = new FormGroup(
     {
@@ -80,9 +85,45 @@ export class SigninComponent {
       console.log('INVALID FORM');
       return;
     }
+
+    if (
+      this.form.value.name &&
+      this.form.value.email &&
+      this.form.value.password
+    ) {
+      const userData = {
+        name: this.form.value.name,
+        email: this.form.value.email,
+        password: this.form.value.password,
+      };
+
+      this.subscription = this.authService.signUp(userData).subscribe({
+        next: (response) => {
+          // Handle successful signup
+          console.log('Signup successful:', response);
+          // this.router.navigate(['/dashboard']);
+        },
+        error: (error) => {
+          // Handle error
+          if (error.status === 409) {
+            this.error = 'Email already exists';
+          } else {
+            this.error = 'An error occurred. Please try again later.';
+          }
+          console.error('Signup error:', error);
+        },
+      });
+    }
   }
 
   onReset() {
     this.form.reset();
+    this.error = null;
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

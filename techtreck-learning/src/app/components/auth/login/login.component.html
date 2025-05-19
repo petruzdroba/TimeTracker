@@ -12,6 +12,8 @@
     </button>
   </mat-form-field>
 
+  <mat-error>{{this.error ? this.error : ''}}</mat-error>
+
   <button type="button" class="btn-form" (click)="onReset()">Reset</button>
   @if(this.form.invalid){
   <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>

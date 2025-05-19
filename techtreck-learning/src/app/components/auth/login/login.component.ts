@@ -1,6 +1,6 @@
 import { UserData } from './../../../model/user-data.interface';
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { UserDataService } from '../../../service/user-data.service';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -28,9 +29,10 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrl: './login.component.sass',
 })
-export class LoginComponent {
+export class LoginComponent implements OnDestroy {
   private authService = inject(UserDataService);
   private router = inject(Router);
+  private subscription?: Subscription;
   hidePassword = true;
   error: string | null = null;
 
@@ -55,17 +57,16 @@ export class LoginComponent {
         password: this.form.value.password,
       };
 
-      this.authService.logIn(userData).subscribe({
+      this.subscription = this.authService.logIn(userData).subscribe({
         next: (response) => {
           // Handle successful login
-          // this.authService.saveUserData(response, true);
           console.log('Login successful:', response);
           // this.router.navigate(['/dashboard']);
         },
         error: (error) => {
-          // Handle error
           if (error.status === 401) {
             this.error = 'Invalid email or password';
+            this.form.reset();
           } else {
             this.error = 'An error occurred. Please try again later.';
           }
@@ -78,5 +79,11 @@ export class LoginComponent {
   onReset() {
     this.form.reset();
     this.error = null;
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
