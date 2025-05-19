@@ -1,11 +1,21 @@
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Minima autem ullam ab molestiae, quas quaerat exercitationem
-architecto atque praesentium beatae hic. Quidem repellendus sit iste nulla sint dolorum reiciendis suscipit.
-Voluptate consequatur doloribus est cupiditate neque nam eum deleniti enim excepturi numquam molestiae distinctio autem
-dolor nisi nemo quia earum in atque corporis beatae, qui sit id natus. Veniam, aperiam.
-Ipsum molestias earum asperiores nam et eius ea nisi, laborum possimus debitis provident libero, assumenda id fuga
-eveniet illo. Dolorum ipsum esse obcaecati doloremque sequi! Quidem dicta quos dolorem nemo!
-Voluptas eum id voluptatem rem temporibus adipisci reiciendis soluta velit fugiat quod harum nostrum numquam tenetur at
-sunt, voluptates earum illum animi, eius culpa expedita ab vitae? Maiores, quasi dolorum!
-Laboriosam laudantium tempore voluptatibus pariatur unde soluta, nisi esse ipsam? Officia nemo magni necessitatibus sit
-quasi numquam nostrum rem aspernatur earum perspiciatis quae, repudiandae temporibus illo voluptatum maiores cumque
-ullam?
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <mat-form-field class="form-input" [hideRequiredMarker]="true">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" placeholder="johndoe@example.com">
+  </mat-form-field>
+
+  <mat-form-field class="form-input" [hideRequiredMarker]="true">
+    <mat-label>Password</mat-label>
+    <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" placeholder="8-20 characters">
+    <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
+      <mat-icon class="btn-icon">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <button type="button" class="btn-form" (click)="onReset()">Reset</button>
+  @if(this.form.invalid){
+  <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>
+  }@else {
+  <button type="submit" class="btn-form">Submit</button>
+  }
+</form>

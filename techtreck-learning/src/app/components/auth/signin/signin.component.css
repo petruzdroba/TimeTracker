@@ -33,3 +33,7 @@
   font-size: 90%;
 
 }
+
+.btn-icon {
+  color: var(--text-color);
+}

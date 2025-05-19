@@ -14,7 +14,7 @@
     <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'"
       placeholder="8-20 characters">
     <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" type="button">
-      <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-icon class="btn-icon">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
     </button>
   </mat-form-field>
 
@@ -22,7 +22,7 @@
     <mat-label>Re-type password</mat-label>
     <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword ? 'password' : 'text'">
     <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
-      <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+      <mat-icon class="btn-icon">{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
     </button>
   </mat-form-field>
 
