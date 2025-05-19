@@ -3,10 +3,11 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { Router } from '@angular/router';
 import { ThemeService } from '../../service/theme.service';
 import { EditBoxComponent } from '../edit-box/edit-box.component';
+import { AuthComponent } from '../../components/auth/auth.component';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [MatSidenavModule, EditBoxComponent],
+  imports: [MatSidenavModule, EditBoxComponent, AuthComponent],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.sass',
 })
