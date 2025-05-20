@@ -1,9 +1,16 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { LeaveSlip } from '../model/leave-slip.interface';
 import { LeaveSlipData } from '../model/leaveslip-data.interface';
+import { HttpClient } from '@angular/common/http';
+import { take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class LeaveSlipService {
+export class LeaveSlipService implements OnDestroy {
+  private http = inject(HttpClient);
+  private baseUrl =
+    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private subscribtion: any;
+
   private leaveSlipData = signal<LeaveSlipData>({
     futureLeaves: [],
     pastLeaves: [],
@@ -11,15 +18,19 @@ export class LeaveSlipService {
   });
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      const storedData = window.localStorage.getItem('leaveData');
-      if (storedData) {
-        const data = JSON.parse(storedData);
-        const processedData = this.processExpiredLeaves(data);
-        this.leaveSlipData.set(processedData);
-        this.updateLeaveData();
-      }
-    }
+    this.http
+      .get<LeaveSlipData>(`${this.baseUrl}/leaveslip/get`)
+      .pipe(take(1))
+      .subscribe({
+        next: (res) => {
+          const processedData = this.processExpiredLeaves(res);
+          this.leaveSlipData.set(processedData);
+          this.updateLeaveData();
+        },
+        error: (err) => {
+          console.error('Error fetching vacation data:', err);
+        },
+      });
   }
 
   private processExpiredLeaves(data: LeaveSlipData): LeaveSlipData {
@@ -78,6 +89,13 @@ export class LeaveSlipService {
       'leaveData',
       JSON.stringify(this.leaveSlipData())
     );
+
+    this.subscribtion = this.http
+      .put(`${this.baseUrl}/leaveslip/update`, this.leaveSlipData())
+      .subscribe({
+        next: (res) => {},
+        error: (err) => {},
+      });
   }
 
   addLeave(leaveData: LeaveSlip) {
@@ -175,5 +193,11 @@ export class LeaveSlipService {
         new Date(item.date).getTime() === new Date(leave.date).getTime() &&
         item.description === leave.description
     );
+  }
+
+  ngOnDestroy() {
+    if (this.subscribtion) {
+      this.subscribtion.unsubscribe();
+    }
   }
 }
