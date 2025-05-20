@@ -1,6 +1,12 @@
 import { UserData } from './../../../model/user-data.interface';
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -30,6 +36,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './login.component.sass',
 })
 export class LoginComponent implements OnDestroy {
+  @Output() close = new EventEmitter<void>();
   private authService = inject(UserDataService);
   private router = inject(Router);
   private subscription?: Subscription;
@@ -59,9 +66,10 @@ export class LoginComponent implements OnDestroy {
 
       this.subscription = this.authService.logIn(userData).subscribe({
         next: (response) => {
-          // Handle successful login
-          console.log('Login successful:', response);
-          // this.router.navigate(['/dashboard']);
+          this.authService.saveUserData(response, true);
+          this.form.reset();
+          this.closeWindow();
+          this.router.navigate(['/home']);
         },
         error: (error) => {
           if (error.status === 401) {
@@ -79,6 +87,10 @@ export class LoginComponent implements OnDestroy {
   onReset() {
     this.form.reset();
     this.error = null;
+  }
+
+  closeWindow() {
+    this.close.emit();
   }
 
   ngOnDestroy() {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { LoginComponent } from './login/login.component';
 import { SigninComponent } from './signin/signin.component';
@@ -10,4 +10,10 @@ import { SigninComponent } from './signin/signin.component';
   templateUrl: './auth.component.html',
   styleUrl: './auth.component.sass',
 })
-export class AuthComponent {}
+export class AuthComponent {
+  @Output() close = new EventEmitter<void>();
+
+  closeWindow() {
+    this.close.emit();
+  }
+}

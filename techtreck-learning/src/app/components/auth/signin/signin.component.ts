@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnDestroy } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  OnDestroy,
+  Output,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -31,6 +37,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './signin.component.sass',
 })
 export class SigninComponent implements OnDestroy {
+  @Output() close = new EventEmitter<void>();
   private authService = inject(UserDataService);
   private router = inject(Router);
   private subscription?: Subscription;
@@ -99,14 +106,15 @@ export class SigninComponent implements OnDestroy {
 
       this.subscription = this.authService.signUp(userData).subscribe({
         next: (response) => {
-          // Handle successful signup
-          console.log('Signup successful:', response);
-          // this.router.navigate(['/dashboard']);
+          this.authService.saveUserData(response, false);
+          this.form.reset();
+          this.closeWindow();
+          this.router.navigate(['/home']);
         },
         error: (error) => {
-          // Handle error
           if (error.status === 409) {
             this.error = 'Email already exists';
+            this.form.get('email')?.reset();
           } else {
             this.error = 'An error occurred. Please try again later.';
           }
@@ -119,6 +127,10 @@ export class SigninComponent implements OnDestroy {
   onReset() {
     this.form.reset();
     this.error = null;
+  }
+
+  closeWindow() {
+    this.close.emit();
   }
 
   ngOnDestroy() {

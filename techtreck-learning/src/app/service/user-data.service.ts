@@ -1,7 +1,9 @@
 import { HttpResponse, HttpClient } from '@angular/common/http';
 import { UserData } from '../model/user-data.interface';
 import { Injectable, signal, computed } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { stat } from 'fs';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
@@ -28,8 +30,8 @@ export class UserDataService {
     }
   }
 
-  logIn(data: { email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/login`, data);
+  logIn(data: { email: string; password: string }): Observable<UserData> {
+    return this.http.post<UserData>(`${this.baseUrl}/auth/login`, data);
   }
 
   signUp(data: {
