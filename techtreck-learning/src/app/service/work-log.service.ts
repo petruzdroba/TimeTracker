@@ -1,11 +1,39 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Session } from '../model/session.interface';
+import { take } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class WorkLogService {
+export class WorkLogService implements OnDestroy {
+  private http = inject(HttpClient);
+  private baseUrl =
+    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private subscribtion!: any;
+
   private workLog = signal<Session[]>([]);
+  constructor() {
+    this.http
+      .get(`${this.baseUrl}/worklog/get`)
+      .pipe(take(1))
+      .subscribe({
+        next: (res) => {
+          if (Array.isArray(res)) {
+            this.workLog.set(res);
+          } else {
+            this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+            //nu dam update pentru ca stergem tot
+            // this.updateWorkLog();
+          }
+        },
+      });
+  }
+
+  get getWorkLog() {
+    return this.workLog();
+  }
+
   private readonly _firstClockIn = computed(() =>
     this.workLog().find((session) => {
       const currentTime = new Date();
@@ -15,28 +43,6 @@ export class WorkLogService {
       return currentTime.getTime() === dateLastSession.getTime();
     })
   );
-
-  constructor() {
-    if (typeof window !== 'undefined') {
-      const storedWorkLogString = window.localStorage.getItem('workLog');
-      if (storedWorkLogString === null || storedWorkLogString === 'undefined') {
-        this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-        this.updateWorkLog();
-      } else {
-        const storedWorkLog = JSON.parse(storedWorkLogString);
-        if (Array.isArray(storedWorkLog)) {
-          this.workLog.set(storedWorkLog);
-        } else {
-          this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-          this.updateWorkLog();
-        }
-      }
-    }
-  }
-
-  get getWorkLog() {
-    return this.workLog();
-  }
 
   get firstClockIn() {
     return this._firstClockIn();
@@ -110,6 +116,17 @@ export class WorkLogService {
   }
 
   updateWorkLog() {
-    window.localStorage.setItem('workLog', JSON.stringify(this.workLog()));
+    this.subscribtion = this.http
+      .put(`${this.baseUrl}/worklog/update`, this.workLog())
+      .subscribe({
+        next: (res) => {},
+        error: (err) => {},
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscribtion) {
+      this.subscribtion.unsubscribe();
+    }
   }
 }

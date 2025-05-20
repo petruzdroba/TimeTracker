@@ -1,14 +1,14 @@
-import { HttpResponse, HttpClient } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { UserData } from '../model/user-data.interface';
-import { Injectable, signal, computed } from '@angular/core';
-import { Observable, tap } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { stat } from 'fs';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
+  private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+
   private userData = signal<UserData>({
     id: -1,
     name: 'NoUser',
@@ -17,8 +17,6 @@ export class UserDataService {
     vacationDays: 0,
     personalTime: 0,
   });
-
-  constructor(private http: HttpClient) {}
 
   public readonly user = computed(() => this.userData());
 
