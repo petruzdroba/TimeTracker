@@ -10,7 +10,7 @@ export class WorkLogService implements OnDestroy {
   private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
-  private subscribtion!: any;
+  private subscribtion: any;
 
   private workLog = signal<Session[]>([]);
   constructor() {

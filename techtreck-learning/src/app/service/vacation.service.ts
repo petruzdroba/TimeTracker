@@ -1,26 +1,37 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { Vacation } from '../model/vacation.interface';
 import { VacationData } from '../model/vacation-data.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
+import { HttpClient } from '@angular/common/http';
+import { take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class VacationService {
+export class VacationService implements OnDestroy {
+  private http = inject(HttpClient);
+  private baseUrl =
+    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private subscribtion: any;
+
   private vacationData = signal<VacationData>({
     futureVacations: [],
     pastVacations: [],
     remainingVacationDays: 14,
   });
-
   constructor() {
-    if (typeof window !== 'undefined') {
-      const storedVacationData = window.localStorage.getItem('vacationData');
-      if (storedVacationData) {
-        const data = JSON.parse(storedVacationData);
-        const processedData = this.processExpiredVacations(data);
-        this.vacationData.set(processedData);
-        this.updateVacationData();
-      }
-    }
+    this.http
+      .get<VacationData>(`${this.baseUrl}/vacation/get`)
+      .pipe(take(1))
+      .subscribe({
+        next: (res) => {
+          const processedData = this.processExpiredVacations(res);
+          this.vacationData.set(processedData);
+          this.updateVacationData();
+        },
+        error: (err) => {
+          console.error('Error fetching vacation data:', err);
+          // this.updateVacationData();
+        },
+      });
   }
 
   private processExpiredVacations(data: VacationData): VacationData {
@@ -72,10 +83,12 @@ export class VacationService {
   }
 
   updateVacationData() {
-    window.localStorage.setItem(
-      'vacationData',
-      JSON.stringify(this.vacationData())
-    );
+    this.subscribtion = this.http
+      .put(`${this.baseUrl}/vacation/update`, this.vacationData())
+      .subscribe({
+        next: (res) => {},
+        error: (err) => {},
+      });
   }
 
   getVacationIndex(vacation: Vacation): number {
@@ -196,5 +209,11 @@ export class VacationService {
     });
     this.updateVacationData();
     window.location.reload();
+  }
+
+  ngOnDestroy() {
+    if (this.subscribtion) {
+      this.subscribtion.unsubscribe();
+    }
   }
 }
