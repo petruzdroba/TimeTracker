@@ -85,11 +85,6 @@ export class LeaveSlipService implements OnDestroy {
   }
 
   updateLeaveData() {
-    window.localStorage.setItem(
-      'leaveData',
-      JSON.stringify(this.leaveSlipData())
-    );
-
     this.subscribtion = this.http
       .put(`${this.baseUrl}/leaveslip/update`, this.leaveSlipData())
       .subscribe({

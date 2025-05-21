@@ -13,7 +13,7 @@ export class UserDataService {
     id: -1,
     name: 'NoUser',
     email: 'NoEmail',
-    workHours: 4,
+    workHours: 8,
     vacationDays: 0,
     personalTime: 0,
   });
@@ -22,6 +22,7 @@ export class UserDataService {
 
   saveUserData(user: UserData, rememberMe: boolean): void {
     this.userData.set(user);
+    console.log('UserData', this.userData());
     if (rememberMe) {
       localStorage.setItem('userData', JSON.stringify(user));
       localStorage.setItem('rememberMe', 'true');

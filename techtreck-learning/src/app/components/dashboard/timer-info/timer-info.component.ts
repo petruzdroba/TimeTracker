@@ -34,7 +34,7 @@ export class TimerInfoComponent implements OnInit {
   }
 
   get procentageValue() {
-    return (100 - (this.remainingTime / this.requiredTime) * 100).toFixed(0);
+    return (100 - (this.remainingTime / this.requiredTime()) * 100).toFixed(0);
   }
 
   get today() {

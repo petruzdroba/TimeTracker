@@ -110,8 +110,7 @@ export class TimerService {
 
     window.location.reload();
   }
-
-  get workingHoursFull(): number {
-    return this.userData.user().workHours * 60 * 60 * 1000 || 7200000;
-  }
+  readonly workingHoursFull = computed(
+    () => this.userData.user().workHours * 60 * 60 * 1000 || 7200000
+  );
 }
