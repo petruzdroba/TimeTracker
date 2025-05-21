@@ -12,15 +12,16 @@ import { getDaysBetweenDates } from '../shared/utils/time.utils';
 import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
 import { UserDataService } from './user-data.service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class VacationService implements OnDestroy {
   private userData = inject(UserDataService);
-
+  private routerService = inject(Router);
   private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
-  private subscribtion: any;
+  private subscription: any;
 
   private vacationData = signal<VacationData>({
     futureVacations: [],
@@ -99,20 +100,6 @@ export class VacationService implements OnDestroy {
 
   get vacation(): VacationData {
     return this._vacationData();
-  }
-
-  updateVacationData() {
-    if (this.userData.isLoggedIn()) {
-      this.subscribtion = this.http
-        .put(`${this.baseUrl}/vacation/update`, {
-          userId: this.userData.user().id,
-          data: this.vacationData(),
-        })
-        .subscribe({
-          next: (res) => {},
-          error: (err) => {},
-        });
-    }
   }
 
   getVacationIndex(vacation: Vacation): number {
@@ -235,9 +222,25 @@ export class VacationService implements OnDestroy {
     window.location.reload();
   }
 
+  updateVacationData() {
+    if (this.userData.isLoggedIn()) {
+      this.subscription = this.http
+        .put(`${this.baseUrl}/vacation/update`, {
+          userId: this.userData.user().id,
+          data: this.vacationData(),
+        })
+        .subscribe({
+          next: (res) => {},
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+          },
+        });
+    }
+  }
+
   ngOnDestroy() {
-    if (this.subscribtion) {
-      this.subscribtion.unsubscribe();
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 }

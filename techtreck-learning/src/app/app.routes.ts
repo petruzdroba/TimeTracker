@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
+import { ErrorPageComponent } from './shared/error-page/error-page.component';
 
 export const routes: Routes = [
   {
@@ -50,6 +51,11 @@ export const routes: Routes = [
         (m) => m.LEAVESLIP_ROUTES
       ),
     title: 'Leave Slips',
+  },
+  {
+    path: 'error/:code',
+    component: ErrorPageComponent,
+    title: 'Error',
   },
   {
     path: '**',
