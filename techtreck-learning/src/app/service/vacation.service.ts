@@ -1,12 +1,22 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import {
+  computed,
+  effect,
+  inject,
+  Injectable,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { Vacation } from '../model/vacation.interface';
 import { VacationData } from '../model/vacation-data.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
 import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
 
 @Injectable({ providedIn: 'root' })
 export class VacationService implements OnDestroy {
+  private userData = inject(UserDataService);
+
   private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
@@ -18,20 +28,29 @@ export class VacationService implements OnDestroy {
     remainingVacationDays: 14,
   });
   constructor() {
-    this.http
-      .get<VacationData>(`${this.baseUrl}/vacation/get`)
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          const processedData = this.processExpiredVacations(res);
-          this.vacationData.set(processedData);
-          this.updateVacationData();
-        },
-        error: (err) => {
-          console.error('Error fetching vacation data:', err);
-          // this.updateVacationData();
-        },
-      });
+    effect(
+      () => {
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get<VacationData>(
+              `${this.baseUrl}/vacation/get?${this.userData.user().id}`
+            )
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                const processedData = this.processExpiredVacations(res);
+                this.vacationData.set(processedData);
+                this.updateVacationData();
+              },
+              error: (err) => {
+                console.error('Error fetching vacation data:', err);
+                // this.updateVacationData();
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   private processExpiredVacations(data: VacationData): VacationData {
@@ -83,12 +102,17 @@ export class VacationService implements OnDestroy {
   }
 
   updateVacationData() {
-    this.subscribtion = this.http
-      .put(`${this.baseUrl}/vacation/update`, this.vacationData())
-      .subscribe({
-        next: (res) => {},
-        error: (err) => {},
-      });
+    if (this.userData.isLoggedIn()) {
+      this.subscribtion = this.http
+        .put(`${this.baseUrl}/vacation/update`, {
+          userId: this.userData.user().id,
+          data: this.vacationData(),
+        })
+        .subscribe({
+          next: (res) => {},
+          error: (err) => {},
+        });
+    }
   }
 
   getVacationIndex(vacation: Vacation): number {

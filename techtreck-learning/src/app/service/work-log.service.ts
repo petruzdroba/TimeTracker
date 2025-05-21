@@ -1,12 +1,22 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
+import {
+  Injectable,
+  signal,
+  computed,
+  inject,
+  OnDestroy,
+  effect,
+} from '@angular/core';
 import { Session } from '../model/session.interface';
 import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class WorkLogService implements OnDestroy {
+  private userData = inject(UserDataService);
+
   private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
@@ -14,20 +24,26 @@ export class WorkLogService implements OnDestroy {
 
   private workLog = signal<Session[]>([]);
   constructor() {
-    this.http
-      .get(`${this.baseUrl}/worklog/get`)
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          if (Array.isArray(res)) {
-            this.workLog.set(res);
-          } else {
-            this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-            //nu dam update pentru ca stergem tot
-            // this.updateWorkLog();
-          }
-        },
-      });
+    effect(
+      () => {
+        //autmatically destroyed when component is destroyed
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get(`${this.baseUrl}/worklog/get?${this.userData.user().id}`)
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                if (Array.isArray(res)) {
+                  this.workLog.set(res);
+                } else {
+                  this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+                }
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   get getWorkLog() {
@@ -117,7 +133,10 @@ export class WorkLogService implements OnDestroy {
 
   updateWorkLog() {
     this.subscribtion = this.http
-      .put(`${this.baseUrl}/worklog/update`, this.workLog())
+      .put(`${this.baseUrl}/worklog/update`, {
+        userId: this.userData.user().id,
+        data: this.workLog(),
+      })
       .subscribe({
         next: (res) => {},
         error: (err) => {},

@@ -10,15 +10,15 @@ export class UserDataService {
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
 
   private userData = signal<UserData>({
-    id: -1,
+    id: 2,
     name: 'NoUser',
     email: 'NoEmail',
     workHours: 8,
     vacationDays: 0,
     personalTime: 0,
   });
-
   public readonly user = computed(() => this.userData());
+  public readonly isLoggedIn = computed(() => this.userData().id !== -1);
 
   saveUserData(user: UserData, rememberMe: boolean): void {
     this.userData.set(user);

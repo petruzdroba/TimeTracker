@@ -1,6 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { TimerData } from '../model/timer-data.interface';
-import { UserData } from '../model/user-data.interface';
 import { UserDataService } from './user-data.service';
 
 @Injectable({ providedIn: 'root' })

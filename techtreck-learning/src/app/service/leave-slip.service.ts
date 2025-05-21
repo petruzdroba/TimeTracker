@@ -1,11 +1,21 @@
-import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
+import {
+  computed,
+  effect,
+  inject,
+  Injectable,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { LeaveSlip } from '../model/leave-slip.interface';
 import { LeaveSlipData } from '../model/leaveslip-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveSlipService implements OnDestroy {
+  private userData = inject(UserDataService);
+
   private http = inject(HttpClient);
   private baseUrl =
     'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
@@ -18,19 +28,28 @@ export class LeaveSlipService implements OnDestroy {
   });
 
   constructor() {
-    this.http
-      .get<LeaveSlipData>(`${this.baseUrl}/leaveslip/get`)
-      .pipe(take(1))
-      .subscribe({
-        next: (res) => {
-          const processedData = this.processExpiredLeaves(res);
-          this.leaveSlipData.set(processedData);
-          this.updateLeaveData();
-        },
-        error: (err) => {
-          console.error('Error fetching vacation data:', err);
-        },
-      });
+    effect(
+      () => {
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get<LeaveSlipData>(
+              `${this.baseUrl}/leaveslip/get?${this.userData.user().id}`
+            )
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                const processedData = this.processExpiredLeaves(res);
+                this.leaveSlipData.set(processedData);
+                this.updateLeaveData();
+              },
+              error: (err) => {
+                console.error('Error fetching vacation data:', err);
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   private processExpiredLeaves(data: LeaveSlipData): LeaveSlipData {
@@ -85,12 +104,17 @@ export class LeaveSlipService implements OnDestroy {
   }
 
   updateLeaveData() {
-    this.subscribtion = this.http
-      .put(`${this.baseUrl}/leaveslip/update`, this.leaveSlipData())
-      .subscribe({
-        next: (res) => {},
-        error: (err) => {},
-      });
+    if (this.userData.isLoggedIn()) {
+      this.subscribtion = this.http
+        .put(`${this.baseUrl}/leaveslip/update`, {
+          userId: this.userData.user().id,
+          data: this.leaveSlipData(),
+        })
+        .subscribe({
+          next: (res) => {},
+          error: (err) => {},
+        });
+    }
   }
 
   addLeave(leaveData: LeaveSlip) {
