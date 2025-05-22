@@ -40,3 +40,26 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Ignore virtual environment
+venv/
+
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+
+# Django migration logs
+*.log
+
+# SQLite DB (optional, if you're using SQLite in dev)
+db.sqlite3
+
+# VSCode settings (if used)
+.vscode/
+
+# Environment variables
+.env
+
+backend/venv/
+venv/
+# Ignore all files in the backend directory
