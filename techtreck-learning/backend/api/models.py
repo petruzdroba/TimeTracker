@@ -1,3 +1,24 @@
-from django.db import models
+from django.db import models  # type: ignore
+
 
 # Create your models here.
+class UserData(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    email = models.EmailField(max_length=100)
+    # stored in hours, as they are default and never changing
+    work_hours = models.IntegerField()
+    vacation_days = models.IntegerField()
+    personal_time = models.IntegerField()  # in hours
+
+    def __str__(self):
+        return self.email
+
+
+class UserAuth(models.Model):
+    id = models.AutoField(primary_key=True)
+    email = models.EmailField(max_length=100)
+    password = models.CharField(max_length=128)  # Increased for hashed passwords
+
+    def __str__(self):
+        return self.email

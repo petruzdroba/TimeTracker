@@ -6,8 +6,7 @@ import { Observable } from 'rxjs';
 @Injectable({ providedIn: 'root' })
 export class UserDataService {
   private http = inject(HttpClient);
-  private baseUrl =
-    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private baseUrl = 'http://127.0.0.1:8000';
 
   private userData = signal<UserData>({
     id: 2,
@@ -30,7 +29,7 @@ export class UserDataService {
   }
 
   logIn(data: { email: string; password: string }): Observable<UserData> {
-    return this.http.post<UserData>(`${this.baseUrl}/auth/login`, data);
+    return this.http.post<UserData>(`${this.baseUrl}/auth/login/`, data);
   }
 
   signUp(data: {
@@ -38,7 +37,7 @@ export class UserDataService {
     email: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/signup`, data);
+    return this.http.post(`${this.baseUrl}/auth/signup/`, data);
   }
 
   checkRememberedUser(): UserData | null {
