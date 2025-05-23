@@ -30,3 +30,21 @@ class WorkLog(models.Model):
 
     def __str__(self):
         return str(id)
+
+
+class Vacation(models.Model):
+    id = models.AutoField(primary_key=True)
+    future_vacation = models.JSONField()
+    past_vacation = models.JSONField()
+
+    def __str__(self):
+        return str(id)
+
+
+class LeaveSlip(models.Model):
+    id = models.AutoField(primary_key=True)
+    future_slip = models.JSONField()
+    past_slip = models.JSONField()
+
+    def __str__(self):
+        return str(id)

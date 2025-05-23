@@ -1,5 +1,5 @@
 from django.shortcuts import render  # type: ignore
-from .models import UserData, UserAuth, WorkLog
+from .models import UserData, UserAuth, WorkLog, Vacation, LeaveSlip
 from django.contrib.auth.hashers import make_password, check_password  # type: ignore
 from django.http import JsonResponse, HttpResponse  # type: ignore
 from rest_framework.views import APIView  # type: ignore
@@ -39,6 +39,10 @@ class UserSignInView(APIView):
             )
 
             WorkLog.objects.create(id=user_data.id, work_log=[{}])
+            Vacation.objects.create(
+                id=user_data.id, future_vacation=[{}], past_vacation=[{}]
+            )
+            LeaveSlip.objects.create(id=user_data.id, future_slip=[{}], past_slip=[{}])
 
             # Return the created user data
             return Response(
