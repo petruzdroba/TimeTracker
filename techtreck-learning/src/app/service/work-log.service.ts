@@ -33,7 +33,11 @@ export class WorkLogService implements OnDestroy {
             .pipe(take(1))
             .subscribe({
               next: (res) => {
-                if (Array.isArray(res)) {
+                console.log('WorkLog', res);
+                if (
+                  Array.isArray(res) &&
+                  !(res.length === 1 && Object.keys(res[0]).length === 0)
+                ) {
                   this.workLog.set(res);
                 } else {
                   this.workLog.set([{ date: new Date(), timeWorked: 0 }]);

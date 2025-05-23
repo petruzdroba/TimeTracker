@@ -75,10 +75,12 @@ export class LoginComponent implements OnDestroy {
           if (error.status === 401) {
             this.error = 'Invalid email or password';
             this.form.reset();
+          } else if (error.status === 404) {
+            this.error = 'User not found';
+            this.form.reset();
           } else {
             this.error = 'An error occurred. Please try again later.';
           }
-          console.error('Login error:', error);
         },
       });
     }
