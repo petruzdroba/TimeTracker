@@ -19,8 +19,7 @@ export class WorkLogService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl =
-    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private workLog = signal<Session[]>([]);
@@ -30,7 +29,7 @@ export class WorkLogService implements OnDestroy {
         //autmatically destroyed when component is destroyed
         if (this.userData.isLoggedIn()) {
           this.http
-            .get(`${this.baseUrl}/worklog/get?${this.userData.user().id}`)
+            .get(`${this.baseUrl}/worklog/get/${this.userData.user().id}/`)
             .pipe(take(1))
             .subscribe({
               next: (res) => {
@@ -133,7 +132,7 @@ export class WorkLogService implements OnDestroy {
   }
   updateWorkLog() {
     this.subscription = this.http
-      .put(`${this.baseUrl}/worklog/update`, {
+      .put(`${this.baseUrl}/worklog/update/`, {
         userId: this.userData.user().id,
         data: this.workLog(),
       })

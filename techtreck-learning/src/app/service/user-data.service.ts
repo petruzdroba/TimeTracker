@@ -9,7 +9,7 @@ export class UserDataService {
   private baseUrl = 'http://127.0.0.1:8000';
 
   private userData = signal<UserData>({
-    id: 2,
+    id: -1,
     name: 'NoUser',
     email: 'NoEmail',
     workHours: 8,

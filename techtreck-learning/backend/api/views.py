@@ -1,5 +1,5 @@
 from django.shortcuts import render  # type: ignore
-from .models import UserData, UserAuth
+from .models import UserData, UserAuth, WorkLog
 from django.contrib.auth.hashers import make_password, check_password  # type: ignore
 from django.http import JsonResponse, HttpResponse  # type: ignore
 from rest_framework.views import APIView  # type: ignore
@@ -25,7 +25,7 @@ class UserSignInView(APIView):
         try:
             hashed_password = make_password(data.get("password"))
 
-            user_auth = UserAuth.objects.create(
+            UserAuth.objects.create(
                 email=email,
                 password=hashed_password,
             )
@@ -37,6 +37,8 @@ class UserSignInView(APIView):
                 vacation_days=14,
                 personal_time=6,
             )
+
+            WorkLog.objects.create(id=user_data.id, work_log={"entries": []})
 
             # Return the created user data
             return Response(
@@ -54,6 +56,44 @@ class UserSignInView(APIView):
         except Exception as e:
             UserAuth.objects.filter(email=email).delete()
             UserData.objects.filter(email=email).delete()
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class WorkLogUpdateView(APIView):
+    def put(self, request):
+        try:
+            id = request.data.get("id")
+            work_log = request.data.get("data")
+
+            WorkLog.objects.filter(id=id).update(work_log=work_log)
+            return Response(
+                {"detail": "Success"},
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class WorkLogGetView(APIView):
+    def get(self, request, id):
+        try:
+            work_log = WorkLog.objects.get(id=id)
+            return Response(
+                work_log.work_log,
+                status=status.HTTP_200_OK,
+            )
+        except WorkLog.DoesNotExist:
+            return Response(
+                {"detail": "fail"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

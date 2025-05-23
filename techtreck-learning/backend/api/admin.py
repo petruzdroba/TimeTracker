@@ -1,5 +1,5 @@
 from django.contrib import admin  # type: ignore
-from .models import UserData, UserAuth
+from .models import UserData, UserAuth, WorkLog
 
 
 class UserDataAdmin(admin.ModelAdmin):
@@ -19,5 +19,11 @@ class UserAuthAdmin(admin.ModelAdmin):
     readonly_fields = ("id",)
 
 
+class WorkLogAdmin(admin.ModelAdmin):
+    list_display = ("id", "work_log")
+    readonly_fields = ("id",)
+
+
 admin.site.register(UserData, UserDataAdmin)
 admin.site.register(UserAuth, UserAuthAdmin)
+admin.site.register(WorkLog, WorkLogAdmin)

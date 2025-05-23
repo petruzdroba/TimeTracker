@@ -22,3 +22,11 @@ class UserAuth(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class WorkLog(models.Model):
+    id = models.IntegerField(primary_key=True)
+    work_log = models.JSONField()
+
+    def __str__(self):
+        return str(id)
