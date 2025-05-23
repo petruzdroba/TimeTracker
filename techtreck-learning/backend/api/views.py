@@ -40,9 +40,17 @@ class UserSignInView(APIView):
 
             WorkLog.objects.create(id=user_data.id, work_log=[{}])
             Vacation.objects.create(
-                id=user_data.id, future_vacation=[{}], past_vacation=[{}]
+                id=user_data.id,
+                future_vacation=[{}],
+                past_vacation=[{}],
+                remaining_vacation=user_data.vacation_days,
             )
-            LeaveSlip.objects.create(id=user_data.id, future_slip=[{}], past_slip=[{}])
+            LeaveSlip.objects.create(
+                id=user_data.id,
+                future_slip=[{}],
+                past_slip=[{}],
+                remaining_time=user_data.personal_time,
+            )
 
             # Return the created user data
             return Response(
@@ -136,6 +144,64 @@ class WorkLogGetView(APIView):
         except WorkLog.DoesNotExist:
             return Response(
                 {"detail": "fail"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class VacationGetView(APIView):
+    def get(self, request, id):
+        try:
+            vacation = Vacation.objects.get(id=id)
+            return Response(
+                {
+                    "futureVacations": vacation.future_vacation,
+                    "pastVacations": vacation.past_vacation,
+                    "remainingVacationDays": vacation.remaining_vacation,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Vacation.DoesNotExist:
+            return Response(
+                {"detail": "fail"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class VacationUpdateView(APIView):
+    def put(self, request):
+        try:
+            user_id = request.data.get("userId")
+            future_data = request.data.get("future")
+            past_data = request.data.get("past")
+            days_data = request.data.get("days")
+
+            user_vacation = Vacation.objects.get(id=user_id)
+            user_vacation.future_vacation = future_data
+            user_vacation.past_vacation = past_data
+            user_vacation.remaining_vacation = days_data
+            user_vacation.save()
+
+            return Response(
+                {
+                    "futureVacations": user_vacation.future_vacation,
+                    "pastVacations": user_vacation.past_vacation,
+                    "remainingVacationDays": user_vacation.remaining_vacation,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Vacation.DoesNotExist:
+            return Response(
+                {"detail": f"Vacation not found for user {user_id}"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:

@@ -36,6 +36,7 @@ class Vacation(models.Model):
     id = models.AutoField(primary_key=True)
     future_vacation = models.JSONField()
     past_vacation = models.JSONField()
+    remaining_vacation = models.IntegerField(default=14)  # in days
 
     def __str__(self):
         return str(id)
@@ -45,6 +46,7 @@ class LeaveSlip(models.Model):
     id = models.AutoField(primary_key=True)
     future_slip = models.JSONField()
     past_slip = models.JSONField()
+    remaining_time = models.IntegerField(default=6)  # in dtime
 
     def __str__(self):
         return str(id)

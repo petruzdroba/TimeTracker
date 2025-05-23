@@ -19,8 +19,7 @@ export class VacationService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl =
-    'https://b4c7a985-29f1-454e-a42e-97347971520e.mock.pstmn.io';
+  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private vacationData = signal<VacationData>({
@@ -34,13 +33,31 @@ export class VacationService implements OnDestroy {
         if (this.userData.isLoggedIn()) {
           this.http
             .get<VacationData>(
-              `${this.baseUrl}/vacation/get?${this.userData.user().id}`
+              `${this.baseUrl}/vacation/get/${this.userData.user().id}/`
             )
             .pipe(take(1))
             .subscribe({
               next: (res) => {
                 const processedData = this.processExpiredVacations(res);
-                this.vacationData.set(processedData);
+                this.vacationData.set({
+                  ...processedData,
+                  futureVacations:
+                    Array.isArray(processedData.futureVacations) &&
+                    !(
+                      processedData.futureVacations.length === 1 &&
+                      Object.keys(processedData.futureVacations[0]).length === 0
+                    )
+                      ? processedData.futureVacations
+                      : [],
+                  pastVacations:
+                    Array.isArray(processedData.pastVacations) &&
+                    !(
+                      processedData.pastVacations.length === 1 &&
+                      Object.keys(processedData.pastVacations[0]).length === 0
+                    )
+                      ? processedData.pastVacations
+                      : [],
+                });
                 this.updateVacationData();
               },
               error: (err) => {
@@ -225,9 +242,12 @@ export class VacationService implements OnDestroy {
   updateVacationData() {
     if (this.userData.isLoggedIn()) {
       this.subscription = this.http
-        .put(`${this.baseUrl}/vacation/update`, {
+        .put(`${this.baseUrl}/vacation/update/`, {
           userId: this.userData.user().id,
-          data: this.vacationData(),
+
+          future: this.vacationData().futureVacations,
+          past: this.vacationData().pastVacations,
+          days: this.vacationData().remainingVacationDays,
         })
         .subscribe({
           next: (res) => {},

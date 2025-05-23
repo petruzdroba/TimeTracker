@@ -25,12 +25,12 @@ class WorkLogAdmin(admin.ModelAdmin):
 
 
 class VacationAdmin(admin.ModelAdmin):
-    list_display = ("id", "future_vacation", "past_vacation")
+    list_display = ("id", "future_vacation", "past_vacation", "remaining_vacation")
     readonly_fields = ("id",)
 
 
 class LeaveSlipAdmin(admin.ModelAdmin):
-    list_display = ("id", "future_slip", "past_slip")
+    list_display = ("id", "future_slip", "past_slip", "remaining_time")
     readonly_fields = ("id",)
 
 

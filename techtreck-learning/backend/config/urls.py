@@ -29,4 +29,14 @@ urlpatterns = [
         "worklog/get/<int:id>/", api_views.WorkLogGetView.as_view(), name="worklog_get"
     ),
     path("auth/login/", api_views.UserLogInView.as_view(), name="user_login"),
+    path(
+        "vacation/get/<int:id>/",
+        api_views.VacationGetView.as_view(),
+        name="vacation_get",
+    ),
+    path(
+        "vacation/update/",
+        api_views.VacationUpdateView.as_view(),
+        name="vacation_update",
+    ),
 ]
