@@ -18,7 +18,7 @@ export class LeaveSlipService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.1:8000';
+  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private leaveSlipData = signal<LeaveSlipData>({

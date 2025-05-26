@@ -52,4 +52,5 @@ urlpatterns = [
         api_views.LeaveSlipUpdateView.as_view(),
         name="leaveslip_update",
     ),
+    path("timer/sync/", api_views.TimerDataSyncView.as_view(), name="timer_sync"),
 ]

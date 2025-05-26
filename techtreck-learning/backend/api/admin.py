@@ -1,5 +1,5 @@
 from django.contrib import admin  # type: ignore
-from .models import UserData, UserAuth, WorkLog, Vacation, LeaveSlip
+from .models import UserData, UserAuth, WorkLog, Vacation, LeaveSlip, TimerData
 
 
 class UserDataAdmin(admin.ModelAdmin):
@@ -34,8 +34,14 @@ class LeaveSlipAdmin(admin.ModelAdmin):
     readonly_fields = ("id",)
 
 
+class TimerDataAdmin(admin.ModelAdmin):
+    list_display = ("id", "start_time", "end_time", "remaining_time")
+    readonly_fields = ("id",)
+
+
 admin.site.register(UserData, UserDataAdmin)
 admin.site.register(UserAuth, UserAuthAdmin)
 admin.site.register(WorkLog, WorkLogAdmin)
 admin.site.register(Vacation, VacationAdmin)
 admin.site.register(LeaveSlip, LeaveSlipAdmin)
+admin.site.register(TimerData, TimerDataAdmin)

@@ -50,3 +50,14 @@ class LeaveSlip(models.Model):
 
     def __str__(self):
         return str(id)
+
+
+class TimerData(models.Model):
+    id = models.IntegerField(primary_key=True)
+    start_time = models.CharField(max_length=100)
+    end_time = models.CharField(max_length=100)
+    remaining_time = models.IntegerField()  # in ms
+    timer_type = models.CharField(max_length=4, default="OFF")
+
+    def __str__(self):
+        return str(self.id)
