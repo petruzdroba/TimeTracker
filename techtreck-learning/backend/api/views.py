@@ -49,7 +49,8 @@ class UserSignInView(APIView):
                 id=user_data.id,
                 future_slip=[{}],
                 past_slip=[{}],
-                remaining_time=user_data.personal_time,
+                remaining_time=user_data.personal_time
+                * 3600000,  # Convert hours to milliseconds,
             )
 
             # Return the created user data
@@ -104,6 +105,33 @@ class UserLogInView(APIView):
             return Response(
                 {"detail": "User not found"},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+class GetUserDataView(APIView):
+    def get(self, request, id):
+        try:
+            user_data = UserData.objects.get(id=id)
+            return Response(
+                {
+                    "id": user_data.id,
+                    "name": user_data.name,
+                    "email": user_data.email,
+                    "workHours": user_data.work_hours,
+                    "vacationDays": user_data.vacation_days,
+                    "personalTime": user_data.personal_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except UserData.DoesNotExist:
+            return Response(
+                {"detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
@@ -181,14 +209,12 @@ class VacationUpdateView(APIView):
     def put(self, request):
         try:
             user_id = request.data.get("userId")
-            future_data = request.data.get("future")
-            past_data = request.data.get("past")
-            days_data = request.data.get("days")
+            data = request.data.get("data")
 
             user_vacation = Vacation.objects.get(id=user_id)
-            user_vacation.future_vacation = future_data
-            user_vacation.past_vacation = past_data
-            user_vacation.remaining_vacation = days_data
+            user_vacation.future_vacation = data.get("futureVacations")
+            user_vacation.past_vacation = data.get("pastVacations")
+            user_vacation.remaining_vacation = data.get("remainingVacationDays")
             user_vacation.save()
 
             return Response(
@@ -202,6 +228,62 @@ class VacationUpdateView(APIView):
         except Vacation.DoesNotExist:
             return Response(
                 {"detail": f"Vacation not found for user {user_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class LeaveSlipGetView(APIView):
+    def get(self, request, id):
+        try:
+            leave_slip = LeaveSlip.objects.get(id=id)
+            return Response(
+                {
+                    "futureLeaves": leave_slip.future_slip,
+                    "pastLeaves": leave_slip.past_slip,
+                    "remainingTime": leave_slip.remaining_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except LeaveSlip.DoesNotExist:
+            return Response(
+                {"detail": "fail"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class LeaveSlipUpdateView(APIView):
+    def put(self, request):
+        try:
+            user_id = request.data.get("userId")
+            data = request.data.get("data")
+
+            user_leave_slip = LeaveSlip.objects.get(id=user_id)
+            user_leave_slip.future_slip = data.get("futureLeaves")
+            user_leave_slip.past_slip = data.get("pastLeaves")
+            user_leave_slip.remaining_time = data.get("remainingTime")
+            user_leave_slip.save()
+
+            return Response(
+                {
+                    "futureLeaves": user_leave_slip.future_slip,
+                    "pastLeaves": user_leave_slip.past_slip,
+                    "remainingTime": user_leave_slip.remaining_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except LeaveSlip.DoesNotExist:
+            return Response(
+                {"detail": f"LeaveSlip not found for user {user_id}"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:

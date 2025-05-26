@@ -244,10 +244,11 @@ export class VacationService implements OnDestroy {
       this.subscription = this.http
         .put(`${this.baseUrl}/vacation/update/`, {
           userId: this.userData.user().id,
-
-          future: this.vacationData().futureVacations,
-          past: this.vacationData().pastVacations,
-          days: this.vacationData().remainingVacationDays,
+          data: {
+            futureVacations: this.vacationData().futureVacations,
+            pastVacations: this.vacationData().pastVacations,
+            remainingVacationDays: this.vacationData().remainingVacationDays,
+          },
         })
         .subscribe({
           next: (res) => {},

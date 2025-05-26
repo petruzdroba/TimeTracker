@@ -22,13 +22,16 @@ from api import views as api_views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/signup/", api_views.UserSignInView.as_view(), name="user_signup"),
+    path("auth/login/", api_views.UserLogInView.as_view(), name="user_login"),
+    path(
+        "auth/getuser/<int:id>/", api_views.GetUserDataView.as_view(), name="user_get"
+    ),
     path(
         "worklog/update/", api_views.WorkLogUpdateView.as_view(), name="worklog_update"
     ),
     path(
         "worklog/get/<int:id>/", api_views.WorkLogGetView.as_view(), name="worklog_get"
     ),
-    path("auth/login/", api_views.UserLogInView.as_view(), name="user_login"),
     path(
         "vacation/get/<int:id>/",
         api_views.VacationGetView.as_view(),
@@ -38,5 +41,15 @@ urlpatterns = [
         "vacation/update/",
         api_views.VacationUpdateView.as_view(),
         name="vacation_update",
+    ),
+    path(
+        "leaveslip/get/<int:id>/",
+        api_views.LeaveSlipGetView.as_view(),
+        name="leaveslip_get",
+    ),
+    path(
+        "leaveslip/update/",
+        api_views.LeaveSlipUpdateView.as_view(),
+        name="leaveslip_update",
     ),
 ]

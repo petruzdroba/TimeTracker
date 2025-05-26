@@ -1,11 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { UserData } from '../model/user-data.interface';
-import { Injectable, signal, computed, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
+import { Observable, take } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class UserDataService {
+export class UserDataService implements OnDestroy {
   private http = inject(HttpClient);
+  private router = inject(Router);
+  private subscription: any;
   private baseUrl = 'http://127.0.0.1:8000';
 
   private userData = signal<UserData>({
@@ -19,12 +22,18 @@ export class UserDataService {
   public readonly user = computed(() => this.userData());
   public readonly isLoggedIn = computed(() => this.userData().id !== -1);
 
+  constructor() {
+    this.checkRememberedUser();
+  }
+
   saveUserData(user: UserData, rememberMe: boolean): void {
     this.userData.set(user);
     console.log('UserData', this.userData());
     if (rememberMe) {
-      localStorage.setItem('userData', JSON.stringify(user));
-      localStorage.setItem('rememberMe', 'true');
+      localStorage.setItem(
+        'rememberMe',
+        JSON.stringify({ rememberMe: true, id: user.id })
+      );
     }
   }
 
@@ -40,13 +49,26 @@ export class UserDataService {
     return this.http.post(`${this.baseUrl}/auth/signup/`, data);
   }
 
-  checkRememberedUser(): UserData | null {
-    const remembered = localStorage.getItem('rememberMe');
-    if (remembered) {
-      const storedUser = localStorage.getItem('userData');
-      return storedUser ? JSON.parse(storedUser) : null;
+  checkRememberedUser(): void {
+    if (typeof window !== 'undefined') {
+      const remembered = window.localStorage.getItem('rememberMe');
+      if (remembered) {
+        const parsed = JSON.parse(remembered);
+        if (parsed.rememberMe) {
+          this.subscription = this.http
+            .get<UserData>(`${this.baseUrl}/auth/getuser/${parsed.id}/`)
+            .pipe(take(1))
+            .subscribe({
+              next: (user) => {
+                this.userData.set(user);
+              },
+              error: (err) => {
+                this.router.navigate(['/error', err.status]);
+              },
+            });
+        }
+      }
     }
-    return null;
   }
 
   logout(): void {
@@ -60,5 +82,11 @@ export class UserDataService {
       vacationDays: 0,
       personalTime: 0,
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
