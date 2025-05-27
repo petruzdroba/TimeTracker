@@ -19,8 +19,9 @@
   </div>
   <mat-drawer-container [hasBackdrop]=" false" class="drawer-container">
     <mat-drawer #drawer mode="side" class="drawer">
-      <div class="option-group">
-        <button class="btn-icon" (click)="openLoginWindow()">Login</button>
+      <div class="nav-bar-item">
+        <i class="fa-solid fa-user"></i>
+        <button class="btn-txt" (click)="openLoginWindow()">Account</button>
       </div>
       <div [class]="'nav-bar-item ' + (currentRoute === '/home' ? 'selected' : '')">
         <i class="fas fa-chart-bar"></i>

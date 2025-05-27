@@ -1,8 +1,15 @@
+@if(!isLoggedIn)
+{
 <mat-tab-group>
   <mat-tab label="Log In">
-    <app-login (close)="closeWindow()"/>
-  </mat-tab>  
+    <app-login (close)="closeWindow()" />
+  </mat-tab>
   <mat-tab label="Sign Up">
-    <app-signin (close)="closeWindow()"/>
+    <app-signin (close)="closeWindow()" />
   </mat-tab>
 </mat-tab-group>
+}
+@else
+{
+<app-info (close)="closeWindow()" />
+}
