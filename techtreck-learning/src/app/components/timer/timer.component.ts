@@ -5,19 +5,18 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Session } from '../../model/session.interface';
 import { WorkLogService } from '../../service/work-log.service';
 import { TimerService } from '../../service/timer.service';
-import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 import { TimerData } from '../../model/timer-data.interface';
 
 @Component({
   selector: 'app-timer',
   standalone: true,
-  imports: [DatePipe, ProgressBarComponent, ResetButtonComponent],
+  imports: [DatePipe, ProgressBarComponent],
   templateUrl: './timer.component.html',
   styleUrl: './timer.component.sass',
 })
 export class TimerComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
-  protected timerService = inject(TimerService);
+  private timerService = inject(TimerService);
   private workLogService = inject(WorkLogService);
 
   protected timerData = signal<TimerData>({} as TimerData);

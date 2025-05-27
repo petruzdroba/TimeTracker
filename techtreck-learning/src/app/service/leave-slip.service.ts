@@ -165,16 +165,6 @@ export class LeaveSlipService implements OnDestroy {
     this.updateLeaveData();
   }
 
-  resetData() {
-    this.leaveSlipData.set({
-      remainingTime: 21600000,
-      pastLeaves: [],
-      futureLeaves: [],
-    });
-    this.updateLeaveData();
-    window.location.reload();
-  }
-
   editLeaveSlip(oldLeave: LeaveSlip, newLeaveData: LeaveSlip) {
     const currentData = this.leaveSlipData();
     const index = this.findLeaveIndex(oldLeave);

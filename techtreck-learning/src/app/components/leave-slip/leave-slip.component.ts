@@ -5,7 +5,6 @@ import { LeaveSlip } from '../../model/leave-slip.interface';
 import { LeaveSlipTableComponent } from './leave-slip-table/leave-slip-table.component';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
 import { DatePipe } from '@angular/common';
-import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 import { LeaveSlipData } from '../../model/leaveslip-data.interface';
 import { MatTabsModule } from '@angular/material/tabs';
 
@@ -17,7 +16,6 @@ import { MatTabsModule } from '@angular/material/tabs';
     LeaveSlipTableComponent,
     ProgressBarComponent,
     DatePipe,
-    ResetButtonComponent,
     MatTabsModule,
   ],
   templateUrl: './leave-slip.component.html',
@@ -25,7 +23,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 })
 export class LeaveSlipComponent {
   protected leaveData = signal<LeaveSlipData>({} as LeaveSlipData);
-  protected leaveSlipService = inject(LeaveSlipService);
+  private leaveSlipService = inject(LeaveSlipService);
 
   constructor() {
     this.leaveData.set(this.leaveSlipService.leaveSlip);

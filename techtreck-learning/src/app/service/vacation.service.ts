@@ -229,16 +229,6 @@ export class VacationService implements OnDestroy {
     this.updateVacationData();
   }
 
-  resetData() {
-    this.vacationData.set({
-      remainingVacationDays: 14,
-      pastVacations: [],
-      futureVacations: [],
-    });
-    this.updateVacationData();
-    window.location.reload();
-  }
-
   updateVacationData() {
     if (this.userData.isLoggedIn()) {
       this.subscription = this.http

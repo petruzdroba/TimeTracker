@@ -4,7 +4,6 @@ import { VacationTableComponent } from './vacation-table/vacation-table.componen
 import { Vacation } from '../../model/vacation.interface';
 import { VacationService } from '../../service/vacation.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { ResetButtonComponent } from '../../shared/reset-button/reset-button.component';
 import { VacationData } from '../../model/vacation-data.interface';
 import { MatTabsModule } from '@angular/material/tabs';
 
@@ -15,7 +14,6 @@ import { MatTabsModule } from '@angular/material/tabs';
     VacationPickerComponent,
     VacationTableComponent,
     ProgressBarComponent,
-    ResetButtonComponent,
     MatTabsModule,
   ],
   templateUrl: './vacation.component.html',
@@ -24,7 +22,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 export class VacationComponent implements OnInit {
   protected vacationData = signal<VacationData>({} as VacationData);
 
-  protected vacationService = inject(VacationService);
+  private vacationService = inject(VacationService);
 
   ngOnInit(): void {
     this.vacationData.set(this.vacationService.vacation);

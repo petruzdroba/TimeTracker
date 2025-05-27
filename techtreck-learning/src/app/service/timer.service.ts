@@ -13,6 +13,7 @@ export class TimerService implements OnDestroy {
   private lastSync: Date = new Date();
 
   private timerData = signal<TimerData>({
+    id: -1,
     startTime: new Date(),
     endTime: new Date(),
     requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
@@ -37,6 +38,7 @@ export class TimerService implements OnDestroy {
           }
 
           this.timerData.set({
+            id: this.userData.user().id,
             startTime: new Date(parsed.startTime),
             endTime: new Date(parsed.endTime),
             requiredTime: parsed.remainingTime,
@@ -98,7 +100,10 @@ export class TimerService implements OnDestroy {
 
   syncTimerData() {
     const currentTime = new Date();
-    if (currentTime.getTime() - this.lastSync.getTime() < 90000) {
+    if (
+      currentTime.getTime() - this.lastSync.getTime() < 90000 &&
+      this.userData.user().id !== -1
+    ) {
       console.log(this.userData.user().id);
       // Prevent syncing more than once every 15 minutes
       this.subscription = this.http
@@ -118,6 +123,7 @@ export class TimerService implements OnDestroy {
 
   resetData() {
     const defaultData: TimerData = {
+      id: -1,
       startTime: new Date(),
       endTime: new Date(),
       requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
