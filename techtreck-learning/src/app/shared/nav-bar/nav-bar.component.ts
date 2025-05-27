@@ -42,7 +42,9 @@ export class NavBarComponent {
   }
 
   openLoginWindow() {
-    this.loginWindow = true;
+    if (this.currentRoute !== '/auth') {
+      this.loginWindow = true;
+    }
   }
 
   closeLoginWindow() {

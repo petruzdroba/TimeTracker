@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { SigninComponent } from './signin/signin.component';
 import { UserDataService } from '../../service/user-data.service';
 import { InfoComponent } from './info/info.component';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth',
@@ -15,9 +16,14 @@ import { InfoComponent } from './info/info.component';
 export class AuthComponent {
   @Output() close = new EventEmitter<void>();
   private userService = inject(UserDataService);
+  routerService = inject(Router);
 
   get isLoggedIn() {
     return this.userService.isLoggedIn();
+  }
+
+  get currentRoute() {
+    return this.routerService.url;
   }
 
   closeWindow() {
