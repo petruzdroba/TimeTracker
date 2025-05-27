@@ -10,6 +10,7 @@ class UserDataAdmin(admin.ModelAdmin):
         "work_hours",
         "vacation_days",
         "personal_time",
+        "role",
     )
     readonly_fields = ("id",)
 

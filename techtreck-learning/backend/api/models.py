@@ -10,6 +10,9 @@ class UserData(models.Model):
     work_hours = models.IntegerField()
     vacation_days = models.IntegerField()
     personal_time = models.IntegerField()  # in hours
+    role = models.CharField(
+        max_length=50, default="employee"
+    )  # e.g., employee, manager, admin
 
     def __str__(self):
         return self.email

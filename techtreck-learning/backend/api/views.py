@@ -70,6 +70,7 @@ class UserSignInView(APIView):
                     "workHours": user_data.work_hours,
                     "vacationDays": user_data.vacation_days,
                     "personalTime": user_data.personal_time,
+                    "role": user_data.role,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -101,6 +102,7 @@ class UserLogInView(APIView):
                         "workHours": user_data.work_hours,
                         "vacationDays": user_data.vacation_days,
                         "personalTime": user_data.personal_time,
+                        "role": user_data.role,
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -128,6 +130,7 @@ class GetUserDataView(APIView):
                     "workHours": user_data.work_hours,
                     "vacationDays": user_data.vacation_days,
                     "personalTime": user_data.personal_time,
+                    "role": user_data.role,
                 },
                 status=status.HTTP_200_OK,
             )

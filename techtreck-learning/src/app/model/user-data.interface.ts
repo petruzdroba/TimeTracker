@@ -5,4 +5,5 @@ export interface UserData {
   workHours: number;
   vacationDays: number;
   personalTime: number;
+  role: string;
 }
