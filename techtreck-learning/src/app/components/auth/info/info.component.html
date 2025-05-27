@@ -1,0 +1,29 @@
+<table class="info-table">
+  <tbody>
+    <tr>
+      <td>Name</td>
+      <td class="txt-right">{{userData().name}}</td>
+    </tr>
+
+    <tr>
+      <td>Email</td>
+      <td class="txt-right">{{userData().email}}</td>
+    </tr>
+
+    <tr>
+      <td>Hours worked a day</td>
+      <td class="txt-right">{{userData().workHours}}</td>
+    </tr>
+
+    <tr>
+      <td>Vacation days a year</td>
+      <td class="txt-right">{{userData().vacationDays}}</td>
+    </tr>
+
+    <tr>
+      <td>Personal time off</td>
+      <td class="txt-right">{{userData().personalTime}}</td>
+    </tr>
+  </tbody>
+</table>
+<button class="btn" (click)="onLogout()">Log Out</button>

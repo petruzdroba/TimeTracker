@@ -1,11 +1,58 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import {
+  Injectable,
+  signal,
+  computed,
+  inject,
+  OnDestroy,
+  effect,
+} from '@angular/core';
 import { Session } from '../model/session.interface';
+import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root',
 })
-export class WorkLogService {
+export class WorkLogService implements OnDestroy {
+  private userData = inject(UserDataService);
+  private routerService = inject(Router);
+  private http = inject(HttpClient);
+  private baseUrl = 'http://127.0.0.1:8000';
+  private subscription: any;
+
   private workLog = signal<Session[]>([]);
+  constructor() {
+    effect(
+      () => {
+        //autmatically destroyed when component is destroyed
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get(`${this.baseUrl}/worklog/get/${this.userData.user().id}/`)
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                if (
+                  Array.isArray(res) &&
+                  !(res.length === 1 && Object.keys(res[0]).length === 0)
+                ) {
+                  this.workLog.set(res);
+                } else {
+                  this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+                }
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
+  }
+
+  get getWorkLog() {
+    return this.workLog();
+  }
+
   private readonly _firstClockIn = computed(() =>
     this.workLog().find((session) => {
       const currentTime = new Date();
@@ -15,28 +62,6 @@ export class WorkLogService {
       return currentTime.getTime() === dateLastSession.getTime();
     })
   );
-
-  constructor() {
-    if (typeof window !== 'undefined') {
-      const storedWorkLogString = window.localStorage.getItem('workLog');
-      if (storedWorkLogString === null || storedWorkLogString === 'undefined') {
-        this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-        this.updateWorkLog();
-      } else {
-        const storedWorkLog = JSON.parse(storedWorkLogString);
-        if (Array.isArray(storedWorkLog)) {
-          this.workLog.set(storedWorkLog);
-        } else {
-          this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-          this.updateWorkLog();
-        }
-      }
-    }
-  }
-
-  get getWorkLog() {
-    return this.workLog();
-  }
 
   get firstClockIn() {
     return this._firstClockIn();
@@ -108,8 +133,23 @@ export class WorkLogService {
     });
     this.updateWorkLog();
   }
-
   updateWorkLog() {
-    window.localStorage.setItem('workLog', JSON.stringify(this.workLog()));
+    this.subscription = this.http
+      .put(`${this.baseUrl}/worklog/update/`, {
+        userId: this.userData.user().id,
+        data: this.workLog(),
+      })
+      .subscribe({
+        next: (res) => {},
+        error: (err) => {
+          this.routerService.navigate(['/error', err.status]);
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

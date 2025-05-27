@@ -1,26 +1,74 @@
-import { computed, Injectable, signal } from '@angular/core';
+import {
+  computed,
+  effect,
+  inject,
+  Injectable,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { Vacation } from '../model/vacation.interface';
 import { VacationData } from '../model/vacation-data.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
+import { HttpClient } from '@angular/common/http';
+import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class VacationService {
+export class VacationService implements OnDestroy {
+  private userData = inject(UserDataService);
+  private routerService = inject(Router);
+  private http = inject(HttpClient);
+  private baseUrl = 'http://127.0.0.1:8000';
+  private subscription: any;
+
   private vacationData = signal<VacationData>({
     futureVacations: [],
     pastVacations: [],
     remainingVacationDays: 14,
   });
-
   constructor() {
-    if (typeof window !== 'undefined') {
-      const storedVacationData = window.localStorage.getItem('vacationData');
-      if (storedVacationData) {
-        const data = JSON.parse(storedVacationData);
-        const processedData = this.processExpiredVacations(data);
-        this.vacationData.set(processedData);
-        this.updateVacationData();
-      }
-    }
+    effect(
+      () => {
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get<VacationData>(
+              `${this.baseUrl}/vacation/get/${this.userData.user().id}/`
+            )
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                const processedData = this.processExpiredVacations(res);
+                this.vacationData.set({
+                  ...processedData,
+                  futureVacations:
+                    Array.isArray(processedData.futureVacations) &&
+                    !(
+                      processedData.futureVacations.length === 1 &&
+                      Object.keys(processedData.futureVacations[0]).length === 0
+                    )
+                      ? processedData.futureVacations
+                      : [],
+                  pastVacations:
+                    Array.isArray(processedData.pastVacations) &&
+                    !(
+                      processedData.pastVacations.length === 1 &&
+                      Object.keys(processedData.pastVacations[0]).length === 0
+                    )
+                      ? processedData.pastVacations
+                      : [],
+                });
+                this.updateVacationData();
+              },
+              error: (err) => {
+                console.error('Error fetching vacation data:', err);
+                // this.updateVacationData();
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   private processExpiredVacations(data: VacationData): VacationData {
@@ -69,13 +117,6 @@ export class VacationService {
 
   get vacation(): VacationData {
     return this._vacationData();
-  }
-
-  updateVacationData() {
-    window.localStorage.setItem(
-      'vacationData',
-      JSON.stringify(this.vacationData())
-    );
   }
 
   getVacationIndex(vacation: Vacation): number {
@@ -188,13 +229,29 @@ export class VacationService {
     this.updateVacationData();
   }
 
-  resetData() {
-    this.vacationData.set({
-      remainingVacationDays: 14,
-      pastVacations: [],
-      futureVacations: [],
-    });
-    this.updateVacationData();
-    window.location.reload();
+  updateVacationData() {
+    if (this.userData.isLoggedIn()) {
+      this.subscription = this.http
+        .put(`${this.baseUrl}/vacation/update/`, {
+          userId: this.userData.user().id,
+          data: {
+            futureVacations: this.vacationData().futureVacations,
+            pastVacations: this.vacationData().pastVacations,
+            remainingVacationDays: this.vacationData().remainingVacationDays,
+          },
+        })
+        .subscribe({
+          next: (res) => {},
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+          },
+        });
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

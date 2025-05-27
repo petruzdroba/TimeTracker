@@ -16,7 +16,7 @@ export class TimerInfoComponent implements OnInit {
   private workLogService = inject(WorkLogService);
   private zone = inject(NgZone);
 
-  protected requiredTime = 7200000;
+  protected requiredTime = this.timerService.workingHoursFull;
   protected remainingTime: number = 0;
   protected currentTime = new Date();
 
@@ -34,7 +34,7 @@ export class TimerInfoComponent implements OnInit {
   }
 
   get procentageValue() {
-    return (100 - (this.remainingTime / this.requiredTime) * 100).toFixed(0);
+    return (100 - (this.remainingTime / this.requiredTime()) * 100).toFixed(0);
   }
 
   get today() {

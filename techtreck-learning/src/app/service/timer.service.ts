@@ -1,12 +1,22 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { TimerData } from '../model/timer-data.interface';
+import { UserDataService } from './user-data.service';
+import { HttpClient } from '@angular/common/http';
 
 @Injectable({ providedIn: 'root' })
-export class TimerService {
+export class TimerService implements OnDestroy {
+  private userData = inject(UserDataService);
+  private http = inject(HttpClient);
+  private baseUrl = 'http://127.0.0.1:8000';
+  private subscription: any;
+
+  private lastSync: Date = new Date();
+
   private timerData = signal<TimerData>({
+    id: -1,
     startTime: new Date(),
     endTime: new Date(),
-    requiredTime: 7200000,
+    requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
     timerType: 'OFF',
   });
 
@@ -28,6 +38,7 @@ export class TimerService {
           }
 
           this.timerData.set({
+            id: this.userData.user().id,
             startTime: new Date(parsed.startTime),
             endTime: new Date(parsed.endTime),
             requiredTime: parsed.remainingTime,
@@ -84,13 +95,38 @@ export class TimerService {
         timerType: timerData.timerType,
       })
     );
+    this.syncTimerData();
+  }
+
+  syncTimerData() {
+    const currentTime = new Date();
+    if (
+      currentTime.getTime() - this.lastSync.getTime() < 90000 &&
+      this.userData.user().id !== -1
+    ) {
+      console.log(this.userData.user().id);
+      // Prevent syncing more than once every 15 minutes
+      this.subscription = this.http
+        .put<TimerData>(`${this.baseUrl}/timer/sync/`, {
+          userId: this.userData.user().id,
+          data: this.timerData(),
+        })
+        .subscribe({
+          next(res) {},
+          error: (err) => {
+            console.error('Error syncing timer data:', err);
+          },
+        });
+    }
+    this.lastSync = currentTime;
   }
 
   resetData() {
     const defaultData: TimerData = {
+      id: -1,
       startTime: new Date(),
       endTime: new Date(),
-      requiredTime: 7200000,
+      requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
       timerType: 'OFF',
     };
 
@@ -107,4 +143,18 @@ export class TimerService {
 
     window.location.reload();
   }
+
+  ngOnDestroy() {
+    //force a sync on destroy
+    this.lastSync = new Date(new Date().getTime() - 1000000);
+    this.syncTimerData();
+
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+
+  readonly workingHoursFull = computed(
+    () => this.userData.user().workHours * 60 * 60 * 1000 || 7200000
+  );
 }

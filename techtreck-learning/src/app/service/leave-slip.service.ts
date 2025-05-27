@@ -1,9 +1,26 @@
-import { computed, Injectable, signal } from '@angular/core';
+import {
+  computed,
+  effect,
+  inject,
+  Injectable,
+  OnDestroy,
+  signal,
+} from '@angular/core';
 import { LeaveSlip } from '../model/leave-slip.interface';
 import { LeaveSlipData } from '../model/leaveslip-data.interface';
+import { HttpClient } from '@angular/common/http';
+import { take } from 'rxjs';
+import { UserDataService } from './user-data.service';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
-export class LeaveSlipService {
+export class LeaveSlipService implements OnDestroy {
+  private userData = inject(UserDataService);
+  private routerService = inject(Router);
+  private http = inject(HttpClient);
+  private baseUrl = 'http://127.0.0.1:8000';
+  private subscription: any;
+
   private leaveSlipData = signal<LeaveSlipData>({
     futureLeaves: [],
     pastLeaves: [],
@@ -11,15 +28,28 @@ export class LeaveSlipService {
   });
 
   constructor() {
-    if (typeof window !== 'undefined') {
-      const storedData = window.localStorage.getItem('leaveData');
-      if (storedData) {
-        const data = JSON.parse(storedData);
-        const processedData = this.processExpiredLeaves(data);
-        this.leaveSlipData.set(processedData);
-        this.updateLeaveData();
-      }
-    }
+    effect(
+      () => {
+        if (this.userData.isLoggedIn()) {
+          this.http
+            .get<LeaveSlipData>(
+              `${this.baseUrl}/leaveslip/get/${this.userData.user().id}/`
+            )
+            .pipe(take(1))
+            .subscribe({
+              next: (res) => {
+                const processedData = this.processExpiredLeaves(res);
+                this.leaveSlipData.set(processedData);
+                this.updateLeaveData();
+              },
+              error: (err) => {
+                console.error('Error fetching vacation data:', err);
+              },
+            });
+        }
+      },
+      { allowSignalWrites: true }
+    );
   }
 
   private processExpiredLeaves(data: LeaveSlipData): LeaveSlipData {
@@ -71,13 +101,6 @@ export class LeaveSlipService {
 
   get leaveSlip(): LeaveSlipData {
     return this._leaveSlipData();
-  }
-
-  updateLeaveData() {
-    window.localStorage.setItem(
-      'leaveData',
-      JSON.stringify(this.leaveSlipData())
-    );
   }
 
   addLeave(leaveData: LeaveSlip) {
@@ -142,16 +165,6 @@ export class LeaveSlipService {
     this.updateLeaveData();
   }
 
-  resetData() {
-    this.leaveSlipData.set({
-      remainingTime: 21600000,
-      pastLeaves: [],
-      futureLeaves: [],
-    });
-    this.updateLeaveData();
-    window.location.reload();
-  }
-
   editLeaveSlip(oldLeave: LeaveSlip, newLeaveData: LeaveSlip) {
     const currentData = this.leaveSlipData();
     const index = this.findLeaveIndex(oldLeave);
@@ -175,5 +188,28 @@ export class LeaveSlipService {
         new Date(item.date).getTime() === new Date(leave.date).getTime() &&
         item.description === leave.description
     );
+  }
+
+  updateLeaveData() {
+    if (this.userData.isLoggedIn()) {
+      this.subscription = this.http
+        .put(`${this.baseUrl}/leaveslip/update/`, {
+          userId: this.userData.user().id,
+          data: this.leaveSlipData(),
+        })
+        .subscribe({
+          next: (res) => {},
+          error: (err) => {
+            //this is for server eror handling
+            this.routerService.navigate(['/error', err.status]);
+          },
+        });
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
