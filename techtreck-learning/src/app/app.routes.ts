@@ -55,8 +55,10 @@ export const routes: Routes = [
   {
     path: 'manager',
     loadChildren: () =>
-      import('./components/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
-    title: 'Admin',
+      import('./components/manager/manager.routes').then(
+        (m) => m.MANAGER_ROUTES
+      ),
+    title: 'Manager',
     canActivate: [authGuard, managerGuard],
   },
   {
