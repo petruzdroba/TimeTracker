@@ -5,6 +5,12 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take, map } from 'rxjs';
 import { Vacation } from '../model/vacation.interface';
+import { getDaysBetweenDates } from '../shared/utils/time.utils';
+
+interface VacationWithUser {
+  userId: number;
+  vacation: Vacation;
+}
 
 @Injectable({ providedIn: 'root' })
 export class ManagerService implements OnDestroy {
@@ -74,6 +80,63 @@ export class ManagerService implements OnDestroy {
     }
     return result;
   });
+
+  acceptVacation(vacationWithUser: VacationWithUser) {
+    const { userId, vacation } = vacationWithUser;
+    const userVacations = this.managerData().vacations[userId];
+    if (!userVacations) return;
+
+    this.http
+      .put(`${this.baseUrl}/vacation/update/`, {
+        userId,
+        data: {
+          futureVacations: userVacations.futureVacations.map((v) =>
+            v.startDate === vacation.startDate &&
+            v.description === vacation.description
+              ? { ...v, status: 'accepted' }
+              : v
+          ),
+          pastVacations: userVacations.pastVacations,
+          remainingVacationDays:
+            userVacations.remainingVacationDays -
+            getDaysBetweenDates(
+              new Date(vacation.startDate),
+              new Date(vacation.endDate)
+            ),
+        },
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: () => this.fetchManagerData(),
+        error: (err) => this.routerService.navigate(['/error', err.status]),
+      });
+  }
+
+  rejectVacation(vacationWithUser: VacationWithUser) {
+    const { userId, vacation } = vacationWithUser;
+    const userVacations = this.managerData().vacations[userId];
+    if (!userVacations) return;
+
+    this.http
+      .put(`${this.baseUrl}/vacation/update/`, {
+        userId,
+        data: {
+          futureVacations: userVacations.futureVacations.map((v) =>
+            v.startDate === vacation.startDate &&
+            v.description === vacation.description
+              ? { ...v, status: 'rejected' }
+              : v
+          ),
+          pastVacations: userVacations.pastVacations,
+          remainingVacationDays: userVacations.remainingVacationDays,
+        },
+      })
+      .pipe(take(1))
+      .subscribe({
+        next: () => this.fetchManagerData(),
+        error: (err) => this.routerService.navigate(['/error', err.status]),
+      });
+  }
 
   ngOnDestroy(): void {
     if (this.subscription) {

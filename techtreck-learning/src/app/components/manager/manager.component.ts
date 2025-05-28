@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ManagerService } from '../../service/manager.service';
-import { Vacation } from '../../model/vacation.interface';
 import { VacationWithUser } from '../../model/manager-data.interface';
 
 @Component({
@@ -18,5 +17,9 @@ export class ManagerComponent implements OnInit {
   ngOnInit(): void {
     this.futureVacations = this.managerService.futureVacations();
     this.pastVacations = this.managerService.pastVacations();
+    // console.log('Future Vacations:', this.futureVacations);
+    // if (this.futureVacations && this.futureVacations.length > 0) {
+    //   this.managerService.acceptVacation(this.futureVacations[0]);
+    // }
   }
 }
