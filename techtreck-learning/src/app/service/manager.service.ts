@@ -1,9 +1,10 @@
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { ManagerData } from '../model/manager-data.interface';
 import { UserDataService } from './user-data.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { take } from 'rxjs';
+import { take, map } from 'rxjs';
+import { Vacation } from '../model/vacation.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ManagerService implements OnDestroy {
@@ -14,8 +15,8 @@ export class ManagerService implements OnDestroy {
   private subscription: any;
 
   private managerData = signal<ManagerData>({
-    vacations: [],
-    leaves: [],
+    vacations: {},
+    leaves: {},
   });
 
   constructor() {
@@ -24,18 +25,55 @@ export class ManagerService implements OnDestroy {
 
   private fetchManagerData() {
     this.subscription = this.http
-      .get<ManagerData>(this.baseUrl + '/manager/get/')
-      .pipe(take(1))
+      .get<{ vacations: any[]; leaves: any[] }>(this.baseUrl + '/manager/get/')
+      .pipe(
+        map((response) => ({
+          vacations: Object.fromEntries(
+            response.vacations.map((v) => [v.id, v])
+          ),
+          leaves: Object.fromEntries(response.leaves.map((l) => [l.id, l])),
+        })),
+        take(1)
+      )
       .subscribe({
         next: (res) => {
           this.managerData.set(res);
-          console.log('Manager data fetched successfully:', this.managerData());
         },
         error: (err) => {
-          this.routerService.navigate(['/error/' + err]);
+          this.routerService.navigate(['/error', err.status]);
         },
       });
   }
+
+  readonly futureVacations = computed(() => {
+    const result: { userId: number; vacation: Vacation }[] = [];
+    const vacations = this.managerData().vacations;
+
+    for (const [userId, userData] of Object.entries(vacations)) {
+      userData.futureVacations.forEach((vacation) => {
+        result.push({
+          userId: Number(userId),
+          vacation,
+        });
+      });
+    }
+    return result;
+  });
+
+  readonly pastVacations = computed(() => {
+    const result: { userId: number; vacation: Vacation }[] = [];
+    const vacations = this.managerData().vacations;
+
+    for (const [userId, userData] of Object.entries(vacations)) {
+      userData.pastVacations.forEach((vacation) => {
+        result.push({
+          userId: Number(userId),
+          vacation,
+        });
+      });
+    }
+    return result;
+  });
 
   ngOnDestroy(): void {
     if (this.subscription) {
