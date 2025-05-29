@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { ManagerData } from '../model/manager-data.interface';
 import { UserDataService } from './user-data.service';
@@ -29,26 +30,32 @@ export class ManagerService implements OnDestroy {
     this.fetchManagerData();
   }
 
-  private fetchManagerData() {
-    this.subscription = this.http
-      .get<{ vacations: any[]; leaves: any[] }>(this.baseUrl + '/manager/get/')
-      .pipe(
-        map((response) => ({
-          vacations: Object.fromEntries(
-            response.vacations.map((v) => [v.id, v])
-          ),
-          leaves: Object.fromEntries(response.leaves.map((l) => [l.id, l])),
-        })),
-        take(1)
-      )
-      .subscribe({
-        next: (res) => {
-          this.managerData.set(res);
-        },
-        error: (err) => {
-          this.routerService.navigate(['/error', err.status]);
-        },
-      });
+  fetchManagerData(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .get<{ vacations: any[]; leaves: any[] }>(
+          this.baseUrl + '/manager/get/'
+        )
+        .pipe(
+          map((response) => ({
+            vacations: Object.fromEntries(
+              response.vacations.map((v) => [v.id, v])
+            ),
+            leaves: Object.fromEntries(response.leaves.map((l) => [l.id, l])),
+          })),
+          take(1)
+        )
+        .subscribe({
+          next: (res) => {
+            this.managerData.set(res);
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
   }
 
   readonly futureVacations = computed(() => {
@@ -81,61 +88,82 @@ export class ManagerService implements OnDestroy {
     return result;
   });
 
-  acceptVacation(vacationWithUser: VacationWithUser) {
+  acceptVacation(vacationWithUser: VacationWithUser): Promise<void> {
     const { userId, vacation } = vacationWithUser;
     const userVacations = this.managerData().vacations[userId];
-    if (!userVacations) return;
+    if (!userVacations) return Promise.reject();
 
-    this.http
-      .put(`${this.baseUrl}/vacation/update/`, {
-        userId,
-        data: {
-          futureVacations: userVacations.futureVacations.map((v) =>
-            v.startDate === vacation.startDate &&
-            v.description === vacation.description
-              ? { ...v, status: 'accepted' }
-              : v
-          ),
-          pastVacations: userVacations.pastVacations,
-          remainingVacationDays:
-            userVacations.remainingVacationDays -
-            getDaysBetweenDates(
-              new Date(vacation.startDate),
-              new Date(vacation.endDate)
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(`${this.baseUrl}/vacation/update/`, {
+          userId,
+          data: {
+            futureVacations: userVacations.futureVacations.map((v) =>
+              v.startDate === vacation.startDate &&
+              v.description === vacation.description
+                ? { ...v, status: 'accepted' }
+                : v
             ),
-        },
-      })
-      .pipe(take(1))
-      .subscribe({
-        next: () => this.fetchManagerData(),
-        error: (err) => this.routerService.navigate(['/error', err.status]),
-      });
+            pastVacations: userVacations.pastVacations,
+            remainingVacationDays:
+              userVacations.remainingVacationDays -
+              getDaysBetweenDates(
+                new Date(vacation.startDate),
+                new Date(vacation.endDate)
+              ),
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
   }
 
-  rejectVacation(vacationWithUser: VacationWithUser) {
+  rejectVacation(vacationWithUser: VacationWithUser): Promise<void> {
     const { userId, vacation } = vacationWithUser;
     const userVacations = this.managerData().vacations[userId];
-    if (!userVacations) return;
+    if (!userVacations) return Promise.reject();
 
-    this.http
-      .put(`${this.baseUrl}/vacation/update/`, {
-        userId,
-        data: {
-          futureVacations: userVacations.futureVacations.map((v) =>
-            v.startDate === vacation.startDate &&
-            v.description === vacation.description
-              ? { ...v, status: 'rejected' }
-              : v
-          ),
-          pastVacations: userVacations.pastVacations,
-          remainingVacationDays: userVacations.remainingVacationDays,
-        },
-      })
-      .pipe(take(1))
-      .subscribe({
-        next: () => this.fetchManagerData(),
-        error: (err) => this.routerService.navigate(['/error', err.status]),
-      });
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(`${this.baseUrl}/vacation/update/`, {
+          userId,
+          data: {
+            futureVacations: userVacations.futureVacations.map((v) =>
+              v.startDate === vacation.startDate &&
+              v.description === vacation.description
+                ? { ...v, status: 'denied' }
+                : v
+            ),
+            pastVacations: userVacations.pastVacations,
+            remainingVacationDays: userVacations.remainingVacationDays,
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
+  getRemainingDays(userId: number): number {
+    const userVacations = this.managerData().vacations[userId];
+    return userVacations ? userVacations.remainingVacationDays : 0;
   }
 
   ngOnDestroy(): void {

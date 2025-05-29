@@ -1,25 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ManagerService } from '../../service/manager.service';
-import { VacationWithUser } from '../../model/manager-data.interface';
+import { Component } from '@angular/core';
+import { ManagerVacationComponent } from './manager-vacation/manager-vacation.component';
 
 @Component({
   selector: 'app-manager',
   standalone: true,
-  imports: [],
+  imports: [ManagerVacationComponent],
   templateUrl: './manager.component.html',
   styleUrl: './manager.component.sass',
 })
-export class ManagerComponent implements OnInit {
-  private managerService = inject(ManagerService);
-  futureVacations: VacationWithUser[] = [];
-  pastVacations: VacationWithUser[] = [];
-
-  ngOnInit(): void {
-    this.futureVacations = this.managerService.futureVacations();
-    this.pastVacations = this.managerService.pastVacations();
-    // console.log('Future Vacations:', this.futureVacations);
-    // if (this.futureVacations && this.futureVacations.length > 0) {
-    //   this.managerService.acceptVacation(this.futureVacations[0]);
-    // }
-  }
-}
+export class ManagerComponent {}
