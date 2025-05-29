@@ -1,7 +1,5 @@
-import { resolve } from 'node:path';
 import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { ManagerData } from '../model/manager-data.interface';
-import { UserDataService } from './user-data.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take, map } from 'rxjs';
@@ -15,7 +13,6 @@ interface VacationWithUser {
 
 @Injectable({ providedIn: 'root' })
 export class ManagerService implements OnDestroy {
-  private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
   private baseUrl = 'http://127.0.0.1:8000';
@@ -30,7 +27,11 @@ export class ManagerService implements OnDestroy {
     this.fetchManagerData();
   }
 
-  fetchManagerData(): Promise<void> {
+  initialize(): Promise<void> {
+    return this.fetchManagerData();
+  }
+
+  private fetchManagerData(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
         .get<{ vacations: any[]; leaves: any[] }>(

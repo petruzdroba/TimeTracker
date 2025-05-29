@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { LeaveSlipPickerComponent } from './leave-slip-picker/leave-slip-picker.component';
 import { LeaveSlipService } from '../../service/leave-slip.service';
 import { LeaveSlip } from '../../model/leave-slip.interface';
@@ -21,11 +21,12 @@ import { MatTabsModule } from '@angular/material/tabs';
   templateUrl: './leave-slip.component.html',
   styleUrl: './leave-slip.component.sass',
 })
-export class LeaveSlipComponent {
+export class LeaveSlipComponent implements OnInit {
   protected leaveData = signal<LeaveSlipData>({} as LeaveSlipData);
   private leaveSlipService = inject(LeaveSlipService);
 
-  constructor() {
+  async ngOnInit(): Promise<void> {
+    this.leaveSlipService.initialize();
     this.leaveData.set(this.leaveSlipService.leaveSlip);
   }
 

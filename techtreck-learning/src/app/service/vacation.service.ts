@@ -30,45 +30,49 @@ export class VacationService implements OnDestroy {
   constructor() {
     effect(
       () => {
-        if (this.userData.isLoggedIn()) {
-          this.http
-            .get<VacationData>(
-              `${this.baseUrl}/vacation/get/${this.userData.user().id}/`
-            )
-            .pipe(take(1))
-            .subscribe({
-              next: (res) => {
-                const processedData = this.processExpiredVacations(res);
-                this.vacationData.set({
-                  ...processedData,
-                  futureVacations:
-                    Array.isArray(processedData.futureVacations) &&
-                    !(
-                      processedData.futureVacations.length === 1 &&
-                      Object.keys(processedData.futureVacations[0]).length === 0
-                    )
-                      ? processedData.futureVacations
-                      : [],
-                  pastVacations:
-                    Array.isArray(processedData.pastVacations) &&
-                    !(
-                      processedData.pastVacations.length === 1 &&
-                      Object.keys(processedData.pastVacations[0]).length === 0
-                    )
-                      ? processedData.pastVacations
-                      : [],
-                });
-                this.updateVacationData();
-              },
-              error: (err) => {
-                console.error('Error fetching vacation data:', err);
-                // this.updateVacationData();
-              },
-            });
-        }
+        this.initialize();
       },
       { allowSignalWrites: true }
     );
+  }
+
+  initialize(): void {
+    if (this.userData.isLoggedIn()) {
+      this.http
+        .get<VacationData>(
+          `${this.baseUrl}/vacation/get/${this.userData.user().id}/`
+        )
+        .pipe(take(1))
+        .subscribe({
+          next: (res) => {
+            const processedData = this.processExpiredVacations(res);
+            this.vacationData.set({
+              ...processedData,
+              futureVacations:
+                Array.isArray(processedData.futureVacations) &&
+                !(
+                  processedData.futureVacations.length === 1 &&
+                  Object.keys(processedData.futureVacations[0]).length === 0
+                )
+                  ? processedData.futureVacations
+                  : [],
+              pastVacations:
+                Array.isArray(processedData.pastVacations) &&
+                !(
+                  processedData.pastVacations.length === 1 &&
+                  Object.keys(processedData.pastVacations[0]).length === 0
+                )
+                  ? processedData.pastVacations
+                  : [],
+            });
+            this.updateVacationData();
+          },
+          error: (err) => {
+            console.error('Error fetching vacation data:', err);
+            // this.updateVacationData();
+          },
+        });
+    }
   }
 
   private processExpiredVacations(data: VacationData): VacationData {

@@ -33,7 +33,7 @@ export class ManagerVacationComponent implements OnInit {
   private statusFilter: StatusFilter = { status: 'all' };
 
   async ngOnInit(): Promise<void> {
-    await this.managerService.fetchManagerData();
+    await this.managerService.initialize();
     this.futureVacations = this.managerService.futureVacations();
     this.pastVacations = this.managerService.pastVacations();
   }
@@ -150,14 +150,14 @@ export class ManagerVacationComponent implements OnInit {
 
   async onAccept(v: VacationWithUser) {
     await this.managerService.acceptVacation(v);
-    await this.managerService.fetchManagerData();
+    await this.managerService.initialize();
     this.futureVacations = this.managerService.futureVacations();
     this.pastVacations = this.managerService.pastVacations();
   }
 
   async onDeny(v: VacationWithUser) {
     await this.managerService.rejectVacation(v);
-    await this.managerService.fetchManagerData();
+    await this.managerService.initialize();
     this.futureVacations = this.managerService.futureVacations();
     this.pastVacations = this.managerService.pastVacations();
   }

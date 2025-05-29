@@ -310,7 +310,7 @@ class TimerDataSyncView(APIView):
             user_id = request.data.get("userId")
             data = request.data.get("data")
 
-            print("Received data:", data)
+            # print("Received data:", data)
 
             timer_data = TimerData.objects.get(id=user_id)
             timer_data.start_time = data.get("startTime")

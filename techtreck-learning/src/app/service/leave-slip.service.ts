@@ -30,26 +30,30 @@ export class LeaveSlipService implements OnDestroy {
   constructor() {
     effect(
       () => {
-        if (this.userData.isLoggedIn()) {
-          this.http
-            .get<LeaveSlipData>(
-              `${this.baseUrl}/leaveslip/get/${this.userData.user().id}/`
-            )
-            .pipe(take(1))
-            .subscribe({
-              next: (res) => {
-                const processedData = this.processExpiredLeaves(res);
-                this.leaveSlipData.set(processedData);
-                this.updateLeaveData();
-              },
-              error: (err) => {
-                console.error('Error fetching vacation data:', err);
-              },
-            });
-        }
+        this.initialize();
       },
       { allowSignalWrites: true }
     );
+  }
+
+  initialize(): void {
+    if (this.userData.isLoggedIn()) {
+      this.http
+        .get<LeaveSlipData>(
+          `${this.baseUrl}/leaveslip/get/${this.userData.user().id}/`
+        )
+        .pipe(take(1))
+        .subscribe({
+          next: (res) => {
+            const processedData = this.processExpiredLeaves(res);
+            this.leaveSlipData.set(processedData);
+            this.updateLeaveData();
+          },
+          error: (err) => {
+            console.error('Error fetching vacation data:', err);
+          },
+        });
+    }
   }
 
   private processExpiredLeaves(data: LeaveSlipData): LeaveSlipData {
