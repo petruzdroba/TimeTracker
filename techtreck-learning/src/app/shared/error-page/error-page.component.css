@@ -24,3 +24,7 @@
 .btn-return:hover {
   background-color: var(--primary-hover-color)
 }
+
+.link {
+  color: var(--primary-color)
+}

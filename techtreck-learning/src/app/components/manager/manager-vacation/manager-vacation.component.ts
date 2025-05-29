@@ -148,6 +148,16 @@ export class ManagerVacationComponent implements OnInit {
     );
   }
 
+  getUserEmail(userId: number): string {
+    const user = this.managerService.getUserById(userId);
+    return user?.email || '';
+  }
+
+  disabled(v: VacationWithUser): boolean {
+    const index = this.managerService.getVacationIndex(v);
+    return index === -1;
+  }
+
   async onAccept(v: VacationWithUser) {
     await this.managerService.acceptVacation(v);
     await this.managerService.initialize();
@@ -157,6 +167,13 @@ export class ManagerVacationComponent implements OnInit {
 
   async onDeny(v: VacationWithUser) {
     await this.managerService.rejectVacation(v);
+    await this.managerService.initialize();
+    this.futureVacations = this.managerService.futureVacations();
+    this.pastVacations = this.managerService.pastVacations();
+  }
+
+  async onUndo(v: VacationWithUser) {
+    await this.managerService.undoVacation(v);
     await this.managerService.initialize();
     this.futureVacations = this.managerService.futureVacations();
     this.pastVacations = this.managerService.pastVacations();

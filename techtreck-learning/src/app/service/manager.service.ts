@@ -2,9 +2,10 @@ import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
 import { ManagerData } from '../model/manager-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { take, map } from 'rxjs';
+import { take, map, firstValueFrom } from 'rxjs';
 import { Vacation } from '../model/vacation.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
+import { UserData } from '../model/user-data.interface';
 
 interface VacationWithUser {
   userId: number;
@@ -22,6 +23,9 @@ export class ManagerService implements OnDestroy {
     vacations: {},
     leaves: {},
   });
+
+  private usersData = signal<{ [key: number]: UserData }>({});
+  private pendingRequests = new Map<number, Promise<UserData>>();
 
   constructor() {
     this.fetchManagerData();
@@ -162,9 +166,84 @@ export class ManagerService implements OnDestroy {
     });
   }
 
+  undoVacation(vacationWithUser: VacationWithUser): Promise<void> {
+    const { userId, vacation } = vacationWithUser;
+    const userVacations = this.managerData().vacations[userId];
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(this.baseUrl + '/vacation/update/', {
+          userId,
+          data: {
+            futureVacations: userVacations.futureVacations.map((v) =>
+              v.startDate === vacation.startDate &&
+              v.description === vacation.description
+                ? { ...v, status: 'pending' }
+                : v
+            ),
+            pastVacations: userVacations.pastVacations,
+            remainingVacationDays:
+              vacation.status === 'accepted'
+                ? userVacations.remainingVacationDays +
+                  getDaysBetweenDates(
+                    new Date(vacation.startDate),
+                    new Date(vacation.endDate)
+                  )
+                : userVacations.remainingVacationDays,
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
   getRemainingDays(userId: number): number {
     const userVacations = this.managerData().vacations[userId];
     return userVacations ? userVacations.remainingVacationDays : 0;
+  }
+
+  getUserById(userId: number): UserData | null {
+    // Return cached user if exists
+    if (this.usersData()[userId]) {
+      return this.usersData()[userId];
+    }
+
+    // If there's no pending request for this userId, create one
+    if (!this.pendingRequests.has(userId)) {
+      const request = firstValueFrom(
+        this.http.get<UserData>(`${this.baseUrl}/auth/getuser/${userId}/`)
+      )
+        .then((res) => {
+          this.usersData.update((state) => ({ ...state, [userId]: res }));
+          this.pendingRequests.delete(userId);
+          return res;
+        })
+        .catch((err) => {
+          this.routerService.navigate(['/error', err.status]);
+          this.pendingRequests.delete(userId);
+          throw err;
+        });
+
+      this.pendingRequests.set(userId, request);
+    }
+
+    return null;
+  }
+
+  getVacationIndex(vacationWithUser: VacationWithUser): number {
+    const { userId, vacation } = vacationWithUser;
+    return this.managerData().vacations[userId]?.futureVacations.findIndex(
+      (v) => v === vacation
+    );
   }
 
   ngOnDestroy(): void {
