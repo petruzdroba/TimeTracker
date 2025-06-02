@@ -53,6 +53,7 @@
     <tbody>
       <tr>
         <th>Status</th>
+        <th>ID</th>
         <th>Start Date</th>
         <th>End Date</th>
         <th>Undo</th>
@@ -60,6 +61,7 @@
       @for(vacation of filteredCompletedVacationRequests; track vacation){
       <tr>
         <td><i [ngClass]="'fas fa-circle ' + vacation.vacation.status" [title]="vacation.vacation.status"></i></td>
+        <td>{{ getUserEmail(vacation.userId) }}</td>
         <td>{{vacation.vacation.startDate| date: 'longDate'}}</td>
         <td>{{vacation.vacation.endDate | date: 'longDate'}}</td>
         <td><button [class]="!disabled(vacation) ?  'btn-icon' : 'btn-icon-disabled'" [disabled]="disabled(vacation)"

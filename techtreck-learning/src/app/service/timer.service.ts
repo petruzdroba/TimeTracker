@@ -104,7 +104,6 @@ export class TimerService implements OnDestroy {
       currentTime.getTime() - this.lastSync.getTime() < 90000 &&
       this.userData.user().id !== -1
     ) {
-      console.log(this.userData.user().id);
       // Prevent syncing more than once every 15 minutes
       this.subscription = this.http
         .put<TimerData>(`${this.baseUrl}/timer/sync/`, {
@@ -112,13 +111,14 @@ export class TimerService implements OnDestroy {
           data: this.timerData(),
         })
         .subscribe({
-          next(res) {},
+          next: () => {
+            this.lastSync = currentTime;
+          },
           error: (err) => {
             console.error('Error syncing timer data:', err);
           },
         });
     }
-    this.lastSync = currentTime;
   }
 
   resetData() {
