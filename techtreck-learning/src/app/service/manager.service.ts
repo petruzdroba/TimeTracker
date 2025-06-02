@@ -253,6 +253,117 @@ export class ManagerService implements OnDestroy {
     });
   }
 
+  acceptLeave(leaveWithUser: LeaveWithUser): Promise<void> {
+    const { userId, leave } = leaveWithUser;
+    const userLeaves = this.managerData().leaves[userId];
+    if (!userLeaves) return Promise.reject();
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(`${this.baseUrl}/leaveslip/update/`, {
+          userId,
+          data: {
+            futureLeaves: userLeaves.futureLeaves.map((l) =>
+              l.date === leave.date && l.description === leave.description
+                ? { ...l, status: 'accepted' }
+                : l
+            ),
+            pastLeaves: userLeaves.pastLeaves,
+            remainingTime:
+              userLeaves.remainingTime -
+              Number(
+                new Date(leave.endTime).getTime() -
+                  new Date(leave.startTime).getTime()
+              ),
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
+  rejectLeave(leaveWithUser: LeaveWithUser): Promise<void> {
+    const { userId, leave } = leaveWithUser;
+    const userLeaves = this.managerData().leaves[userId];
+    if (!userLeaves) return Promise.reject();
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(`${this.baseUrl}/leaveslip/update/`, {
+          userId,
+          data: {
+            futureLeaves: userLeaves.futureLeaves.map((l) =>
+              l.date === leave.date && l.description === leave.description
+                ? { ...l, status: 'denied' }
+                : l
+            ),
+            pastLeaves: userLeaves.pastLeaves,
+            remainingTime: userLeaves.remainingTime,
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
+  undoLeave(leaveWithUser: LeaveWithUser): Promise<void> {
+    const { userId, leave } = leaveWithUser;
+    const userLeaves = this.managerData().leaves[userId];
+    if (!userLeaves) return Promise.reject();
+
+    return new Promise((resolve, reject) => {
+      this.http
+        .put(`${this.baseUrl}/leaveslip/update/`, {
+          userId,
+          data: {
+            futureLeaves: userLeaves.futureLeaves.map((l) =>
+              l.date === leave.date && l.description === leave.description
+                ? { ...l, status: 'pending' }
+                : l
+            ),
+            pastLeaves: userLeaves.pastLeaves,
+            remainingTime:
+              leave.status === 'accepted'
+                ? userLeaves.remainingTime +
+                  Number(
+                    new Date(leave.endTime).getTime() -
+                      new Date(leave.startTime).getTime()
+                  )
+                : userLeaves.remainingTime,
+          },
+        })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchManagerData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
   getRemainingDays(userId: number): number {
     const userVacations = this.managerData().vacations[userId];
     return userVacations ? userVacations.remainingVacationDays : 0;

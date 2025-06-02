@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { ManagerService } from '../../../service/manager.service';
 import { LeaveWithUser } from '../../../model/manager-data.interface';
 import { DateFilter } from '../../../model/date-filter.interface';
@@ -122,16 +122,31 @@ export class ManagerLeavesComponent implements OnInit {
     return user?.email || '';
   }
 
-  onDeny(leave: LeaveWithUser) {}
+  async onAccept(leave: LeaveWithUser) {
+    await this.managerService.acceptLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+  }
 
-  onAccept(leave: LeaveWithUser) {}
+  async onDeny(leave: LeaveWithUser) {
+    await this.managerService.rejectLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+  }
+
+  async onUndo(leave: LeaveWithUser) {
+    await this.managerService.undoLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+  }
 
   disabled(leave: LeaveWithUser): boolean {
     const index = this.managerService.getLeaveIndex(leave);
     return index === -1;
   }
-
-  onUndo(leave: LeaveWithUser) {}
 
   onChangeDateFilterPending(newDateFilter: DateFilter) {
     if (newDateFilter.startDate === null && newDateFilter.endDate === null) {

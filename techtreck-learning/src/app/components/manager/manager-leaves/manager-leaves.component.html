@@ -54,6 +54,7 @@
     <tbody>
       <tr>
         <th>Status</th>
+        <th>ID</th>
         <th>Date</th>
         <th>Start time</th>
         <th>End time</th>
@@ -61,7 +62,8 @@
       </tr>
       @for(leave of filteredCompletedVacationRequests; track leave){
       <tr>
-        <td><i [ngClass]="'fas fa-circle ' + leave.leave" [title]="leave.leave.status"></i></td>
+        <td><i [ngClass]="'fas fa-circle ' + leave.leave.status" [title]="leave.leave.status"></i></td>
+        <td>{{getUserEmail(leave.userId)}}</td>
         <td>{{leave.leave.date | date: 'longDate'}}</td>
         <td>{{leave.leave.startTime | date: 'hh:mm a'}}</td>
         <td>{{leave.leave.endTime | date: 'hh:mm a'}}</td>
