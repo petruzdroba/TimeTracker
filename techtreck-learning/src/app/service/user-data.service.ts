@@ -87,6 +87,7 @@ export class UserDataService implements OnDestroy {
       personalTime: 0,
       role: 'NoRole',
     });
+    window.location.reload();
   }
 
   ngOnDestroy(): void {

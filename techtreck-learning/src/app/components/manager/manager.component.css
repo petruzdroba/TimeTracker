@@ -6,3 +6,9 @@
   width: 88%;
   height: 95%;
 }
+
+.tab-box {
+  /* position: flex; */
+  height: 92vh;
+  width: 88vw;
+}

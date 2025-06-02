@@ -1,11 +1,12 @@
 import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
-import { ManagerData } from '../model/manager-data.interface';
+import { LeaveWithUser, ManagerData } from '../model/manager-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take, map, firstValueFrom } from 'rxjs';
 import { Vacation } from '../model/vacation.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
 import { UserData } from '../model/user-data.interface';
+import { LeaveSlip } from '../model/leave-slip.interface';
 
 interface VacationWithUser {
   userId: number;
@@ -68,12 +69,16 @@ export class ManagerService implements OnDestroy {
     const vacations = this.managerData().vacations;
 
     for (const [userId, userData] of Object.entries(vacations)) {
-      userData.futureVacations.forEach((vacation) => {
-        result.push({
-          userId: Number(userId),
-          vacation,
-        });
-      });
+      if (userData && userData.futureVacations) {
+        userData.futureVacations
+          .filter((vacation) => vacation && Object.keys(vacation).length > 0)
+          .forEach((vacation) => {
+            result.push({
+              userId: Number(userId),
+              vacation,
+            });
+          });
+      }
     }
     return result;
   });
@@ -83,12 +88,54 @@ export class ManagerService implements OnDestroy {
     const vacations = this.managerData().vacations;
 
     for (const [userId, userData] of Object.entries(vacations)) {
-      userData.pastVacations.forEach((vacation) => {
-        result.push({
-          userId: Number(userId),
-          vacation,
-        });
-      });
+      if (userData && userData.pastVacations) {
+        userData.pastVacations
+          .filter((vacation) => vacation && Object.keys(vacation).length > 0)
+          .forEach((vacation) => {
+            result.push({
+              userId: Number(userId),
+              vacation,
+            });
+          });
+      }
+    }
+    return result;
+  });
+
+  readonly futureLeaves = computed(() => {
+    const result: { userId: number; leave: LeaveSlip }[] = [];
+    const leaves = this.managerData().leaves;
+
+    for (const [userId, userData] of Object.entries(leaves)) {
+      if (userData && userData.futureLeaves) {
+        userData.futureLeaves
+          .filter((leave) => leave && Object.keys(leave).length > 0)
+          .forEach((leave) => {
+            result.push({
+              userId: Number(userId),
+              leave,
+            });
+          });
+      }
+    }
+    return result;
+  });
+
+  readonly pastLeaves = computed(() => {
+    const result: { userId: number; leave: LeaveSlip }[] = [];
+    const leaves = this.managerData().leaves;
+
+    for (const [userId, userData] of Object.entries(leaves)) {
+      if (userData && userData.pastLeaves) {
+        userData.pastLeaves
+          .filter((leave) => leave && Object.keys(leave).length > 0)
+          .forEach((leave) => {
+            result.push({
+              userId: Number(userId),
+              leave,
+            });
+          });
+      }
     }
     return result;
   });
@@ -211,13 +258,16 @@ export class ManagerService implements OnDestroy {
     return userVacations ? userVacations.remainingVacationDays : 0;
   }
 
+  getRemainingTime(userId: number): number {
+    const userLeaves = this.managerData().leaves[userId];
+    return userLeaves ? userLeaves.remainingTime : 0;
+  }
+
   getUserById(userId: number): UserData | null {
-    // Return cached user if exists
     if (this.usersData()[userId]) {
       return this.usersData()[userId];
     }
 
-    // If there's no pending request for this userId, create one
     if (!this.pendingRequests.has(userId)) {
       const request = firstValueFrom(
         this.http.get<UserData>(`${this.baseUrl}/auth/getuser/${userId}/`)
@@ -243,6 +293,13 @@ export class ManagerService implements OnDestroy {
     const { userId, vacation } = vacationWithUser;
     return this.managerData().vacations[userId]?.futureVacations.findIndex(
       (v) => v === vacation
+    );
+  }
+
+  getLeaveIndex(leaveWithUser: LeaveWithUser): number {
+    const { userId, leave } = leaveWithUser;
+    return this.managerData().leaves[userId]?.futureLeaves.findIndex(
+      (l) => l === leave
     );
   }
 
