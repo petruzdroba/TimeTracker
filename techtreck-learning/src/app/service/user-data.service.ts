@@ -78,6 +78,7 @@ export class UserDataService implements OnDestroy {
   logout(): void {
     localStorage.removeItem('userData');
     localStorage.removeItem('rememberMe');
+    localStorage.removeItem('timerData');
     this.userData.set({
       id: -1,
       name: 'NoUser',

@@ -2,6 +2,8 @@ import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { TimerData } from '../model/timer-data.interface';
 import { UserDataService } from './user-data.service';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService implements OnDestroy {
@@ -9,6 +11,7 @@ export class TimerService implements OnDestroy {
   private http = inject(HttpClient);
   private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
+  private router = inject(Router);
 
   private lastSync: Date = new Date();
 
@@ -44,7 +47,10 @@ export class TimerService implements OnDestroy {
             requiredTime: parsed.remainingTime,
             timerType: parsed.timerType,
           });
-        } //else remains the same as default data for new day
+        }
+      } else {
+        //no local storage timer found, aka  user logged out
+        this.fetchTimerData();
       }
     }
   }
@@ -98,6 +104,30 @@ export class TimerService implements OnDestroy {
     this.syncTimerData();
   }
 
+  fetchTimerData() {
+    if (this.userData.isLoggedIn()) {
+      this.http
+        .get<TimerData>(this.baseUrl + `/timer/get/${this.userData.user().id}/`)
+        .pipe(take(1))
+        .subscribe({
+          next: (res) => {
+            console.log('Fetched timer data:', res);
+            if (this.isSameDay(new Date(), new Date(res.startTime))) {
+              if (res.timerType === 'ON') {
+                const elapsedTime =
+                  new Date().getTime() - new Date(res.startTime).getTime();
+                res.requiredTime -= elapsedTime;
+              }
+              this.updateTimerData(res);
+            }
+          },
+          error: (err) => {
+            this.router.navigate(['/error', err]);
+          },
+        });
+    }
+  }
+
   syncTimerData() {
     const currentTime = new Date();
     if (
@@ -115,33 +145,10 @@ export class TimerService implements OnDestroy {
             this.lastSync = currentTime;
           },
           error: (err) => {
-            console.error('Error syncing timer data:', err);
+            this.router.navigate(['/error', err]);
           },
         });
     }
-  }
-
-  resetData() {
-    const defaultData: TimerData = {
-      id: -1,
-      startTime: new Date(),
-      endTime: new Date(),
-      requiredTime: this.userData.user().workHours * 60 * 60 * 1000 || 7200000,
-      timerType: 'OFF',
-    };
-
-    this.timerData.set(defaultData);
-    window.localStorage.setItem(
-      'timerData',
-      JSON.stringify({
-        startTime: defaultData.startTime,
-        endTime: defaultData.endTime,
-        remainingTime: defaultData.requiredTime,
-        timerType: defaultData.timerType,
-      })
-    );
-
-    window.location.reload();
   }
 
   ngOnDestroy() {

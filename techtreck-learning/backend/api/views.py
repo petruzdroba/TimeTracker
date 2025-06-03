@@ -38,17 +38,17 @@ class UserSignInView(APIView):
                 personal_time=6,
             )
 
-            WorkLog.objects.create(id=user_data.id, work_log=[{}])
+            WorkLog.objects.create(id=user_data.id, work_log=[])
             Vacation.objects.create(
                 id=user_data.id,
-                future_vacation=[{}],
-                past_vacation=[{}],
+                future_vacation=[],
+                past_vacation=[],
                 remaining_vacation=user_data.vacation_days,
             )
             LeaveSlip.objects.create(
                 id=user_data.id,
-                future_slip=[{}],
-                past_slip=[{}],
+                future_slip=[],
+                past_slip=[],
                 remaining_time=user_data.personal_time
                 * 3600000,  # Convert hours to milliseconds,
             )
@@ -331,6 +331,32 @@ class TimerDataSyncView(APIView):
         except TimerData.DoesNotExist:
             return Response(
                 {"detail": f"TimerData not found for user {user_id}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class TimerGetView(APIView):
+    def get(self, request, id):
+        try:
+            timer_data = TimerData.objects.get(id=id)
+            return Response(
+                {
+                    "id": id,
+                    "startTime": timer_data.start_time,
+                    "endTime": timer_data.end_time,
+                    "requiredTime": timer_data.remaining_time,
+                    "timerType": timer_data.timer_type,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except TimerData.DoesNotExist:
+            return Response(
+                {"detail": "fail"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:
