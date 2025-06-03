@@ -55,4 +55,5 @@ urlpatterns = [
     path("timer/sync/", api_views.TimerDataSyncView.as_view(), name="timer_sync"),
     path("timer/get/<int:id>/", api_views.TimerGetView.as_view(), name="timer_get"),
     path("manager/get/", api_views.ManagerGetView.as_view(), name="manager_get"),
+    path("adminfe/get/", api_views.AdminGetView.as_view(), name="admin_get"),
 ]

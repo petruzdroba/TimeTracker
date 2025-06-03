@@ -409,3 +409,28 @@ class ManagerGetView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class AdminGetView(APIView):
+    def get(self, request):
+        try:
+            users = UserData.objects.all()
+            return Response(
+                [
+                    {
+                        "id": user.id,
+                        "name": user.name,
+                        "email": user.email,
+                        "workHours": user.work_hours,
+                        "vacationDays": user.vacation_days,
+                        "personalTime": user.personal_time,
+                        "role": user.role,
+                    }
+                    for user in users
+                ],
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
