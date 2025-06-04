@@ -2,6 +2,8 @@ import { Routes } from '@angular/router';
 import { NotFoundComponent } from './shared/not-found/not-found.component';
 import { ErrorPageComponent } from './shared/error-page/error-page.component';
 import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
+import { managerGuard } from './guards/manager.guard';
 
 export const routes: Routes = [
   {
@@ -48,7 +50,16 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./components/admin/admin.routes').then((m) => m.ADMIN_ROUTES),
     title: 'Admin',
-    canActivate: [authGuard],
+    canActivate: [authGuard, adminGuard],
+  },
+  {
+    path: 'manager',
+    loadChildren: () =>
+      import('./components/manager/manager.routes').then(
+        (m) => m.MANAGER_ROUTES
+      ),
+    title: 'Manager',
+    canActivate: [authGuard, managerGuard],
   },
   {
     path: 'leaveslip',

@@ -18,9 +18,14 @@ export class UserDataService implements OnDestroy {
     workHours: 8,
     vacationDays: 0,
     personalTime: 0,
+    role: 'NoRole',
   });
   public readonly user = computed(() => this.userData());
   public readonly isLoggedIn = computed(() => this.userData().id !== -1);
+  public readonly isAdmin = computed(() => this.userData().role === 'admin');
+  public readonly isManager = computed(
+    () => this.userData().role === 'manager'
+  );
 
   constructor() {
     this.checkRememberedUser();
@@ -28,7 +33,6 @@ export class UserDataService implements OnDestroy {
 
   saveUserData(user: UserData, rememberMe: boolean): void {
     this.userData.set(user);
-    console.log('UserData', this.userData());
     if (rememberMe) {
       localStorage.setItem(
         'rememberMe',
@@ -74,6 +78,7 @@ export class UserDataService implements OnDestroy {
   logout(): void {
     localStorage.removeItem('userData');
     localStorage.removeItem('rememberMe');
+    localStorage.removeItem('timerData');
     this.userData.set({
       id: -1,
       name: 'NoUser',
@@ -81,7 +86,9 @@ export class UserDataService implements OnDestroy {
       workHours: 0,
       vacationDays: 0,
       personalTime: 0,
+      role: 'NoRole',
     });
+    window.location.reload();
   }
 
   ngOnDestroy(): void {

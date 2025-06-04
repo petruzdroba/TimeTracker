@@ -1,21 +1,22 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
-import { LeaveSlipService } from '../../../service/leave-slip.service';
-import { LeaveSlip } from '../../../model/leave-slip.interface';
-import { CommonModule, DatePipe } from '@angular/common';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { ManagerService } from '../../../service/manager.service';
+import { LeaveWithUser } from '../../../model/manager-data.interface';
 import { DateFilter } from '../../../model/date-filter.interface';
+import { StatusFilter } from '../../../model/status-filter.interface';
+import { CommonModule } from '@angular/common';
 import { DateFilterComponent } from '../../../shared/date-filter/date-filter.component';
 import { StatusFilterComponent } from '../../../shared/status-filter/status-filter.component';
-import { StatusFilter } from '../../../model/status-filter.interface';
 
 @Component({
-  selector: 'app-admin-leave',
+  selector: 'app-manager-leaves',
   standalone: true,
-  imports: [DatePipe, CommonModule, DateFilterComponent, StatusFilterComponent],
-  templateUrl: './admin-leave.component.html',
-  styleUrl: './admin-leave.component.sass',
+  imports: [CommonModule, DateFilterComponent, StatusFilterComponent],
+  templateUrl: './manager-leaves.component.html',
+  styleUrl: './manager-leaves.component.sass',
 })
-export class AdminLeaveComponent implements OnInit {
-  private leaveService = inject(LeaveSlipService);
+export class ManagerLeavesComponent implements OnInit {
+  private managerService = inject(ManagerService);
+
   private dateFilterPending: DateFilter = {
     startDate: new Date(0),
     endDate: new Date(0),
@@ -26,16 +27,23 @@ export class AdminLeaveComponent implements OnInit {
     endDate: new Date(0),
   };
   private statusFilter: StatusFilter = { status: 'all' };
-  protected futureLeaves!: LeaveSlip[];
-  protected pastLeaves!: LeaveSlip[];
 
-  ngOnInit(): void {
-    this.futureLeaves = this.leaveService.futureLeaves;
-    this.pastLeaves = this.leaveService.pastLeaves;
+  futureLeaves: LeaveWithUser[] = [];
+  pastLeaves: LeaveWithUser[] = [];
+
+  async ngOnInit(): Promise<void> {
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+
+    console.log('Future Leaves:', this.futureLeaves);
+    console.log('Past Leaves:', this.pastLeaves);
   }
 
   private get pendingLeaveRequests() {
-    return [...this.futureLeaves.filter((leave) => leave.status === 'pending')];
+    return [
+      ...this.futureLeaves.filter((leave) => leave.leave.status === 'pending'),
+    ];
   }
 
   get filteredPendingVacationRequests() {
@@ -47,7 +55,7 @@ export class AdminLeaveComponent implements OnInit {
     }
     return [
       ...this.pendingLeaveRequests.filter((leave) => {
-        const dateA = new Date(leave.date);
+        const dateA = new Date(leave.leave.date);
         const dateB = new Date(this.dateFilterPending.startDate);
         const dateC = new Date(this.dateFilterPending.endDate);
         if (
@@ -63,8 +71,8 @@ export class AdminLeaveComponent implements OnInit {
 
   private get completedLeaveRequests() {
     return [
-      ...this.pastLeaves.filter((leave) => leave.status !== 'pending'),
-      ...this.futureLeaves.filter((leave) => leave.status !== 'pending'),
+      ...this.pastLeaves.filter((leave) => leave.leave.status !== 'pending'),
+      ...this.futureLeaves.filter((leave) => leave.leave.status !== 'pending'),
     ];
   }
 
@@ -72,7 +80,7 @@ export class AdminLeaveComponent implements OnInit {
     if (this.statusFilter.status === 'all') return this.completedLeaveRequests;
     else {
       return this.completedLeaveRequests.filter((leave) => {
-        return this.statusFilter.status === leave.status;
+        return this.statusFilter.status === leave.leave.status;
       });
     }
   }
@@ -86,7 +94,7 @@ export class AdminLeaveComponent implements OnInit {
     }
     return [
       ...this.completedLeaveRequests.filter((leave) => {
-        const dateA = new Date(leave.date);
+        const dateA = new Date(leave.leave.date);
         const dateB = new Date(this.dateFilterCompleted.startDate);
         const dateC = new Date(this.dateFilterCompleted.endDate);
         if (
@@ -100,35 +108,44 @@ export class AdminLeaveComponent implements OnInit {
     ];
   }
 
-  getValidLeave(leave: LeaveSlip) {
-    const dateA = new Date(leave.startTime);
-    const dateB = new Date(leave.endTime);
-    return this.leaveService.remainingTime >= dateB.getTime() - dateA.getTime();
+  getValidLeave(leave: LeaveWithUser) {
+    const dateA = new Date(leave.leave.startTime);
+    const dateB = new Date(leave.leave.endTime);
+    return (
+      this.managerService.getRemainingTime(leave.userId) >=
+      dateB.getTime() - dateA.getTime()
+    );
   }
 
-  onDeny(leave: LeaveSlip) {
-    leave.status = 'denied';
-    this.leaveService.updateLeaveData();
+  getUserEmail(userId: number): string {
+    const user = this.managerService.getUserById(userId);
+    return user?.email || '';
   }
 
-  onAccept(leave: LeaveSlip) {
-    leave.status = 'accepted';
-    this.leaveService.acceptedLeaveSlip(leave);
-    this.leaveService.updateLeaveData();
+  async onAccept(leave: LeaveWithUser) {
+    await this.managerService.acceptLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
   }
 
-  disabled(leave: LeaveSlip): boolean {
-    const index = this.leaveService.findLeaveIndex(leave);
+  async onDeny(leave: LeaveWithUser) {
+    await this.managerService.rejectLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+  }
+
+  async onUndo(leave: LeaveWithUser) {
+    await this.managerService.undoLeave(leave);
+    await this.managerService.initialize();
+    this.futureLeaves = this.managerService.futureLeaves();
+    this.pastLeaves = this.managerService.pastLeaves();
+  }
+
+  disabled(leave: LeaveWithUser): boolean {
+    const index = this.managerService.getLeaveIndex(leave);
     return index === -1;
-  }
-
-  onUndo(leave: LeaveSlip) {
-    const index = this.leaveService.findLeaveIndex(leave);
-    if (index !== -1) {
-      this.leaveService.restoreLeaveTime(index);
-      leave.status = 'pending';
-      this.leaveService.updateLeaveData();
-    }
   }
 
   onChangeDateFilterPending(newDateFilter: DateFilter) {

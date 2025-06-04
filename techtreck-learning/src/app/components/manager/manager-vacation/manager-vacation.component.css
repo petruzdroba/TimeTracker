@@ -1,31 +1,31 @@
-.admin-tables
-{
+.admin-tables {
   list-style-type: none;
   position: absolute;
   top: 0;
+  /* margin-left: 12%; */
   width: 100%;
 }
 
-.pending-table
-{
-  width: 100%;
-  margin-bottom: 10%;
+.pending-table {
+  width: 90%;
+  margin-bottom: 5%;
 }
 
-.completed-table
-{
-  width: 100%;
+.completed-table {
+  width: 90%;
   /* margin-top: 10%; */
 }
 
-.pending-table th, .pending-table td, .completed-table th, .completed-table td {
+.pending-table th,
+.pending-table td,
+.completed-table th,
+.completed-table td {
   color: var(--text-color);
-  padding: 6px;
+  padding: 8px;
   text-align: center;
 }
 
-.txt-table-title
-{
+.txt-table-title {
   font-size: large;
   color: var(--text-color);
   font-weight: bolder;
@@ -33,26 +33,31 @@
   margin-right: 2%;
 }
 
-.btn-status
-{
-  /* width: 50%; */
+.btn-status {
+  width: 100px;
+  height: 50px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px;
+  padding: 6px 12px;
   box-shadow: 7px 7px 12px var(--shadow-color);
-}
-.btn-status p
-{
-  margin-left: 5%;
-}
-
-.btn-status{
-  width: 30%;
+  margin: 0 5px;
+  border-radius: 4px;
+  transition: all 0.6s ease;
 }
 
-.accept{
-  margin-left: 5%;
+.btn-status p {
+  font-size: 110%;
+  font-weight: 300;
+  margin: 0 8px;
+}
+
+.btn-status i {
+  padding-left: 8px;
+}
+
+.accept {
+  margin-left: 2%;
   border-radius: 4px;
   color: forestgreen;
   border-color: forestgreen;
@@ -62,31 +67,32 @@
   transition: all 0.6s ease;
 }
 
-.accept:hover{
+.accept:hover {
   background-color: rgb(154, 244, 154);
   border-color: limegreen;
 }
 
-.accept:disabled{
-  cursor: not-allowed;
+.accept:disabled {
   box-shadow: none;
   background-color: var(--text-disabled-color);
-  color: var(--text-color);
-  border-color: var(--text-color);
+  color: black;
+  border-color: black;
 }
 
-.accept p{
+.accept p {
   font-size: 110%;
   font-weight: 300;
-  /* padding-left: 5%; */
-  padding-right: 13%;
+  margin-left: 8px;
+  /* Equal margins */
+  margin-right: 8px;
 }
 
-.accept i{
-  padding-left: 10%;
+.accept i {
+  padding-left: 8px;
+  /* Equal padding */
 }
 
-.deny{
+.deny {
   border-radius: 4px;
   color: darkred;
   border-color: darkred;
@@ -95,73 +101,75 @@
   transition: all 0.6s ease;
 }
 
-.deny:hover{
+.deny:hover {
   background-color: rgb(249, 145, 108);
   border-color: crimson;
 }
 
-.deny p{
+.deny p {
   font-size: 110%;
   font-weight: 300;
-  /* padding-left: 5%; */
-  padding-right: 13%;
+  margin-left: 8px;
+  /* Equal margins */
+  margin-right: 8px;
 }
 
-.deny i{
-  padding-left: 10%;
+.deny i {
+  padding-left: 8px;
+  /* Equal padding */
 }
 
-.pending{
+.pending {
   color: yellow;
 }
-.accepted{
+
+.accepted {
   color: chartreuse;
 }
-.denied{
+
+.denied {
   color: red;
 }
 
-.ignored{
-  color:grey;
+.ignored {
+  color: grey;
 }
 
-.txt-none
-{
-  color: var(--text-color);
+
+
+.txt-none {
   margin-bottom: 10vh;
+  color: var(--text-color);
 }
 
-.btn-icon{
-  border:none;
+.btn-icon {
+  border: none;
   background-color: transparent;
   color: var(--text-color);
   transition: color 0.6s ease;
 }
 
-.btn-icon:hover{
+.btn-icon:hover {
   color: red;
 }
 
-.btn-icon i{
+.btn-icon i {
   font-size: medium;
 }
 
-.btn-icon-disabled
-{
-  border:none;
+.btn-icon-disabled {
+  border: none;
   background-color: transparent;
   color: gray;
 }
 
-.btn-icon-disabled i
-{
+.btn-icon-disabled i {
   opacity: 0.5;
   cursor: not-allowed;
   font-size: medium;
 }
 
-.filter
-{
+.filter {
   display: flex;
   width: 90%;
   justify-content: space-between;

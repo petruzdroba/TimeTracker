@@ -1,17 +1,76 @@
-.admin
-{
-  top: 0;
+.admin {
   list-style-type: none;
-  position: fixed;
+  position: absolute;
+  top: 0;
   margin-left: 12%;
-  width: 88%;
-  height: 95%;
+  width: 80%;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font-size: medium;
 }
 
-.tab-box {
-  /* position: flex; */
-  height: 92vh;
-  width: 88vw;
+.info-table {
+  margin-bottom: 1%;
+  width: 100%;
 }
 
+.info-table tbody {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding-left: 5%;
+  padding-right: 5%;
+  gap: 2rem;
+}
 
+.info-table tr {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-table td {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.txt-head {
+  font-size: large;
+  color: var(--primary-color);
+  font-weight: bolder;
+  text-align: left;
+  margin-right: 0.5rem;
+}
+
+.txt-right {
+  font-size: medium;
+  color: var(--text-color);
+}
+
+.txt-title {
+  color: var(--text-color);
+  font-size: medium;
+}
+
+.txt-mail {
+  color: var(--primary-color)
+}
+
+.btn-icon-primary {
+  border: none;
+  font-size: medium;
+  background-color: transparent;
+  color: var(--text-color);
+  transition: color 0.6s ease;
+}
+
+.btn-icon-primary:hover {
+  color: var(--primary-hover-color);
+}
+
+.search-field {
+  width: 80%;
+  margin: 20px 0;
+}

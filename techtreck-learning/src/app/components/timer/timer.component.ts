@@ -25,7 +25,9 @@ export class TimerComponent implements OnInit, OnDestroy {
   private interval!: NodeJS.Timeout;
   protected TIME_REQ!: number;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.workLogService.initialize();
+
     this.timerData.set(this.timerService.timer);
     this.workLog.set(this.workLogService.getWorkLog);
     this.TIME_REQ = this.timerService.workingHoursFull();

@@ -38,17 +38,17 @@ class UserSignInView(APIView):
                 personal_time=6,
             )
 
-            WorkLog.objects.create(id=user_data.id, work_log=[{}])
+            WorkLog.objects.create(id=user_data.id, work_log=[])
             Vacation.objects.create(
                 id=user_data.id,
-                future_vacation=[{}],
-                past_vacation=[{}],
+                future_vacation=[],
+                past_vacation=[],
                 remaining_vacation=user_data.vacation_days,
             )
             LeaveSlip.objects.create(
                 id=user_data.id,
-                future_slip=[{}],
-                past_slip=[{}],
+                future_slip=[],
+                past_slip=[],
                 remaining_time=user_data.personal_time
                 * 3600000,  # Convert hours to milliseconds,
             )
@@ -70,6 +70,7 @@ class UserSignInView(APIView):
                     "workHours": user_data.work_hours,
                     "vacationDays": user_data.vacation_days,
                     "personalTime": user_data.personal_time,
+                    "role": user_data.role,
                 },
                 status=status.HTTP_201_CREATED,
             )
@@ -101,6 +102,7 @@ class UserLogInView(APIView):
                         "workHours": user_data.work_hours,
                         "vacationDays": user_data.vacation_days,
                         "personalTime": user_data.personal_time,
+                        "role": user_data.role,
                     },
                     status=status.HTTP_200_OK,
                 )
@@ -128,6 +130,7 @@ class GetUserDataView(APIView):
                     "workHours": user_data.work_hours,
                     "vacationDays": user_data.vacation_days,
                     "personalTime": user_data.personal_time,
+                    "role": user_data.role,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -307,7 +310,7 @@ class TimerDataSyncView(APIView):
             user_id = request.data.get("userId")
             data = request.data.get("data")
 
-            print("Received data:", data)
+            # print("Received data:", data)
 
             timer_data = TimerData.objects.get(id=user_id)
             timer_data.start_time = data.get("startTime")
@@ -334,4 +337,129 @@ class TimerDataSyncView(APIView):
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class TimerGetView(APIView):
+    def get(self, request, id):
+        try:
+            timer_data = TimerData.objects.get(id=id)
+            return Response(
+                {
+                    "id": id,
+                    "startTime": timer_data.start_time,
+                    "endTime": timer_data.end_time,
+                    "requiredTime": timer_data.remaining_time,
+                    "timerType": timer_data.timer_type,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except TimerData.DoesNotExist:
+            return Response(
+                {"detail": "fail"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+
+class ManagerGetView(APIView):
+    def get(self, request):
+        vacations = []
+        leaves = []
+
+        for user_id in UserData.objects.all().values_list("id", flat=True):
+            try:
+                vacation = Vacation.objects.get(id=user_id)
+                leave = LeaveSlip.objects.get(id=user_id)
+
+                vacations.append(
+                    {
+                        "id": user_id,
+                        "futureVacations": vacation.future_vacation,
+                        "pastVacations": vacation.past_vacation,
+                        "remainingVacationDays": vacation.remaining_vacation,
+                    }
+                )
+
+                leaves.append(
+                    {
+                        "id": user_id,
+                        "futureLeaves": leave.future_slip,
+                        "pastLeaves": leave.past_slip,
+                        "remainingTime": leave.remaining_time,
+                    }
+                )
+            except (
+                Vacation.DoesNotExist,
+                LeaveSlip.DoesNotExist,
+            ) as e:
+                return Response(
+                    {"detail": str(e)},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        return Response(
+            {
+                "vacations": vacations,
+                "leaves": leaves,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class AdminGetView(APIView):
+    def get(self, request):
+        try:
+            users = UserData.objects.all()
+            return Response(
+                [
+                    {
+                        "id": user.id,
+                        "name": user.name,
+                        "email": user.email,
+                        "workHours": user.work_hours,
+                        "vacationDays": user.vacation_days,
+                        "personalTime": user.personal_time,
+                        "role": user.role,
+                    }
+                    for user in users
+                ],
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class UserUpdateData(APIView):
+
+    def put(self, request):
+        try:
+            data = request.data.get("data")
+
+            current_user = UserData.objects.get(id=data.get("id"))
+            current_user.role = data.get("role")
+            current_user.vacation_days = data.get("vacationDays")
+            current_user.personal_time = data.get("personalTime")
+            current_user.work_hours = data.get("workHours")
+            current_user.save()
+
+            return Response(
+                {
+                    "role": current_user.role,
+                    "workHours": current_user.work_hours,
+                    "vacationDays": current_user.vacation_days,
+                    "personalTime": current_user.personal_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

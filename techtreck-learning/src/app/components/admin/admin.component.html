@@ -1,14 +1,80 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 <div class="admin">
-  <mat-tab-group>
-    <mat-tab label="Vacations">
-      <div class="tab-box">
-        <app-admin-vacation />
-      </div>
-    </mat-tab>
-    <mat-tab label="Leaves">
-      <div class="tab-box">
-        <app-admin-leave />
-      </div>
-    </mat-tab>
-  </mat-tab-group>
+  <mat-form-field class="search-field">
+    <mat-label>Search by email</mat-label>
+    <input matInput type="text" [(ngModel)]="searchText" (ngModelChange)="filterUsers()">
+    <mat-icon matPrefix>search</mat-icon>
+  </mat-form-field>
+
+  <div class="users">
+    <mat-accordion>
+      @for(user of filteredUsers(); track user.id)
+      {
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title class="txt-title">
+            {{user.name}}
+          </mat-panel-title>
+          <mat-panel-description class="txt-mail">
+            {{user.email}}
+          </mat-panel-description>
+        </mat-expansion-panel-header>
+
+        <table class="info-table">
+          <tbody>
+            <tr>
+              <td class="txt-head">Hours </td>
+              <td class="txt-right">{{user?.workHours}}</td>
+            </tr>
+
+            <tr>
+              <td class="txt-head">Vacation days </td>
+              <td class="txt-right">{{user?.vacationDays}}</td>
+            </tr>
+
+            <tr>
+              <td class="txt-head">Personal time </td>
+              <td class="txt-right">{{user?.personalTime}}</td>
+            </tr>
+            <tr>
+              <td class="txt-head">Clearence </td>
+              <td class="txt-right">{{user?.role}}</td>
+            </tr>
+            <tr>
+              <td><button class="btn-icon-primary" (click)="openEditWindow(user)"><i class="fa-solid fa-pen"
+                    title="Edit"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+
+      </mat-expansion-panel>
+      }
+    </mat-accordion>
+  </div>
 </div>
+
+<app-edit-user [isOpen]="isOpenEdit" [user]="selectedUser" (closeWindow)="closeEditWindow()" />
+
+<!-- <table class="admin-table">
+  <thead class="txt-head">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Edit</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for(user of filteredUsers(); track user.id)
+    {
+    <tr>
+      <td>{{ user.name }}</td>
+      <td>{{ user.email }}</td>
+      <td>{{ user.role }}</td>
+      <td><button class="btn-icon-primary" (click)="openEditWindow(user)"><i class="fa-solid fa-pen"
+            title="Edit"></i></button></td>
+    </tr>
+    }
+  </tbody>
+</table> -->

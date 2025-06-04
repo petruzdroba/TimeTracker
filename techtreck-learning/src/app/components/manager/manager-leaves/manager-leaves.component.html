@@ -8,6 +8,7 @@
   <table class="pending-table">
     <tbody>
       <tr>
+        <th>ID</th>
         <th>Leave date</th>
         <th>Start time</th>
         <th>End time</th>
@@ -17,10 +18,11 @@
       </tr>
       @for(leave of filteredPendingVacationRequests; track leave){
       <tr>
-        <td>{{leave.date | date: 'mediumDate'}}</td>
-        <td>{{leave.startTime | date: 'hh:mm a'}}</td>
-        <td>{{leave.endTime | date: 'hh:mm a'}}</td>
-        <td>{{leave.description}}</td>
+        <td>{{getUserEmail(leave.userId)}}</td>
+        <td>{{leave.leave.date | date: 'mediumDate'}}</td>
+        <td>{{leave.leave.startTime | date: 'hh:mm a'}}</td>
+        <td>{{leave.leave.endTime | date: 'hh:mm a'}}</td>
+        <td>{{leave.leave.description}}</td>
         <td>
           <button class="btn-status deny" (click)="onDeny(leave)" title="Deny">
             <i class="fas fa-times"></i>
@@ -32,7 +34,7 @@
             <p>Accept</p>
           </button>
         </td>
-        <td>{{leave.startTime | date: 'mediumDate'}}</td>
+        <td>{{leave.leave.startTime | date: 'mediumDate'}}</td>
       </tr>
       }
     </tbody>
@@ -52,6 +54,7 @@
     <tbody>
       <tr>
         <th>Status</th>
+        <th>ID</th>
         <th>Date</th>
         <th>Start time</th>
         <th>End time</th>
@@ -59,10 +62,11 @@
       </tr>
       @for(leave of filteredCompletedVacationRequests; track leave){
       <tr>
-        <td><i [ngClass]="'fas fa-circle ' + leave.status" [title]="leave.status"></i></td>
-        <td>{{leave.date | date: 'longDate'}}</td>
-        <td>{{leave.startTime | date: 'hh:mm a'}}</td>
-        <td>{{leave.endTime | date: 'hh:mm a'}}</td>
+        <td><i [ngClass]="'fas fa-circle ' + leave.leave.status" [title]="leave.leave.status"></i></td>
+        <td>{{getUserEmail(leave.userId)}}</td>
+        <td>{{leave.leave.date | date: 'longDate'}}</td>
+        <td>{{leave.leave.startTime | date: 'hh:mm a'}}</td>
+        <td>{{leave.leave.endTime | date: 'hh:mm a'}}</td>
         <td><button [class]="!disabled(leave) ?  'btn-icon' : 'btn-icon-disabled'" [disabled]="disabled(leave)"
             (click)="onUndo(leave)"><i class="fas fa-undo"
               [title]="!disabled(leave) ?  'Undo leave' : 'Past date'"></i></button>

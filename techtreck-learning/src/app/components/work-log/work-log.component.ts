@@ -40,7 +40,9 @@ export class WorkLogComponent implements OnInit {
   protected selectedSession: Session | null = null;
   protected isOpenAdd: boolean = false;
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    await this.workLogService.initialize();
+
     this.workLog.set(this.workLogService.getWorkLog);
     this.pageSize = 10;
     this.updatePaginatedData();

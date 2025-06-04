@@ -2,6 +2,7 @@
   <h1>{{ statusCode }}</h1>
   <h2>{{ statusMessage }}</h2>
   <p>Sorry, something went wrong. Please try again or contact support if the problem persists.</p>
-  <a [href]="'https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/' + statusCode">See more</a>
+  <a [href]="'https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/' + statusCode" class="link">See
+    more</a>
   <button class="btn-return" (click)="onReturnClick()">Take me home!</button>
 </div>

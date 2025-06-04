@@ -24,7 +24,8 @@ export class VacationComponent implements OnInit {
 
   private vacationService = inject(VacationService);
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.vacationService.initialize();
     this.vacationData.set(this.vacationService.vacation);
   }
 

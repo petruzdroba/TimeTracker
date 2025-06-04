@@ -8,7 +8,7 @@ import {
   effect,
 } from '@angular/core';
 import { Session } from '../model/session.interface';
-import { take } from 'rxjs';
+import { take, firstValueFrom } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 
@@ -23,30 +23,47 @@ export class WorkLogService implements OnDestroy {
   private subscription: any;
 
   private workLog = signal<Session[]>([]);
+  private initialized = signal<boolean>(false);
+
   constructor() {
-    effect(
-      () => {
-        //autmatically destroyed when component is destroyed
-        if (this.userData.isLoggedIn()) {
-          this.http
-            .get(`${this.baseUrl}/worklog/get/${this.userData.user().id}/`)
-            .pipe(take(1))
-            .subscribe({
-              next: (res) => {
-                if (
-                  Array.isArray(res) &&
-                  !(res.length === 1 && Object.keys(res[0]).length === 0)
-                ) {
-                  this.workLog.set(res);
-                } else {
-                  this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-                }
-              },
-            });
-        }
-      },
-      { allowSignalWrites: true }
-    );
+    // Start initialization but don't block constructor
+    this.initialize().catch((err) => {
+      console.error('Failed to initialize WorkLogService:', err);
+      this.routerService.navigate(['/error']);
+    });
+  }
+
+  async initialize(): Promise<void> {
+    if (this.initialized()) return;
+
+    if (this.userData.isLoggedIn()) {
+      return new Promise((resolve, reject) => {
+        this.http
+          .get<Session[]>(
+            `${this.baseUrl}/worklog/get/${this.userData.user().id}/`
+          )
+          .pipe(take(1))
+          .subscribe({
+            next: (res) => {
+              if (
+                Array.isArray(res) &&
+                !(res.length === 1 && Object.keys(res[0]).length === 0)
+              ) {
+                this.workLog.set(res);
+              } else {
+                this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
+              }
+              this.initialized.set(true);
+              resolve();
+            },
+            error: (err) => {
+              const status = err?.status ?? 'unknown';
+              this.routerService.navigate(['/error', status]);
+              reject(err);
+            },
+          });
+      });
+    }
   }
 
   get getWorkLog() {
