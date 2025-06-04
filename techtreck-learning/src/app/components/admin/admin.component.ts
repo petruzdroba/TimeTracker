@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../service/admin.service';
 import { UserData } from '../../model/user-data.interface';
 import { EditUserComponent } from './edit-user/edit-user.component';
+import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-admin',
@@ -18,6 +19,8 @@ import { EditUserComponent } from './edit-user/edit-user.component';
     MatIconModule,
     FormsModule,
     EditUserComponent,
+    MatExpansionModule,
+    MatAccordion,
   ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.sass',
