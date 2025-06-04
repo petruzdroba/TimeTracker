@@ -112,11 +112,6 @@ export class TimerService implements OnDestroy {
         .subscribe({
           next: (res) => {
             if (this.isSameDay(new Date(), new Date(res.startTime))) {
-              if (res.timerType === 'ON') {
-                const elapsedTime =
-                  new Date().getTime() - new Date(res.startTime).getTime();
-                res.requiredTime -= elapsedTime;
-              }
               this.updateTimerData(res);
             }
           },
