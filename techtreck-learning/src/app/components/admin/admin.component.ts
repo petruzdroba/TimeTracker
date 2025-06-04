@@ -34,7 +34,9 @@ export class AdminComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.adminService.initialize();
-    this.adminData = this.adminService.getAdminData();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
     this.filterUsers();
   }
 
@@ -55,7 +57,13 @@ export class AdminComponent implements OnInit {
     this.selectedUser = user;
   }
 
-  closeEditWindow() {
+  async closeEditWindow() {
+    await this.adminService.initialize();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
+    this.filterUsers();
+
     this.isOpenEdit = false;
     this.selectedUser = null;
   }

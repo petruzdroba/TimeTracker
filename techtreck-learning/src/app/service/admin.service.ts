@@ -32,7 +32,24 @@ export class AdminService {
             resolve();
           },
           error: (err) => {
-            this.routerService.navigate(['/error' + err]);
+            this.routerService.navigate(['/error/' + err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
+  updateUser(data: UserData): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.subscription = this.http
+        .put<UserData>(`${this.baseUrl}/user/update/`, { data: data })
+        .subscribe({
+          next: () => {
+            this.fetchAdminData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error/' + err.status]);
             reject(err);
           },
         });

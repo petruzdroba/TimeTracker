@@ -65,7 +65,27 @@ export class EditUserComponent implements OnChanges {
     }
   }
 
-  onSubmit() {}
+  async onSubmit() {
+    if (this.form.valid && this.user) {
+      if (
+        this.form.value.workHours &&
+        this.form.value.role &&
+        this.form.value.personalTime &&
+        this.form.value.vacationDays
+      ) {
+        const updatedUser: UserData = {
+          ...this.user,
+          role: this.form.value.role,
+          workHours: this.form.value.workHours,
+          personalTime: this.form.value.personalTime,
+          vacationDays: this.form.value.vacationDays,
+        };
+
+        await this.adminService.updateUser(updatedUser);
+        this.onCloseWindow();
+      }
+    }
+  }
 
   onReset() {
     if (!this.user) return;

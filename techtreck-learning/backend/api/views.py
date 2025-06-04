@@ -434,3 +434,32 @@ class AdminGetView(APIView):
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class UserUpdateData(APIView):
+
+    def put(self, request):
+        try:
+            data = request.data.get("data")
+
+            current_user = UserData.objects.get(id=data.get("id"))
+            current_user.role = data.get("role")
+            current_user.vacation_days = data.get("vacationDays")
+            current_user.personal_time = data.get("personalTime")
+            current_user.work_hours = data.get("workHours")
+            current_user.save()
+
+            return Response(
+                {
+                    "role": current_user.role,
+                    "workHours": current_user.work_hours,
+                    "vacationDays": current_user.vacation_days,
+                    "personalTime": current_user.personal_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
