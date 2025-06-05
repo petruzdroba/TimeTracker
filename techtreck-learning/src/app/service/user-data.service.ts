@@ -88,6 +88,10 @@ export class UserDataService implements OnDestroy {
       personalTime: 0,
       role: 'NoRole',
     });
+    this.reloadPage();
+  }
+
+  reloadPage(): void {
     window.location.reload();
   }
 
