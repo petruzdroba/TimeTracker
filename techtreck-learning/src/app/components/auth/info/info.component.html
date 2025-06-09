@@ -31,3 +31,27 @@
   </tbody>
 </table>
 <button class="btn" (click)="onLogout()">Log Out</button>
+<button class="btn-delete" (click)="onShowDialog()">Delete account</button>
+
+<app-edit-box [isOpen]="showDialog" title="Delete account" (close)="onHideDialog()">
+  @if(!accountDeleted)
+  {
+  <p class="txt-warning">Warning: Deleting your account is <strong>irreversible</strong> and will permanently remove
+    all your data.</p>
+
+  <form [formGroup]="form" (ngSubmit)="onDelete()">
+    <mat-form-field class="form-input" [hideRequiredMarker]="true">
+      <input matInput formControlName="password" placeholder="Confirm password">
+    </mat-form-field>
+
+    @if(this.form.invalid){
+    <button type="submit" class="btn-form" [disabled]="form.invalid">Delete forever</button>
+    }@else {
+    <button type="submit" class="btn-form">Delete forever</button>
+    }
+  </form>
+  }
+  @else {
+  <h1>Account deleted!</h1>
+  }
+</app-edit-box>
