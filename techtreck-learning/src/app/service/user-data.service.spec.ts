@@ -152,4 +152,44 @@ describe('UserDataService', () => {
     expect(service.isAdmin()).toBeFalse();
     expect(service.isManager()).toBeTrue();
   });
+
+  it('should call delete API and handle success and error responses', fakeAsync(() => {
+    const password = 'testpassword123';
+    const mockUser = { id: 1 } as any;
+
+    // Instead of spyOn(service, 'user'), set userData properly
+    service.saveUserData(mockUser, false);
+
+    const deleteResponse = { detail: 'User deleted' };
+    httpClientSpy.post.and.returnValue(of(deleteResponse));
+
+    service.delete(password).subscribe({
+      next: (res) => {
+        expect(res).toEqual(deleteResponse);
+      },
+      error: () => {
+        fail('Should not fail on success');
+      },
+    });
+    tick();
+
+    expect(httpClientSpy.post).toHaveBeenCalledWith(
+      'http://127.0.0.1:8000/user/delete/',
+      { userId: mockUser.id, password }
+    );
+
+    // Error case
+    const errorResponse = { status: 401, message: 'Unauthorized' };
+    httpClientSpy.post.and.returnValue(throwError(() => errorResponse));
+
+    service.delete(password).subscribe({
+      next: () => {
+        fail('Should not succeed on error');
+      },
+      error: (err) => {
+        expect(err).toEqual(errorResponse);
+      },
+    });
+    tick();
+  }));
 });
