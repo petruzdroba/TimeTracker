@@ -120,7 +120,7 @@ class UserLogInView(APIView):
 
 class UserDeleteView(APIView):
     def post(self, request):
-        data = request.get("data")
+        data = request.data
 
         user_id = data.get("userId")
         password = data.get("password")
