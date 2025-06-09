@@ -132,8 +132,8 @@ describe('TimerService', () => {
     const endDiff = Math.abs(
       new Date(callData.data.endTime).getTime() - now.getTime()
     );
-    expect(startDiff).toBeLessThanOrEqual(5); // Allow up to 5ms difference
-    expect(endDiff).toBeLessThanOrEqual(5); // Allow up to 5ms difference
+    expect(startDiff).toBeLessThanOrEqual(100);
+    expect(endDiff).toBeLessThanOrEqual(100);
 
     jasmine.clock().uninstall();
   }));

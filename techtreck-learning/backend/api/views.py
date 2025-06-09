@@ -118,6 +118,44 @@ class UserLogInView(APIView):
             )
 
 
+class UserDeleteView(APIView):
+    def post(self, request):
+        data = request.data
+
+        user_id = data.get("userId")
+        password = data.get("password")
+
+        try:
+            user_auth = UserAuth.objects.get(id=user_id)
+            if check_password(password, user_auth.password):
+                work_log = WorkLog.objects.get(id=user_id)
+                vacation = Vacation.objects.get(id=user_id)
+                leave = LeaveSlip.objects.get(id=user_id)
+                timer = TimerData.objects.get(id=user_id)
+                user_data = UserData.objects.get(id=user_id)
+
+                work_log.delete()
+                vacation.delete()
+                leave.delete()
+                timer.delete()
+                user_data.delete()
+                user_auth.delete()
+                return Response(
+                    {"detail": "User deleted"},
+                    status=status.HTTP_200_OK,
+                )
+            else:
+                return Response(
+                    {"detail": "Invalid credentials"},
+                    status=status.HTTP_401_UNAUTHORIZED,
+                )
+        except UserAuth.DoesNotExist:
+            return Response(
+                {"detail": "User not found"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
 class GetUserDataView(APIView):
     def get(self, request, id):
         try:

@@ -57,4 +57,5 @@ urlpatterns = [
     path("manager/get/", api_views.ManagerGetView.as_view(), name="manager_get"),
     path("adminfe/get/", api_views.AdminGetView.as_view(), name="admin_get"),
     path("user/update/", api_views.UserUpdateData.as_view(), name="user_update"),
+    path("user/delete/", api_views.UserDeleteView.as_view(), name="user_delete"),
 ]
