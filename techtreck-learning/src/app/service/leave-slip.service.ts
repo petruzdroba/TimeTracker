@@ -112,21 +112,7 @@ export class LeaveSlipService implements OnDestroy {
       ...currentData,
       futureLeaves: [...currentData.futureLeaves, leaveData],
     }));
-    this.acceptedLeaveSlip(leaveData);
     this.updateLeaveData();
-  }
-
-  acceptedLeaveSlip(leaveData: LeaveSlip) {
-    if (leaveData.status === 'accepted') {
-      const dateA = new Date(leaveData.startTime);
-      const dateB = new Date(leaveData.endTime);
-      this.leaveSlipData.update((currentData) => ({
-        ...currentData,
-        remainingTime:
-          currentData.remainingTime - (dateB.getTime() - dateA.getTime()),
-      }));
-      this.updateLeaveData();
-    }
   }
 
   restoreLeaveTime(index: number) {

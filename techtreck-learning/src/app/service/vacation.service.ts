@@ -130,24 +130,11 @@ export class VacationService implements OnDestroy {
   }
 
   addVacation(vacationData: Vacation) {
-    this.acceptedVacation(vacationData);
     this.vacationData.update((currentData) => ({
       ...currentData,
       futureVacations: [...currentData.futureVacations, vacationData],
     }));
     this.updateVacationData();
-  }
-
-  acceptedVacation(vacationData: Vacation) {
-    if (vacationData.status === 'accepted') {
-      this.vacationData.update((currentData) => ({
-        ...currentData,
-        remainingVacationDays:
-          currentData.remainingVacationDays -
-          getDaysBetweenDates(vacationData.startDate, vacationData.endDate),
-      }));
-      this.updateVacationData();
-    }
   }
 
   deleteVacation(index: number, tableType: string) {
@@ -214,22 +201,6 @@ export class VacationService implements OnDestroy {
       };
     });
 
-    this.updateVacationData();
-  }
-
-  modifyStatus(index: number, newStatus: 'pending' | 'accepted' | 'denied') {
-    this.vacationData.update((currentData) => {
-      const updatedVacations = [...currentData.futureVacations];
-      updatedVacations[index] = {
-        ...updatedVacations[index],
-        status: newStatus,
-      };
-
-      return {
-        ...currentData,
-        futureVacations: updatedVacations,
-      };
-    });
     this.updateVacationData();
   }
 
