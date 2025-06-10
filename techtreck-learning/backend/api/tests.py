@@ -182,3 +182,129 @@ class UserDeleteViewTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data["detail"], "User not found")
+
+
+class AdminGetViewTests(APITestCase):
+    def setUp(self):
+        self.url = reverse("admin_get")
+
+        self.user1 = UserData.objects.create(
+            id=1,
+            name="Alice",
+            email="alice@example.com",
+            work_hours=8,
+            vacation_days=20,
+            personal_time=5,
+            role="employee",
+        )
+        self.user2 = UserData.objects.create(
+            id=2,
+            name="Bob",
+            email="bob@example.com",
+            work_hours=7,
+            vacation_days=15,
+            personal_time=3,
+            role="admin",
+        )
+
+    def test_admin_get_success(self):
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+
+        user_ids = [user["id"] for user in response.data]
+        self.assertIn(self.user1.id, user_ids)
+        self.assertIn(self.user2.id, user_ids)
+
+        self.assertEqual(response.data[0]["email"], self.user1.email)
+        self.assertEqual(response.data[1]["role"], self.user2.role)
+
+    def test_admin_get_handles_exception(self):
+        # Simulate exception in the view
+        from unittest.mock import patch
+
+        with patch(
+            "api.views.UserData.objects.all", side_effect=Exception("DB failure")
+        ):
+            response = self.client.get(self.url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB failure")
+
+
+class UserUpdateDataTests(APITestCase):
+    def setUp(self):
+        self.url = reverse("user_update")
+
+        self.email = "testuser@example.com"
+        self.password = "testpassword123"
+
+        # Create user and related data
+        self.user_auth = UserAuth.objects.create(
+            id=1,
+            email=self.email,
+            password=make_password(self.password),
+        )
+        self.user_data = UserData.objects.create(
+            id=1,
+            email=self.email,
+            name="Test User",
+            work_hours=8,
+            vacation_days=14,
+            personal_time=6,
+            role="employee",
+        )
+
+    def test_user_update_success(self):
+        payload = {
+            "data": {
+                "id": 1,
+                "role": "manager",
+                "workHours": 9,
+                "vacationDays": 20,
+                "personalTime": 8,
+            }
+        }
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["role"], "manager")
+        self.assertEqual(response.data["workHours"], 9)
+        self.assertEqual(response.data["vacationDays"], 20)
+        self.assertEqual(response.data["personalTime"], 8)
+
+        # Verify database updated
+        self.user_data.refresh_from_db()
+        self.assertEqual(self.user_data.role, "manager")
+        self.assertEqual(self.user_data.work_hours, 9)
+        self.assertEqual(self.user_data.vacation_days, 20)
+        self.assertEqual(self.user_data.personal_time, 8)
+
+    def test_user_update_not_found(self):
+        # Using a non-existing user id
+        payload = {
+            "data": {
+                "id": 999,
+                "role": "manager",
+                "workHours": 9,
+                "vacationDays": 20,
+                "personalTime": 8,
+            }
+        }
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)
+
+    def test_user_update_invalid_payload(self):
+        # Sending no data at all
+        response = self.client.put(self.url, {}, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)
