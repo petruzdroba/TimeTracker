@@ -494,3 +494,124 @@ class LeaveSlipUpdateViewTests(APITestCase):
             )
             self.assertIn("detail", response.data)
             self.assertEqual(response.data["detail"], "Unexpected DB failure")
+
+
+class TimerGetViewTests(APITestCase):
+    def setUp(self):
+        self.timer = TimerData.objects.create(
+            id=1,
+            start_time="2024-01-01T08:00:00Z",
+            end_time="2024-01-01T10:00:00Z",
+            remaining_time=7200,
+            timer_type="work",
+        )
+        self.valid_url = reverse("timer_get", args=[self.timer.id])
+        self.invalid_url = reverse("timer_get", args=[999])
+
+    def test_timer_get_success(self):
+        response = self.client.get(self.valid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], self.timer.id)
+        self.assertEqual(response.data["startTime"], self.timer.start_time)
+        self.assertEqual(response.data["endTime"], self.timer.end_time)
+        self.assertEqual(response.data["requiredTime"], self.timer.remaining_time)
+        self.assertEqual(response.data["timerType"], self.timer.timer_type)
+
+    def test_timer_get_not_found(self):
+        response = self.client.get(self.invalid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "fail")
+
+    def test_timer_get_handles_exception(self):
+        from unittest.mock import patch
+
+        with patch(
+            "api.views.TimerData.objects.get", side_effect=Exception("DB error")
+        ):
+            response = self.client.get(self.valid_url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB error")
+
+
+class TimerDataSyncViewTests(APITestCase):
+    def setUp(self):
+        self.url = reverse("timer_sync")  # Ensure this matches your URLConf name
+        self.timer = TimerData.objects.create(
+            id=1,
+            start_time="2023-01-01T08:00:00Z",
+            end_time="2023-01-01T16:00:00Z",
+            remaining_time=28800000,
+            timer_type="work",
+        )
+
+    def test_sync_timer_data_success(self):
+        payload = {
+            "userId": self.timer.id,
+            "data": {
+                "startTime": "2023-01-02T09:00:00Z",
+                "endTime": "2023-01-02T17:00:00Z",
+                "requiredTime": 32400000,
+                "timerType": "break",
+            },
+        }
+
+        response = self.client.put(self.url, data=payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.timer.refresh_from_db()
+        self.assertEqual(self.timer.start_time, "2023-01-02T09:00:00Z")
+        self.assertEqual(self.timer.end_time, "2023-01-02T17:00:00Z")
+        self.assertEqual(self.timer.remaining_time, 32400000)
+        self.assertEqual(self.timer.timer_type, "break")
+
+    def test_sync_timer_data_not_found(self):
+        response = self.client.put(
+            self.url,
+            data={
+                "userId": 999,
+                "data": {
+                    "startTime": "2023-01-02T09:00:00Z",
+                    "endTime": "2023-01-02T17:00:00Z",
+                    "requiredTime": 32400000,
+                    "timerType": "break",
+                },
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "TimerData not found for user 999")
+
+    def test_sync_timer_data_handles_exception(self):
+        from unittest.mock import patch
+
+        with patch(
+            "api.views.TimerData.objects.get", side_effect=Exception("DB error")
+        ):
+            response = self.client.put(
+                self.url,
+                data={
+                    "userId": self.timer.id,
+                    "data": {
+                        "startTime": "2023-01-02T09:00:00Z",
+                        "endTime": "2023-01-02T17:00:00Z",
+                        "requiredTime": 32400000,
+                        "timerType": "break",
+                    },
+                },
+                format="json",
+            )
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB error")
