@@ -1,11 +1,11 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, OnDestroy, signal } from '@angular/core';
 import { UserData } from '../model/user-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class AdminService {
+export class AdminService implements OnDestroy {
   private routerService = inject(Router);
   private http = inject(HttpClient);
   private baseUrl = 'http://127.0.0.1:8000';
@@ -57,4 +57,8 @@ export class AdminService {
   }
 
   readonly getAdminData = computed(() => this.adminData());
+
+  ngOnDestroy(): void {
+    if (this.subscription) this.subscription.unsubscribe();
+  }
 }

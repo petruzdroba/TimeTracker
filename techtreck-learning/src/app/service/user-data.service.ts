@@ -75,6 +75,13 @@ export class UserDataService implements OnDestroy {
     }
   }
 
+  delete(password: string): Observable<any> {
+    return this.http.post(`${this.baseUrl}/user/delete/`, {
+      userId: this.userData().id,
+      password: password,
+    });
+  }
+
   logout(): void {
     localStorage.removeItem('userData');
     localStorage.removeItem('rememberMe');
@@ -88,6 +95,10 @@ export class UserDataService implements OnDestroy {
       personalTime: 0,
       role: 'NoRole',
     });
+    this.reloadPage();
+  }
+
+  reloadPage(): void {
     window.location.reload();
   }
 
