@@ -2,6 +2,7 @@ from rest_framework.test import APITestCase  # type: ignore
 from rest_framework import status  # type: ignore
 from django.urls import reverse  # type: ignore
 from django.contrib.auth.hashers import check_password, make_password  # type: ignore
+from unittest.mock import patch
 
 from api.models import UserAuth, UserData, WorkLog, Vacation, LeaveSlip, TimerData
 
@@ -222,8 +223,6 @@ class AdminGetViewTests(APITestCase):
 
     def test_admin_get_handles_exception(self):
         # Simulate exception in the view
-        from unittest.mock import patch
-
         with patch(
             "api.views.UserData.objects.all", side_effect=Exception("DB failure")
         ):
@@ -308,3 +307,190 @@ class UserUpdateDataTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("detail", response.data)
+
+
+class VacationGetViewTests(APITestCase):
+    def setUp(self):
+        self.vacation = Vacation.objects.create(
+            id=1,
+            future_vacation=[{"startDate": "2025-07-01", "endDate": "2025-07-05"}],
+            past_vacation=[{"startDate": "2025-06-01", "endDate": "2025-06-02"}],
+            remaining_vacation=10,
+        )
+        self.url = reverse("vacation_get", args=[self.vacation.id])
+        self.invalid_url = reverse("vacation_get", args=[999])  # Nonexistent ID
+
+    def test_vacation_get_success(self):
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("futureVacations", response.data)
+        self.assertIn("pastVacations", response.data)
+        self.assertIn("remainingVacationDays", response.data)
+        self.assertEqual(response.data["remainingVacationDays"], 10)
+
+    def test_vacation_get_not_found(self):
+        response = self.client.get(self.invalid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "fail")
+
+    def test_vacation_get_handles_exception(self):
+        with patch(
+            "api.views.Vacation.objects.get", side_effect=Exception("Unexpected")
+        ):
+            response = self.client.get(self.url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "Unexpected")
+
+
+class VacationUpdateViewTests(APITestCase):
+    def setUp(self):
+        self.vacation = Vacation.objects.create(
+            id=1,
+            future_vacation=[{"date": "2025-08-01", "description": "Trip"}],
+            past_vacation=[{"date": "2025-05-01", "description": "Wedding"}],
+            remaining_vacation=10,
+        )
+        self.url = reverse("vacation_update")
+        self.valid_payload = {
+            "userId": self.vacation.id,
+            "data": {
+                "futureVacations": [{"date": "2025-09-01", "description": "Holiday"}],
+                "pastVacations": [{"date": "2025-06-01", "description": "Conference"}],
+                "remainingVacationDays": 8,
+            },
+        }
+
+    def test_vacation_update_success(self):
+        response = self.client.put(self.url, self.valid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["remainingVacationDays"], 8)
+        self.assertEqual(response.data["futureVacations"][0]["description"], "Holiday")
+        self.assertEqual(response.data["pastVacations"][0]["description"], "Conference")
+
+    def test_vacation_update_not_found(self):
+        payload = {
+            "userId": 999,
+            "data": {
+                "futureVacations": [],
+                "pastVacations": [],
+                "remainingVacationDays": 0,
+            },
+        }
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "Vacation not found for user 999")
+
+    def test_vacation_update_handles_exception(self):
+        with patch("api.views.Vacation.objects.get", side_effect=Exception("DB crash")):
+            response = self.client.put(self.url, self.valid_payload, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB crash")
+
+
+class LeaveSlipGetViewTests(APITestCase):
+    def setUp(self):
+        self.leave_slip = LeaveSlip.objects.create(
+            id=1,
+            future_slip=[{"date": "2025-07-01", "description": "Doctor"}],
+            past_slip=[{"date": "2025-06-01", "description": "Errand"}],
+            remaining_time=21600000,
+        )
+        self.url = reverse("leaveslip_get", args=[self.leave_slip.id])
+        self.invalid_url = reverse("leaveslip_get", args=[999])  # Nonexistent ID
+
+    def test_leaveslip_get_success(self):
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("futureLeaves", response.data)
+        self.assertIn("pastLeaves", response.data)
+        self.assertIn("remainingTime", response.data)
+        self.assertEqual(response.data["remainingTime"], 21600000)
+
+    def test_leaveslip_get_not_found(self):
+        response = self.client.get(self.invalid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "fail")
+
+    def test_leaveslip_get_handles_exception(self):
+        with patch(
+            "api.views.LeaveSlip.objects.get", side_effect=Exception("Unexpected")
+        ):
+            response = self.client.get(self.url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "Unexpected")
+
+
+class LeaveSlipUpdateViewTests(APITestCase):
+    def setUp(self):
+        self.leave_slip = LeaveSlip.objects.create(
+            id=1,
+            future_slip=[{"date": "2025-07-15", "description": "Beach"}],
+            past_slip=[{"date": "2025-04-01", "description": "Workshop"}],
+            remaining_time=21600000,
+        )
+        self.url = reverse("leaveslip_update")
+        self.valid_payload = {
+            "userId": self.leave_slip.id,
+            "data": {
+                "futureLeaves": [{"date": "2025-08-01", "description": "Trip"}],
+                "pastLeaves": [{"date": "2025-05-01", "description": "Seminar"}],
+                "remainingTime": 18000000,
+            },
+        }
+
+    def test_leaveslip_update_success(self):
+        response = self.client.put(self.url, self.valid_payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["remainingTime"], 18000000)
+        self.assertEqual(response.data["futureLeaves"][0]["description"], "Trip")
+        self.assertEqual(response.data["pastLeaves"][0]["description"], "Seminar")
+
+    def test_leaveslip_update_not_found(self):
+        payload = {
+            "userId": 999,
+            "data": {
+                "futureLeaves": [],
+                "pastLeaves": [],
+                "remainingTime": 0,
+            },
+        }
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "LeaveSlip not found for user 999")
+
+    def test_leaveslip_update_handles_exception(self):
+        with patch(
+            "api.views.LeaveSlip.objects.get",
+            side_effect=Exception("Unexpected DB failure"),
+        ):
+            response = self.client.put(self.url, self.valid_payload, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "Unexpected DB failure")
