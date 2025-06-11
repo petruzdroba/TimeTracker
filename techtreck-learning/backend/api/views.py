@@ -409,43 +409,40 @@ class ManagerGetView(APIView):
         vacations = []
         leaves = []
 
-        for user_id in UserData.objects.all().values_list("id", flat=True):
-            try:
-                vacation = Vacation.objects.get(id=user_id)
-                leave = LeaveSlip.objects.get(id=user_id)
+        try:
+            for user_id in UserData.objects.all().values_list("id", flat=True):
+                try:
+                    vacation = Vacation.objects.get(id=user_id)
+                    leave = LeaveSlip.objects.get(id=user_id)
 
-                vacations.append(
-                    {
-                        "id": user_id,
-                        "futureVacations": vacation.future_vacation,
-                        "pastVacations": vacation.past_vacation,
-                        "remainingVacationDays": vacation.remaining_vacation,
-                    }
-                )
+                    vacations.append(
+                        {
+                            "id": user_id,
+                            "futureVacations": vacation.future_vacation,
+                            "pastVacations": vacation.past_vacation,
+                            "remainingVacationDays": vacation.remaining_vacation,
+                        }
+                    )
 
-                leaves.append(
-                    {
-                        "id": user_id,
-                        "futureLeaves": leave.future_slip,
-                        "pastLeaves": leave.past_slip,
-                        "remainingTime": leave.remaining_time,
-                    }
-                )
-            except (
-                Vacation.DoesNotExist,
-                LeaveSlip.DoesNotExist,
-            ) as e:
-                return Response(
-                    {"detail": str(e)},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
+                    leaves.append(
+                        {
+                            "id": user_id,
+                            "futureLeaves": leave.future_slip,
+                            "pastLeaves": leave.past_slip,
+                            "remainingTime": leave.remaining_time,
+                        }
+                    )
+                except (Vacation.DoesNotExist, LeaveSlip.DoesNotExist) as e:
+                    return Response(
+                        {"detail": str(e)}, status=status.HTTP_404_NOT_FOUND
+                    )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         return Response(
-            {
-                "vacations": vacations,
-                "leaves": leaves,
-            },
-            status=status.HTTP_200_OK,
+            {"vacations": vacations, "leaves": leaves}, status=status.HTTP_200_OK
         )
 
 

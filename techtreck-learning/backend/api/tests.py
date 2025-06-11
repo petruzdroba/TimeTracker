@@ -44,8 +44,6 @@ class UserSignInViewTests(APITestCase):
 
     def test_creation_rollback_on_error(self):
         # Patch UserData.objects.create to raise an exception
-        from unittest.mock import patch
-
         with patch(
             "api.views.UserData.objects.create",
             side_effect=Exception("Test error"),
@@ -694,3 +692,72 @@ class WorkLogUpdateViewTests(APITestCase):
             )
             self.assertIn("detail", response.data)
             self.assertEqual(response.data["detail"], "DB error")
+
+
+class ManagerGetViewTests(APITestCase):
+    def setUp(self):
+        self.user = UserData.objects.create(
+            id=1,
+            name="Test User",
+            email="test@example.com",
+            work_hours=8,
+            vacation_days=14,
+            personal_time=6,
+            role="Employee",
+        )
+
+        # Create corresponding Vacation and LeaveSlip for this user
+        self.vacation = Vacation.objects.create(
+            id=self.user.id,
+            future_vacation=[{"startDate": "2025-07-01", "endDate": "2025-07-05"}],
+            past_vacation=[{"startDate": "2025-06-01", "endDate": "2025-06-02"}],
+            remaining_vacation=10,
+        )
+        self.leave = LeaveSlip.objects.create(
+            id=self.user.id,
+            future_slip=[{"date": "2025-07-01"}],
+            past_slip=[{"date": "2025-06-01"}],
+            remaining_time=14400000,
+        )
+
+        self.url = reverse("manager_get")
+
+    def test_manager_get_success(self):
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("vacations", response.data)
+        self.assertIn("leaves", response.data)
+
+        self.assertEqual(len(response.data["vacations"]), 1)
+        self.assertEqual(len(response.data["leaves"]), 1)
+
+        vacation = response.data["vacations"][0]
+        leave = response.data["leaves"][0]
+
+        self.assertEqual(vacation["id"], self.user.id)
+        self.assertEqual(vacation["remainingVacationDays"], 10)
+
+        self.assertEqual(leave["id"], self.user.id)
+        self.assertEqual(leave["remainingTime"], 14400000)
+
+    def test_manager_get_not_found(self):
+        # Remove the vacation to simulate missing data
+        self.vacation.delete()
+
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+
+    def test_manager_get_handles_exception(self):
+        with patch(
+            "api.views.Vacation.objects.get", side_effect=Exception("Unexpected")
+        ):
+            response = self.client.get(self.url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "Unexpected")
