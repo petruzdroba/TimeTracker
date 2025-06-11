@@ -57,8 +57,7 @@ export class WorkLogService implements OnDestroy {
               resolve();
             },
             error: (err) => {
-              const status = err?.status ?? 'unknown';
-              this.routerService.navigate(['/error', status]);
+              this.routerService.navigate(['/error', err.status]);
               reject(err);
             },
           });

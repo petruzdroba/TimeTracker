@@ -542,7 +542,7 @@ class TimerGetViewTests(APITestCase):
 
 class TimerDataSyncViewTests(APITestCase):
     def setUp(self):
-        self.url = reverse("timer_sync")  # Ensure this matches your URLConf name
+        self.url = reverse("timer_sync")
         self.timer = TimerData.objects.create(
             id=1,
             start_time="2023-01-01T08:00:00Z",
@@ -609,6 +609,85 @@ class TimerDataSyncViewTests(APITestCase):
                 },
                 format="json",
             )
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB error")
+
+
+class WorkLogGetViewTests(APITestCase):
+    def setUp(self):
+        self.work_log = WorkLog.objects.create(
+            id=1, work_log=[{"date": "2025-06-11", "timeWorked": 3600}]
+        )
+        self.valid_url = reverse("worklog_get", args=[self.work_log.id])
+        self.invalid_url = reverse("worklog_get", args=[99999])  # non-existent ID
+
+    def test_worklog_get_success(self):
+        response = self.client.get(self.valid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, self.work_log.work_log)
+
+    def test_worklog_get_not_found(self):
+        response = self.client.get(self.invalid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "fail")
+
+    def test_worklog_get_handles_exception(self):
+        with patch("api.views.WorkLog.objects.get", side_effect=Exception("DB error")):
+            response = self.client.get(self.valid_url, format="json")
+
+            self.assertEqual(
+                response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            self.assertIn("detail", response.data)
+            self.assertEqual(response.data["detail"], "DB error")
+
+
+class WorkLogUpdateViewTests(APITestCase):
+    def setUp(self):
+        self.work_log = WorkLog.objects.create(
+            id=1,
+            work_log=[{"date": "2025-06-11", "timeWorked": 3600}],
+        )
+        self.url = reverse("worklog_update")
+
+    def test_worklog_update_success(self):
+        new_data = [{"date": "2025-06-12", "timeWorked": 7200}]
+        payload = {"userId": self.work_log.id, "data": new_data}
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "Success")
+        self.assertEqual(response.data["data"], new_data)
+
+        self.work_log.refresh_from_db()
+        self.assertEqual(self.work_log.work_log, new_data)
+
+    def test_worklog_update_not_found(self):
+        payload = {"userId": 9999, "data": [{"date": "2025-06-12", "timeWorked": 7200}]}
+
+        response = self.client.put(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("detail", response.data)
+        self.assertEqual(response.data["detail"], "WorkLog not found for user 9999")
+
+    def test_worklog_update_handles_exception(self):
+        payload = {
+            "userId": self.work_log.id,
+            "data": [{"date": "2025-06-12", "timeWorked": 7200}],
+        }
+
+        with patch("api.views.WorkLog.objects.get", side_effect=Exception("DB error")):
+            response = self.client.put(self.url, payload, format="json")
 
             self.assertEqual(
                 response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR
