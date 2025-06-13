@@ -761,3 +761,57 @@ class ManagerGetViewTests(APITestCase):
             )
             self.assertIn("detail", response.data)
             self.assertEqual(response.data["detail"], "Unexpected")
+
+
+class GetUserBenefitsTests(APITestCase):
+    def setUp(self):
+        # Create test user
+        self.user = UserData.objects.create(
+            id=1,
+            name="Test User",
+            email="test@example.com",
+            work_hours=8,
+            vacation_days=14,
+            personal_time=6,
+            role="Employee",
+        )
+
+        # Create related vacation and leave slip entries
+        self.vacation = Vacation.objects.create(
+            id=self.user.id,
+            remaining_vacation=12,
+            future_vacation=[],
+            past_vacation=[],
+        )
+        self.leave = LeaveSlip.objects.create(
+            id=self.user.id,
+            remaining_time=7200000,
+            future_slip=[],
+            past_slip=[],
+        )
+
+        self.url = reverse("user_benefits", args=[self.user.id])
+        self.invalid_url = reverse("user_benefits", args=[999])  # Invalid ID
+
+    def test_get_user_benefits_success(self):
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], self.user.id)
+        self.assertEqual(response.data["vacations"], 12)
+        self.assertEqual(response.data["leave"], 7200000)
+
+    def test_get_user_benefits_not_found(self):
+        # Delete vacation to simulate missing data
+        self.vacation.delete()
+
+        response = self.client.get(self.url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)
+
+    def test_get_user_benefits_invalid_id(self):
+        response = self.client.get(self.invalid_url, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)

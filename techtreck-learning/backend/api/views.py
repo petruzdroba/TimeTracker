@@ -498,3 +498,23 @@ class UserUpdateData(APIView):
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class GetUserBenefits(APIView):
+    def get(self, request, id):
+        try:
+            user_vacations = Vacation.objects.get(id=id).remaining_vacation
+            user_leave = LeaveSlip.objects.get(id=id).remaining_time
+
+            return Response(
+                {
+                    "id": id,
+                    "vacations": user_vacations,
+                    "leave": user_leave,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

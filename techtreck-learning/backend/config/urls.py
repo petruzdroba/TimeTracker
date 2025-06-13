@@ -58,4 +58,9 @@ urlpatterns = [
     path("adminfe/get/", api_views.AdminGetView.as_view(), name="admin_get"),
     path("user/update/", api_views.UserUpdateData.as_view(), name="user_update"),
     path("user/delete/", api_views.UserDeleteView.as_view(), name="user_delete"),
+    path(
+        "adminfe/benefits/<int:id>/",
+        api_views.GetUserBenefits.as_view(),
+        name="user_benefits",
+    ),
 ]
