@@ -1,3 +1,4 @@
+import { ManagerService } from './../../service/manager.service';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,6 +28,7 @@ import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 })
 export class AdminComponent implements OnInit {
   private adminService = inject(AdminService);
+  private managerService = inject(ManagerService);
 
   adminData: UserData[] = [];
   protected searchText: string = '';
@@ -58,6 +60,13 @@ export class AdminComponent implements OnInit {
   openEditWindow(user: UserData) {
     this.isOpenEdit = true;
     this.selectedUser = user;
+  }
+
+  getBenefits(userId: number) {
+    return {
+      vacations: this.managerService.getRemainingDays(userId),
+      leave: this.managerService.getRemainingTime(userId) / 3600000,
+    };
   }
 
   async closeEditWindow() {
