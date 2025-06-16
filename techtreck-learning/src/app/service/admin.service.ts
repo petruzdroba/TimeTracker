@@ -56,6 +56,42 @@ export class AdminService implements OnDestroy {
     });
   }
 
+  restoreVacation(userId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post(`${this.baseUrl}/vacation/restore/`, { userId: userId })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchAdminData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error/' + err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
+  restoreLeaveTime(userId: number): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post(`${this.baseUrl}/leaveslip/restore/`, { userId: userId })
+        .pipe(take(1))
+        .subscribe({
+          next: () => {
+            this.fetchAdminData();
+            resolve();
+          },
+          error: (err) => {
+            this.routerService.navigate(['/error/' + err.status]);
+            reject(err);
+          },
+        });
+    });
+  }
+
   readonly getAdminData = computed(() => this.adminData());
 
   ngOnDestroy(): void {

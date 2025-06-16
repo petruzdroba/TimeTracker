@@ -48,6 +48,36 @@
           </tbody>
         </table>
 
+        <table class="info-table">
+          <tbody>
+            <tr>
+              <td class="txt-head">Used vacation days </td>
+              <td class="txt-right">
+                {{ (user?.vacationDays != null && getBenefits(user.id)) ? (user.vacationDays -
+                getBenefits(user.id).vacations) : 0 }}
+              </td>
+            </tr>
+
+            <tr>
+              <td class="txt-head">Used leave time</td>
+              <td class="txt-right">
+                {{ getUsedLeaveHours(user) | number:'1.0-0'}}
+              </td>
+            </tr>
+
+            <tr>
+              <td class="txt-head">Restore vacation day</td>
+              <td><button class="btn-icon-primary" (click)="restoreVacation(user.id)"><i
+                    class="fa-solid fa-calendar-days"></i></button></td>
+            </tr>
+
+            <tr>
+              <td class="txt-head">Restore leave time</td>
+              <td><button class="btn-icon-primary" (click)="restoreLeaveTime(user.id)"><i
+                    class="fa-solid fa-clock-rotate-left"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
       </mat-expansion-panel>
       }
     </mat-accordion>
@@ -55,26 +85,3 @@
 </div>
 
 <app-edit-user [isOpen]="isOpenEdit" [user]="selectedUser" (closeWindow)="closeEditWindow()" />
-
-<!-- <table class="admin-table">
-  <thead class="txt-head">
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Edit</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for(user of filteredUsers(); track user.id)
-    {
-    <tr>
-      <td>{{ user.name }}</td>
-      <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
-      <td><button class="btn-icon-primary" (click)="openEditWindow(user)"><i class="fa-solid fa-pen"
-            title="Edit"></i></button></td>
-    </tr>
-    }
-  </tbody>
-</table> -->

@@ -105,4 +105,60 @@ describe('AdminService', () => {
 
     expect(subscriptionMock.unsubscribe).toHaveBeenCalled();
   });
+
+  it('should restore vacation and refetch admin data on success', fakeAsync(() => {
+    httpClientSpy.post = jasmine.createSpy().and.returnValue(of({}));
+    httpClientSpy.get.and.returnValue(of(mockUserList)); // for fetchAdminData()
+
+    service.restoreVacation(1).then(() => {
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        'http://127.0.0.1:8000/vacation/restore/',
+        { userId: 1 }
+      );
+      expect(httpClientSpy.get).toHaveBeenCalled(); // Ensures fetchAdminData was called
+    });
+
+    tick();
+  }));
+
+  it('should navigate to error page on restore vacation failure', fakeAsync(() => {
+    httpClientSpy.post = jasmine
+      .createSpy()
+      .and.returnValue(throwError(() => ({ status: 400 })));
+
+    service.restoreVacation(1).catch((err) => {
+      expect(err.status).toBe(400);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/error/400']);
+    });
+
+    tick();
+  }));
+
+  it('should restore leave time and refetch admin data on success', fakeAsync(() => {
+    httpClientSpy.post = jasmine.createSpy().and.returnValue(of({}));
+    httpClientSpy.get.and.returnValue(of(mockUserList)); // for fetchAdminData()
+
+    service.restoreLeaveTime(1).then(() => {
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        'http://127.0.0.1:8000/leaveslip/restore/',
+        { userId: 1 }
+      );
+      expect(httpClientSpy.get).toHaveBeenCalled(); // Ensures fetchAdminData was called
+    });
+
+    tick();
+  }));
+
+  it('should navigate to error page on restore leave time failure', fakeAsync(() => {
+    httpClientSpy.post = jasmine
+      .createSpy()
+      .and.returnValue(throwError(() => ({ status: 404 })));
+
+    service.restoreLeaveTime(1).catch((err) => {
+      expect(err.status).toBe(404);
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/error/404']);
+    });
+
+    tick();
+  }));
 });

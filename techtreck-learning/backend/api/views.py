@@ -475,9 +475,31 @@ class UserUpdateData(APIView):
 
     def put(self, request):
         try:
-            data = request.data.get("data")
+            data = request.data.get("data", {})
 
             current_user = UserData.objects.get(id=data.get("id"))
+            vacation = Vacation.objects.get(id=data.get("id"))
+            leave = LeaveSlip.objects.get(id=data.get("id"))
+
+            # how many days have already been consumed
+            consumed = current_user.vacation_days - vacation.remaining_vacation
+
+            new_remaining = data.get("vacationDays") - consumed
+            if new_remaining < 0:
+                new_remaining = 0
+
+            vacation.remaining_vacation = new_remaining
+            vacation.save()
+
+            # consumed time
+            used_time = current_user.personal_time - leave.remaining_time
+            new_time = data.get("personalTime") - used_time
+            if new_time < 0:
+                new_time = 0
+            leave.remaining_time = new_time
+            leave.save()
+
+            # update the user record
             current_user.role = data.get("role")
             current_user.vacation_days = data.get("vacationDays")
             current_user.personal_time = data.get("personalTime")
@@ -490,10 +512,67 @@ class UserUpdateData(APIView):
                     "workHours": current_user.work_hours,
                     "vacationDays": current_user.vacation_days,
                     "personalTime": current_user.personal_time,
+                    "remainingVacation": vacation.remaining_vacation,
                 },
                 status=status.HTTP_200_OK,
             )
 
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class GetUserBenefits(APIView):
+    def get(self, request, id):
+        try:
+            user_vacations = Vacation.objects.get(id=id).remaining_vacation
+            user_leave = LeaveSlip.objects.get(id=id).remaining_time
+
+            return Response(
+                {
+                    "id": id,
+                    "vacations": user_vacations,
+                    "leave": user_leave,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class RestoreVacationView(APIView):
+    def post(self, request):
+        try:
+            id = request.data.get("userId")
+
+            vacation_days = UserData.objects.get(id=id).vacation_days
+
+            vacation = Vacation.objects.get(id=id)
+            vacation.remaining_vacation = vacation_days
+            vacation.save()
+
+            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class RestoreLeaveTimeView(APIView):
+    def post(self, request):
+        try:
+            id = request.data.get("userId")
+
+            personal_time = UserData.objects.get(id=id).personal_time * 360000
+
+            leave = LeaveSlip.objects.get(id=id)
+            leave.remaining_time = personal_time
+            leave.save()
+
+            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR

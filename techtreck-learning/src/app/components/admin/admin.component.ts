@@ -1,3 +1,4 @@
+import { ManagerService } from './../../service/manager.service';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -27,6 +28,7 @@ import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
 })
 export class AdminComponent implements OnInit {
   private adminService = inject(AdminService);
+  private managerService = inject(ManagerService);
 
   adminData: UserData[] = [];
   protected searchText: string = '';
@@ -58,6 +60,44 @@ export class AdminComponent implements OnInit {
   openEditWindow(user: UserData) {
     this.isOpenEdit = true;
     this.selectedUser = user;
+  }
+
+  getBenefits(userId: number) {
+    return {
+      vacations: this.managerService.getRemainingDays(userId),
+      leave: this.managerService.getRemainingTime(userId) / 360000,
+    };
+  }
+
+  getUsedLeaveHours(user: UserData): number {
+    if (!user?.personalTime) return 0;
+    const benefits = this.getBenefits(user.id);
+    const leaveHours = benefits?.leave ?? 0;
+    return user.personalTime - leaveHours;
+  }
+
+  async restoreVacation(userId: number) {
+    await this.adminService.restoreVacation(userId);
+    await this.adminService.initialize();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
+    this.filterUsers();
+
+    this.isOpenEdit = false;
+    this.selectedUser = null;
+  }
+
+  async restoreLeaveTime(userId: number) {
+    await this.adminService.restoreLeaveTime(userId);
+    await this.adminService.initialize();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
+    this.filterUsers();
+
+    this.isOpenEdit = false;
+    this.selectedUser = null;
   }
 
   async closeEditWindow() {
