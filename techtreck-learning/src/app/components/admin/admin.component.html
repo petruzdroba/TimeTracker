@@ -61,9 +61,11 @@
             <tr>
               <td class="txt-head">Used leave time </td>
               <td class="txt-right">
-                {{ (user?.personalTime != null && getBenefits(user.id)) ? (user.personalTime -
-                getBenefits(user.id).leave) : 0 }}
-              </td>
+                {{
+                ((user?.personalTime != null && getBenefits(user.id))
+                ? (user.personalTime - getBenefits(user.id).leave)
+                : 0) | number:'1.0-0'
+                }} </td>
             </tr>
 
             <tr>
@@ -84,26 +86,3 @@
 </div>
 
 <app-edit-user [isOpen]="isOpenEdit" [user]="selectedUser" (closeWindow)="closeEditWindow()" />
-
-<!-- <table class="admin-table">
-  <thead class="txt-head">
-    <tr>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Role</th>
-      <th>Edit</th>
-    </tr>
-  </thead>
-  <tbody>
-    @for(user of filteredUsers(); track user.id)
-    {
-    <tr>
-      <td>{{ user.name }}</td>
-      <td>{{ user.email }}</td>
-      <td>{{ user.role }}</td>
-      <td><button class="btn-icon-primary" (click)="openEditWindow(user)"><i class="fa-solid fa-pen"
-            title="Edit"></i></button></td>
-    </tr>
-    }
-  </tbody>
-</table> -->
