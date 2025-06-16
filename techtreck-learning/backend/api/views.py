@@ -475,9 +475,31 @@ class UserUpdateData(APIView):
 
     def put(self, request):
         try:
-            data = request.data.get("data")
+            data = request.data.get("data", {})
 
             current_user = UserData.objects.get(id=data.get("id"))
+            vacation = Vacation.objects.get(id=data.get("id"))
+            leave = LeaveSlip.objects.get(id=data.get("id"))
+
+            # how many days have already been consumed
+            consumed = current_user.vacation_days - vacation.remaining_vacation
+
+            new_remaining = data.get("vacationDays") - consumed
+            if new_remaining < 0:
+                new_remaining = 0
+
+            vacation.remaining_vacation = new_remaining
+            vacation.save()
+
+            # consumed time
+            used_time = current_user.personal_time - leave.remaining_time
+            new_time = data.get("personalTime") - used_time
+            if new_time < 0:
+                new_time = 0
+            leave.remaining_time = new_time
+            leave.save()
+
+            # update the user record
             current_user.role = data.get("role")
             current_user.vacation_days = data.get("vacationDays")
             current_user.personal_time = data.get("personalTime")
@@ -490,6 +512,7 @@ class UserUpdateData(APIView):
                     "workHours": current_user.work_hours,
                     "vacationDays": current_user.vacation_days,
                     "personalTime": current_user.personal_time,
+                    "remainingVacation": vacation.remaining_vacation,
                 },
                 status=status.HTTP_200_OK,
             )

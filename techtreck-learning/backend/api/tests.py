@@ -255,6 +255,22 @@ class UserUpdateDataTests(APITestCase):
             personal_time=6,
             role="employee",
         )
+        # Create matching Vacation
+        self.vacation = Vacation.objects.create(
+            id=1,
+            remaining_vacation=10,
+            future_vacation=[],
+            past_vacation=[],
+        )
+        # Create matching LeaveSlip
+        # Include required fields: future_slip and past_slip lists
+        # Assume user had 6 personal hours and 4 remaining -> used_time = 2
+        self.leave = LeaveSlip.objects.create(
+            id=1,
+            remaining_time=4,
+            future_slip=[],
+            past_slip=[],
+        )
 
     def test_user_update_success(self):
         payload = {
@@ -275,7 +291,15 @@ class UserUpdateDataTests(APITestCase):
         self.assertEqual(response.data["vacationDays"], 20)
         self.assertEqual(response.data["personalTime"], 8)
 
-        # Verify database updated
+        # Verify vacation remaining in DB: 20 - (14-10) = 16
+        self.vacation.refresh_from_db()
+        self.assertEqual(self.vacation.remaining_vacation, 16)
+
+        # Verify leave slip remaining_time in DB: new_time = 8 - (6-4) = 6
+        self.leave.refresh_from_db()
+        self.assertEqual(self.leave.remaining_time, 6)
+
+        # Verify user record updated
         self.user_data.refresh_from_db()
         self.assertEqual(self.user_data.role, "manager")
         self.assertEqual(self.user_data.work_hours, 9)
@@ -283,7 +307,6 @@ class UserUpdateDataTests(APITestCase):
         self.assertEqual(self.user_data.personal_time, 8)
 
     def test_user_update_not_found(self):
-        # Using a non-existing user id
         payload = {
             "data": {
                 "id": 999,
@@ -300,7 +323,6 @@ class UserUpdateDataTests(APITestCase):
         self.assertIn("detail", response.data)
 
     def test_user_update_invalid_payload(self):
-        # Sending no data at all
         response = self.client.put(self.url, {}, format="json")
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
