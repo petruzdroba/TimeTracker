@@ -541,3 +541,39 @@ class GetUserBenefits(APIView):
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+class RestoreVacationView(APIView):
+    def post(self, request):
+        try:
+            id = request.data.get("userId")
+
+            vacation_days = UserData.objects.get(id=id).vacation_days
+
+            vacation = Vacation.objects.get(id=id)
+            vacation.remaining_vacation = vacation_days
+            vacation.save()
+
+            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class RestoreLeaveTimeView(APIView):
+    def post(self, request):
+        try:
+            id = request.data.get("userId")
+
+            personal_time = UserData.objects.get(id=id).personal_time
+
+            leave = LeaveSlip.objects.get(id=id)
+            leave.remaining_time = personal_time
+            leave.save()
+
+            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

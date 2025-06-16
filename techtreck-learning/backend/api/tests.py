@@ -837,3 +837,68 @@ class GetUserBenefitsTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
         self.assertIn("detail", response.data)
+
+
+class RestoreViewsTests(APITestCase):
+    def setUp(self):
+        # Create a user with known balances
+        self.user = UserData.objects.create(
+            id=1,
+            email="foo@bar.com",
+            name="Foo Bar",
+            work_hours=8,
+            vacation_days=15,  # total entitlement
+            personal_time=10,  # total personal time entitlement
+            role="employee",
+        )
+
+        # Create a Vacation with some already used days
+        self.vacation = Vacation.objects.create(
+            id=1,
+            remaining_vacation=5,  # currently only 5 left out of 15
+            future_vacation=[],
+            past_vacation=[],
+        )
+
+        # Create a LeaveSlip with some used personal time
+        self.leave = LeaveSlip.objects.create(
+            id=1,
+            remaining_time=3,  # currently only 3 left out of 10
+            future_slip=[],
+            past_slip=[],
+        )
+
+        self.url_vac = reverse("vacation_restore")
+        self.url_leave = reverse("leave_restore")
+
+    def test_restore_vacation_success(self):
+        """POST /vacation/restore/ should reset remaining_vacation to entitlement."""
+        response = self.client.post(self.url_vac, {"userId": 1}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "ok")
+
+        # after restore, remaining_vacation should match vacation_days (15)
+        self.vacation.refresh_from_db()
+        self.assertEqual(self.vacation.remaining_vacation, self.user.vacation_days)
+
+    def test_restore_vacation_not_found(self):
+        """Non‑existent userId should raise a 500 (generic exception)."""
+        response = self.client.post(self.url_vac, {"userId": 999}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)
+
+    def test_restore_leave_success(self):
+        """POST /leaveslip/restore/ should reset remaining_time to personal_time."""
+        response = self.client.post(self.url_leave, {"userId": 1}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["detail"], "ok")
+
+        # after restore, remaining_time should match personal_time (10)
+        self.leave.refresh_from_db()
+        self.assertEqual(self.leave.remaining_time, self.user.personal_time)
+
+    def test_restore_leave_not_found(self):
+        """Non‑existent userId should raise a 500 (generic exception)."""
+        response = self.client.post(self.url_leave, {"userId": 999}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        self.assertIn("detail", response.data)

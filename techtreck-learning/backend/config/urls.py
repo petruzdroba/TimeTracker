@@ -63,4 +63,14 @@ urlpatterns = [
         api_views.GetUserBenefits.as_view(),
         name="user_benefits",
     ),
+    path(
+        "vacation/restore/",
+        api_views.RestoreVacationView.as_view(),
+        name="vacation_restore",
+    ),
+    path(
+        "leaveslip/restore/",
+        api_views.RestoreLeaveTimeView.as_view(),
+        name="leave_restore",
+    ),
 ]
