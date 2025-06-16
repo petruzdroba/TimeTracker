@@ -65,8 +65,39 @@ export class AdminComponent implements OnInit {
   getBenefits(userId: number) {
     return {
       vacations: this.managerService.getRemainingDays(userId),
-      leave: this.managerService.getRemainingTime(userId) / 3600000,
+      leave: this.managerService.getRemainingTime(userId) / 360000,
     };
+  }
+
+  getUsedLeaveHours(user: UserData): number {
+    if (!user?.personalTime) return 0;
+    const benefits = this.getBenefits(user.id);
+    const leaveHours = benefits?.leave ?? 0;
+    return user.personalTime - leaveHours;
+  }
+
+  async restoreVacation(userId: number) {
+    await this.adminService.restoreVacation(userId);
+    await this.adminService.initialize();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
+    this.filterUsers();
+
+    this.isOpenEdit = false;
+    this.selectedUser = null;
+  }
+
+  async restoreLeaveTime(userId: number) {
+    await this.adminService.restoreLeaveTime(userId);
+    await this.adminService.initialize();
+    this.adminData = this.adminService
+      .getAdminData()
+      .filter((user) => user.role !== 'admin');
+    this.filterUsers();
+
+    this.isOpenEdit = false;
+    this.selectedUser = null;
   }
 
   async closeEditWindow() {

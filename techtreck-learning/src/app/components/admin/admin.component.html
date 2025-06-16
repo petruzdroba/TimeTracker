@@ -59,23 +59,22 @@
             </tr>
 
             <tr>
-              <td class="txt-head">Used leave time </td>
+              <td class="txt-head">Used leave time</td>
               <td class="txt-right">
-                {{
-                ((user?.personalTime != null && getBenefits(user.id))
-                ? (user.personalTime - getBenefits(user.id).leave)
-                : 0) | number:'1.0-0'
-                }} </td>
+                {{ getUsedLeaveHours(user) | number:'1.0-0'}}
+              </td>
             </tr>
 
             <tr>
               <td class="txt-head">Restore vacation day</td>
-              <td><button class="btn-icon-primary"><i class="fa-solid fa-calendar-days"></i></button></td>
+              <td><button class="btn-icon-primary" (click)="restoreVacation(user.id)"><i
+                    class="fa-solid fa-calendar-days"></i></button></td>
             </tr>
 
             <tr>
               <td class="txt-head">Restore leave time</td>
-              <td><button class="btn-icon-primary"><i class="fa-solid fa-clock-rotate-left"></i></button></td>
+              <td><button class="btn-icon-primary" (click)="restoreLeaveTime(user.id)"><i
+                    class="fa-solid fa-clock-rotate-left"></i></button></td>
             </tr>
           </tbody>
         </table>

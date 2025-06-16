@@ -566,7 +566,7 @@ class RestoreLeaveTimeView(APIView):
         try:
             id = request.data.get("userId")
 
-            personal_time = UserData.objects.get(id=id).personal_time
+            personal_time = UserData.objects.get(id=id).personal_time * 360000
 
             leave = LeaveSlip.objects.get(id=id)
             leave.remaining_time = personal_time
