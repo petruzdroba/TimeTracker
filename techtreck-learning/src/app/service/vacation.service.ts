@@ -13,13 +13,13 @@ import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class VacationService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private vacationData = signal<VacationData>({
@@ -40,7 +40,7 @@ export class VacationService implements OnDestroy {
     if (this.userData.isLoggedIn()) {
       this.http
         .get<VacationData>(
-          `${this.baseUrl}/vacation/get/${this.userData.user().id}/`
+          `${environment.apiUrl}/vacation/get/${this.userData.user().id}/`
         )
         .pipe(take(1))
         .subscribe({
@@ -207,7 +207,7 @@ export class VacationService implements OnDestroy {
   updateVacationData() {
     if (this.userData.isLoggedIn()) {
       this.subscription = this.http
-        .put(`${this.baseUrl}/vacation/update/`, {
+        .put(`${environment.apiUrl}/vacation/update/`, {
           userId: this.userData.user().id,
           data: {
             futureVacations: this.vacationData().futureVacations,

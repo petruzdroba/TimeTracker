@@ -7,6 +7,7 @@ import { Vacation } from '../model/vacation.interface';
 import { getDaysBetweenDates } from '../shared/utils/time.utils';
 import { UserData } from '../model/user-data.interface';
 import { LeaveSlip } from '../model/leave-slip.interface';
+import { environment } from '../../environments/environment';
 
 interface VacationWithUser {
   userId: number;
@@ -17,7 +18,6 @@ interface VacationWithUser {
 export class ManagerService implements OnDestroy {
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private managerData = signal<ManagerData>({
@@ -40,7 +40,7 @@ export class ManagerService implements OnDestroy {
     return new Promise((resolve, reject) => {
       this.http
         .get<{ vacations: any[]; leaves: any[] }>(
-          this.baseUrl + '/manager/get/'
+          environment.apiUrl + '/manager/get/'
         )
         .pipe(
           map((response) => ({
@@ -147,7 +147,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${this.baseUrl}/vacation/update/`, {
+        .put(`${environment.apiUrl}/vacation/update/`, {
           userId,
           data: {
             futureVacations: userVacations.futureVacations.map((v) =>
@@ -186,7 +186,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${this.baseUrl}/vacation/update/`, {
+        .put(`${environment.apiUrl}/vacation/update/`, {
           userId,
           data: {
             futureVacations: userVacations.futureVacations.map((v) =>
@@ -219,7 +219,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(this.baseUrl + '/vacation/update/', {
+        .put(environment.apiUrl + '/vacation/update/', {
           userId,
           data: {
             futureVacations: userVacations.futureVacations.map((v) =>
@@ -260,7 +260,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${this.baseUrl}/leaveslip/update/`, {
+        .put(`${environment.apiUrl}/leaveslip/update/`, {
           userId,
           data: {
             futureLeaves: userLeaves.futureLeaves.map((l) =>
@@ -298,7 +298,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${this.baseUrl}/leaveslip/update/`, {
+        .put(`${environment.apiUrl}/leaveslip/update/`, {
           userId,
           data: {
             futureLeaves: userLeaves.futureLeaves.map((l) =>
@@ -331,7 +331,7 @@ export class ManagerService implements OnDestroy {
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${this.baseUrl}/leaveslip/update/`, {
+        .put(`${environment.apiUrl}/leaveslip/update/`, {
           userId,
           data: {
             futureLeaves: userLeaves.futureLeaves.map((l) =>
@@ -381,7 +381,7 @@ export class ManagerService implements OnDestroy {
 
     if (!this.pendingRequests.has(userId)) {
       const request = firstValueFrom(
-        this.http.get<UserData>(`${this.baseUrl}/auth/getuser/${userId}/`)
+        this.http.get<UserData>(`${environment.apiUrl}/auth/getuser/${userId}/`)
       )
         .then((res) => {
           this.usersData.update((state) => ({ ...state, [userId]: res }));

@@ -4,12 +4,12 @@ import { UserDataService } from './user-data.service';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TimerService implements OnDestroy {
   private userData = inject(UserDataService);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
   private router = inject(Router);
 
@@ -107,7 +107,9 @@ export class TimerService implements OnDestroy {
   fetchTimerData() {
     if (this.userData.isLoggedIn()) {
       this.http
-        .get<TimerData>(this.baseUrl + `/timer/get/${this.userData.user().id}/`)
+        .get<TimerData>(
+          environment.apiUrl + `/timer/get/${this.userData.user().id}/`
+        )
         .pipe(take(1))
         .subscribe({
           next: (res) => {
@@ -130,7 +132,7 @@ export class TimerService implements OnDestroy {
     ) {
       // Prevent syncing more than once every 15 minutes
       this.subscription = this.http
-        .put<TimerData>(`${this.baseUrl}/timer/sync/`, {
+        .put<TimerData>(`${environment.apiUrl}/timer/sync/`, {
           userId: this.userData.user().id,
           data: this.timerData(),
         })

@@ -57,8 +57,10 @@ db.sqlite3
 # VSCode settings (if used)
 .vscode/
 
-# Environment variables
+# Environment files
 .env
+.env.*
+src/environments/*
 
 backend/venv/
 venv/

@@ -11,6 +11,7 @@ import { Session } from '../model/session.interface';
 import { take, firstValueFrom } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,6 @@ export class WorkLogService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private workLog = signal<Session[]>([]);
@@ -40,7 +40,7 @@ export class WorkLogService implements OnDestroy {
       return new Promise((resolve, reject) => {
         this.http
           .get<Session[]>(
-            `${this.baseUrl}/worklog/get/${this.userData.user().id}/`
+            `${environment.apiUrl}/worklog/get/${this.userData.user().id}/`
           )
           .pipe(take(1))
           .subscribe({
@@ -151,7 +151,7 @@ export class WorkLogService implements OnDestroy {
   }
   updateWorkLog() {
     this.subscription = this.http
-      .put(`${this.baseUrl}/worklog/update/`, {
+      .put(`${environment.apiUrl}/worklog/update/`, {
         userId: this.userData.user().id,
         data: this.workLog(),
       })

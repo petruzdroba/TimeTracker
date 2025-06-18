@@ -3,13 +3,13 @@ import { UserData } from '../model/user-data.interface';
 import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
 import { Observable, take } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class UserDataService implements OnDestroy {
   private http = inject(HttpClient);
   private router = inject(Router);
   private subscription: any;
-  private baseUrl = 'http://127.0.0.1:8000';
 
   private userData = signal<UserData>({
     id: -1,
@@ -42,7 +42,7 @@ export class UserDataService implements OnDestroy {
   }
 
   logIn(data: { email: string; password: string }): Observable<UserData> {
-    return this.http.post<UserData>(`${this.baseUrl}/auth/login/`, data);
+    return this.http.post<UserData>(`${environment.apiUrl}/auth/login/`, data);
   }
 
   signUp(data: {
@@ -50,7 +50,7 @@ export class UserDataService implements OnDestroy {
     email: string;
     password: string;
   }): Observable<any> {
-    return this.http.post(`${this.baseUrl}/auth/signup/`, data);
+    return this.http.post(`${environment.apiUrl}/auth/signup/`, data);
   }
 
   checkRememberedUser(): void {
@@ -60,7 +60,7 @@ export class UserDataService implements OnDestroy {
         const parsed = JSON.parse(remembered);
         if (parsed.rememberMe) {
           this.subscription = this.http
-            .get<UserData>(`${this.baseUrl}/auth/getuser/${parsed.id}/`)
+            .get<UserData>(`${environment.apiUrl}/auth/getuser/${parsed.id}/`)
             .pipe(take(1))
             .subscribe({
               next: (user) => {
@@ -76,7 +76,7 @@ export class UserDataService implements OnDestroy {
   }
 
   delete(password: string): Observable<any> {
-    return this.http.post(`${this.baseUrl}/user/delete/`, {
+    return this.http.post(`${environment.apiUrl}/user/delete/`, {
       userId: this.userData().id,
       password: password,
     });

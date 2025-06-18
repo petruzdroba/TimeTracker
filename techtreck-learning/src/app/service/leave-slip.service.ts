@@ -12,13 +12,13 @@ import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class LeaveSlipService implements OnDestroy {
   private userData = inject(UserDataService);
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private leaveSlipData = signal<LeaveSlipData>({
@@ -40,7 +40,7 @@ export class LeaveSlipService implements OnDestroy {
     if (this.userData.isLoggedIn()) {
       this.http
         .get<LeaveSlipData>(
-          `${this.baseUrl}/leaveslip/get/${this.userData.user().id}/`
+          `${environment.apiUrl}/leaveslip/get/${this.userData.user().id}/`
         )
         .pipe(take(1))
         .subscribe({
@@ -183,7 +183,7 @@ export class LeaveSlipService implements OnDestroy {
   updateLeaveData() {
     if (this.userData.isLoggedIn()) {
       this.subscription = this.http
-        .put(`${this.baseUrl}/leaveslip/update/`, {
+        .put(`${environment.apiUrl}/leaveslip/update/`, {
           userId: this.userData.user().id,
           data: this.leaveSlipData(),
         })
