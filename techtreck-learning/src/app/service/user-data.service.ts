@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { UserData } from '../model/user-data.interface';
 import { Injectable, signal, computed, inject, OnDestroy } from '@angular/core';
-import { Observable, take } from 'rxjs';
+import { map, Observable, take, tap } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
 
@@ -42,7 +42,21 @@ export class UserDataService implements OnDestroy {
   }
 
   logIn(data: { email: string; password: string }): Observable<UserData> {
-    return this.http.post<UserData>(`${environment.apiUrl}/auth/login/`, data);
+    return this.http
+      .post<{ access: string; refresh: string; user: UserData }>(
+        `${environment.apiUrl}/auth/login/`,
+        data
+      )
+      .pipe(
+        take(1),
+        tap((res) => {
+          localStorage.setItem('authToken', res.access);
+          localStorage.setItem('refreshToken', res.refresh);
+          localStorage.setItem('userData', JSON.stringify(res.user));
+          this.userData.set(res.user);
+        }),
+        map((res) => res.user)
+      );
   }
 
   signUp(data: {

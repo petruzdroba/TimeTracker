@@ -18,8 +18,18 @@ Including another URLconf
 from django.contrib import admin  # type: ignore
 from django.urls import path  # type: ignore
 from api import views as api_views
+from rest_framework_simplejwt.views import (  # type: ignore
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
+    path(
+        "api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"
+    ),  # login endpoint
+    path(
+        "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
+    ),  # refresh token endpoint
     path("admin/", admin.site.urls),
     path("auth/signup/", api_views.UserSignInView.as_view(), name="user_signup"),
     path("auth/login/", api_views.UserLogInView.as_view(), name="user_login"),

@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponse  # type: ignore
 from rest_framework.views import APIView  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework import status  # type: ignore
+from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
 
 
 class UserSignInView(APIView):
@@ -94,15 +95,22 @@ class UserLogInView(APIView):
             user_auth = UserAuth.objects.get(email=email)
             if check_password(password, user_auth.password):
                 user_data = UserData.objects.get(email=email)
+
+                refresh = RefreshToken.for_user(user_auth)
+
                 return Response(
                     {
-                        "id": user_data.id,
-                        "name": user_data.name,
-                        "email": user_data.email,
-                        "workHours": user_data.work_hours,
-                        "vacationDays": user_data.vacation_days,
-                        "personalTime": user_data.personal_time,
-                        "role": user_data.role,
+                        "access": str(refresh.access_token),
+                        "refresh": str(refresh),
+                        "user": {
+                            "id": user_data.id,
+                            "name": user_data.name,
+                            "email": user_data.email,
+                            "workHours": user_data.work_hours,
+                            "vacationDays": user_data.vacation_days,
+                            "personalTime": user_data.personal_time,
+                            "role": user_data.role,
+                        },
                     },
                     status=status.HTTP_200_OK,
                 )
