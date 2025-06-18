@@ -4,8 +4,9 @@ from django.contrib.auth.hashers import make_password, check_password  # type: i
 from django.http import JsonResponse, HttpResponse  # type: ignore
 from rest_framework.views import APIView  # type: ignore
 from rest_framework.response import Response  # type: ignore
-from rest_framework import status  # type: ignore
+from rest_framework import status, permissions  # type: ignore
 from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
+from rest_framework_simplejwt.authentication import JWTAuthentication  # type: ignore
 
 
 class UserSignInView(APIView):
@@ -123,6 +124,34 @@ class UserLogInView(APIView):
             return Response(
                 {"detail": "User not found"},
                 status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+class UserMeView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        try:
+            user_data = UserData.objects.get(email=user.email)
+            return Response(
+                {
+                    "id": user_data.id,
+                    "name": user_data.name,
+                    "email": user_data.email,
+                    "workHours": user_data.work_hours,
+                    "vacationDays": user_data.vacation_days,
+                    "personalTime": user_data.personal_time,
+                    "role": user_data.role,
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        except UserData.DoesNotExist:
+            return Response(
+                {"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
 

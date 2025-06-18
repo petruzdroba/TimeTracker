@@ -30,6 +30,7 @@ urlpatterns = [
     path(
         "api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"
     ),  # refresh token endpoint
+    path("auth/me/", api_views.UserMeView.as_view(), name="user-me"),
     path("admin/", admin.site.urls),
     path("auth/signup/", api_views.UserSignInView.as_view(), name="user_signup"),
     path("auth/login/", api_views.UserLogInView.as_view(), name="user_login"),

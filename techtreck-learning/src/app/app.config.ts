@@ -8,11 +8,11 @@ import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
-  HTTP_INTERCEPTORS,
   provideHttpClient,
   withFetch,
+  withInterceptors,
 } from '@angular/common/http';
-import { AuthInterceptor } from './shared/interceptors/auth.interceptors';
+import { authInterceptor } from './shared/interceptors/auth.interceptors';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,11 +25,6 @@ export const appConfig: ApplicationConfig = {
     ),
     provideClientHydration(),
     provideAnimations(),
-    provideHttpClient(withFetch()),
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true,
-    },
+    provideHttpClient(withFetch(), withInterceptors([authInterceptor])),
   ],
 };

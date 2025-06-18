@@ -68,23 +68,16 @@ export class UserDataService implements OnDestroy {
   }
 
   checkRememberedUser(): void {
-    if (typeof window !== 'undefined') {
-      const remembered = window.localStorage.getItem('rememberMe');
-      if (remembered) {
-        const parsed = JSON.parse(remembered);
-        if (parsed.rememberMe) {
-          this.subscription = this.http
-            .get<UserData>(`${environment.apiUrl}/auth/getuser/${parsed.id}/`)
-            .pipe(take(1))
-            .subscribe({
-              next: (user) => {
-                this.userData.set(user);
-              },
-              error: (err) => {
-                this.router.navigate(['/error', err.status]);
-              },
-            });
-        }
+    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        this.subscription = this.http
+          .get<UserData>(`${environment.apiUrl}/auth/me/`)
+          .pipe(take(1))
+          .subscribe({
+            next: (user) => this.userData.set(user),
+            error: (err) => this.logout(),
+          });
       }
     }
   }
@@ -100,6 +93,9 @@ export class UserDataService implements OnDestroy {
     localStorage.removeItem('userData');
     localStorage.removeItem('rememberMe');
     localStorage.removeItem('timerData');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('refreshToken');
+
     this.userData.set({
       id: -1,
       name: 'NoUser',
@@ -109,7 +105,8 @@ export class UserDataService implements OnDestroy {
       personalTime: 0,
       role: 'NoRole',
     });
-    this.reloadPage();
+
+    this.router.navigate(['/login']);
   }
 
   reloadPage(): void {
