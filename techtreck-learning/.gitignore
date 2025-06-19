@@ -59,8 +59,12 @@ db.sqlite3
 
 # Environment files
 .env
+<<<<<<< Updated upstream
 .env.*
 src/environments/*
+=======
+environments/
+>>>>>>> Stashed changes
 
 backend/venv/
 venv/

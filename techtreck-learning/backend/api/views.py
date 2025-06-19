@@ -5,8 +5,35 @@ from django.http import JsonResponse, HttpResponse  # type: ignore
 from rest_framework.views import APIView  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework import status, permissions  # type: ignore
-from rest_framework_simplejwt.tokens import RefreshToken  # type: ignore
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken  # type: ignore
 from rest_framework_simplejwt.authentication import JWTAuthentication  # type: ignore
+from rest_framework.permissions import AllowAny  # type: ignore
+from rest_framework.exceptions import AuthenticationFailed  # type: ignore
+
+
+class BaseAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def validate_token(self, request):
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            raise AuthenticationFailed("No token provided")
+
+        token = auth_header.split(" ")[1]
+        try:
+            decoded_token = AccessToken(token)
+            user_id = decoded_token.get("user_id")
+            email = decoded_token.get("email")
+            return user_id, email
+        except Exception as e:
+            raise AuthenticationFailed(f"Token validation failed: {str(e)}")
+
+    def check_user_access(self, token_user_id, requested_id):
+        if not token_user_id or not requested_id:
+            raise AuthenticationFailed("Missing user ID")
+
+        if str(token_user_id) != str(requested_id):
+            raise AuthenticationFailed("Not authorized to access this resource")
 
 
 class UserSignInView(APIView):
@@ -87,6 +114,8 @@ class UserSignInView(APIView):
 
 
 class UserLogInView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         data = request.data
         email = data.get("email")
@@ -97,7 +126,10 @@ class UserLogInView(APIView):
             if check_password(password, user_auth.password):
                 user_data = UserData.objects.get(email=email)
 
-                refresh = RefreshToken.for_user(user_auth)
+                # Create JWT tokens
+                refresh = RefreshToken()
+                refresh["email"] = email
+                refresh["user_id"] = user_data.id
 
                 return Response(
                     {
@@ -128,14 +160,26 @@ class UserLogInView(APIView):
 
 
 class UserMeView(APIView):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [AllowAny]  # Temporarily allow all to debug
 
     def get(self, request):
-        user = request.user
+        auth_header = request.headers.get("Authorization", "")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return Response({"error": "No token provided"}, status=401)
 
+        token = auth_header.split(" ")[1]
         try:
-            user_data = UserData.objects.get(email=user.email)
+            # Manually decode the token
+            from rest_framework_simplejwt.tokens import AccessToken  # type: ignore
+
+            decoded_token = AccessToken(token)
+
+            # Get user data directly from token claims
+            user_id = decoded_token.get("user_id")
+            email = decoded_token.get("email")
+
+            user_data = UserData.objects.get(id=user_id)
+
             return Response(
                 {
                     "id": user_data.id,
@@ -145,14 +189,11 @@ class UserMeView(APIView):
                     "vacationDays": user_data.vacation_days,
                     "personalTime": user_data.personal_time,
                     "role": user_data.role,
-                },
-                status=status.HTTP_200_OK,
+                }
             )
-
-        except UserData.DoesNotExist:
-            return Response(
-                {"detail": "User profile not found."}, status=status.HTTP_404_NOT_FOUND
-            )
+        except Exception as e:
+            print(f"Token decode error: {str(e)}")
+            return Response({"error": str(e)}, status=401)
 
 
 class UserDeleteView(APIView):
@@ -193,10 +234,18 @@ class UserDeleteView(APIView):
             )
 
 
-class GetUserDataView(APIView):
+class GetUserDataView(BaseAuthView):
     def get(self, request, id):
         try:
+            # Add print statements for debugging
+            print(f"Getting data for user ID: {id}")
+            token_user_id, email = self.validate_token(request)
+            print(f"Token user_id: {token_user_id}, email: {email}")
+
+            # Remove access check since manager/admin should be able to view other users
             user_data = UserData.objects.get(id=id)
+            print(f"Found user data: {user_data.email}")
+
             return Response(
                 {
                     "id": user_data.id,
@@ -210,23 +259,35 @@ class GetUserDataView(APIView):
                 status=status.HTTP_200_OK,
             )
         except UserData.DoesNotExist:
+            print(f"User {id} not found")
             return Response(
                 {"detail": "User not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
+        except AuthenticationFailed as e:
+            print(f"Authentication failed: {str(e)}")
+            return Response(
+                {"detail": str(e)},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
         except Exception as e:
+            print(f"Error getting user data: {str(e)}")
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
-class WorkLogUpdateView(APIView):
+class WorkLogUpdateView(BaseAuthView):
     def put(self, request):
         try:
             user_id = request.data.get("userId")
-            work_log = request.data.get("data")
+            token_user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(token_user_id, user_id)
+            if access_check:
+                return access_check
 
+            work_log = request.data.get("data")
             user_work_log = WorkLog.objects.get(id=user_id)
             user_work_log.work_log = work_log
             user_work_log.save()
@@ -235,41 +296,38 @@ class WorkLogUpdateView(APIView):
                 {"detail": "Success", "data": work_log},
                 status=status.HTTP_200_OK,
             )
-        except WorkLog.DoesNotExist:
-            return Response(
-                {"detail": f"WorkLog not found for user {user_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class WorkLogGetView(APIView):
+class WorkLogGetView(BaseAuthView):
     def get(self, request, id):
         try:
+            user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(user_id, id)
+            if access_check:
+                return access_check
+
             work_log = WorkLog.objects.get(id=id)
-            return Response(
-                work_log.work_log,
-                status=status.HTTP_200_OK,
-            )
+            return Response(work_log.work_log, status=status.HTTP_200_OK)
         except WorkLog.DoesNotExist:
-            return Response(
-                {"detail": "fail"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"detail": "fail"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class VacationGetView(APIView):
+class VacationGetView(BaseAuthView):
     def get(self, request, id):
         try:
+            user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(user_id, id)
+            if access_check:
+                return access_check
+
             vacation = Vacation.objects.get(id=id)
             return Response(
                 {
@@ -280,23 +338,23 @@ class VacationGetView(APIView):
                 status=status.HTTP_200_OK,
             )
         except Vacation.DoesNotExist:
-            return Response(
-                {"detail": "fail"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"detail": "fail"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class VacationUpdateView(APIView):
+class VacationUpdateView(BaseAuthView):
     def put(self, request):
         try:
             user_id = request.data.get("userId")
-            data = request.data.get("data")
+            token_user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(token_user_id, user_id)
+            if access_check:
+                return access_check
 
+            data = request.data.get("data")
             user_vacation = Vacation.objects.get(id=user_id)
             user_vacation.future_vacation = data.get("futureVacations")
             user_vacation.past_vacation = data.get("pastVacations")
@@ -311,21 +369,20 @@ class VacationUpdateView(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
-        except Vacation.DoesNotExist:
-            return Response(
-                {"detail": f"Vacation not found for user {user_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class LeaveSlipGetView(APIView):
+class LeaveSlipGetView(BaseAuthView):
     def get(self, request, id):
         try:
+            user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(user_id, id)
+            if access_check:
+                return access_check
+
             leave_slip = LeaveSlip.objects.get(id=id)
             return Response(
                 {
@@ -336,23 +393,23 @@ class LeaveSlipGetView(APIView):
                 status=status.HTTP_200_OK,
             )
         except LeaveSlip.DoesNotExist:
-            return Response(
-                {"detail": "fail"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+            return Response({"detail": "fail"}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class LeaveSlipUpdateView(APIView):
+class LeaveSlipUpdateView(BaseAuthView):
     def put(self, request):
         try:
             user_id = request.data.get("userId")
-            data = request.data.get("data")
+            token_user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(token_user_id, user_id)
+            if access_check:
+                return access_check
 
+            data = request.data.get("data")
             user_leave_slip = LeaveSlip.objects.get(id=user_id)
             user_leave_slip.future_slip = data.get("futureLeaves")
             user_leave_slip.past_slip = data.get("pastLeaves")
@@ -367,19 +424,16 @@ class LeaveSlipUpdateView(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
-        except LeaveSlip.DoesNotExist:
-            return Response(
-                {"detail": f"LeaveSlip not found for user {user_id}"},
-                status=status.HTTP_404_NOT_FOUND,
-            )
         except Exception as e:
             return Response(
-                {"detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
 class TimerDataSyncView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
     def put(self, request):
         try:
             user_id = request.data.get("userId")
@@ -417,6 +471,7 @@ class TimerDataSyncView(APIView):
 
 class TimerGetView(APIView):
     def get(self, request, id):
+
         try:
             timer_data = TimerData.objects.get(id=id)
             return Response(
@@ -431,8 +486,7 @@ class TimerGetView(APIView):
             )
         except TimerData.DoesNotExist:
             return Response(
-                {"detail": "fail"},
-                status=status.HTTP_404_NOT_FOUND,
+                {"detail": "Timer not found"}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
             return Response(
@@ -441,12 +495,17 @@ class TimerGetView(APIView):
             )
 
 
-class ManagerGetView(APIView):
+class ManagerGetView(BaseAuthView):
     def get(self, request):
-        vacations = []
-        leaves = []
-
         try:
+            _, email = self.validate_token(request)
+            user = UserData.objects.get(email=email)
+            if user.role not in ["manager", "admin"]:
+                return Response({"error": "Not authorized"}, status=403)
+
+            vacations = []
+            leaves = []
+
             for user_id in UserData.objects.all().values_list("id", flat=True):
                 try:
                     vacation = Vacation.objects.get(id=user_id)
@@ -469,23 +528,27 @@ class ManagerGetView(APIView):
                             "remainingTime": leave.remaining_time,
                         }
                     )
-                except (Vacation.DoesNotExist, LeaveSlip.DoesNotExist) as e:
-                    return Response(
-                        {"detail": str(e)}, status=status.HTTP_404_NOT_FOUND
-                    )
+                except Exception as e:
+                    print(f"Error processing user {user_id}: {str(e)}")
+                    continue
+
+            return Response(
+                {"vacations": vacations, "leaves": leaves}, status=status.HTTP_200_OK
+            )
         except Exception as e:
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        return Response(
-            {"vacations": vacations, "leaves": leaves}, status=status.HTTP_200_OK
-        )
 
-
-class AdminGetView(APIView):
+class AdminGetView(BaseAuthView):
     def get(self, request):
         try:
+            _, email = self.validate_token(request)
+            user = UserData.objects.get(email=email)
+            if user.role != "admin":
+                return Response({"error": "Not authorized"}, status=403)
+
             users = UserData.objects.all()
             return Response(
                 [
@@ -508,11 +571,15 @@ class AdminGetView(APIView):
             )
 
 
-class UserUpdateData(APIView):
-
+class UserUpdateData(BaseAuthView):
     def put(self, request):
         try:
+            # Add token validation
+            token_user_id, _ = self.validate_token(request)
             data = request.data.get("data", {})
+            access_check = self.check_user_access(token_user_id, data.get("id"))
+            if access_check:
+                return access_check
 
             current_user = UserData.objects.get(id=data.get("id"))
             vacation = Vacation.objects.get(id=data.get("id"))
@@ -560,9 +627,15 @@ class UserUpdateData(APIView):
             )
 
 
-class GetUserBenefits(APIView):
+class GetUserBenefits(BaseAuthView):
     def get(self, request, id):
         try:
+            # Add token validation
+            token_user_id, _ = self.validate_token(request)
+            access_check = self.check_user_access(token_user_id, id)
+            if access_check:
+                return access_check
+
             user_vacations = Vacation.objects.get(id=id).remaining_vacation
             user_leave = LeaveSlip.objects.get(id=id).remaining_time
 
@@ -580,37 +653,77 @@ class GetUserBenefits(APIView):
             )
 
 
-class RestoreVacationView(APIView):
+class RestoreVacationView(BaseAuthView):
     def post(self, request):
         try:
+            token_user_id, email = self.validate_token(request)
             id = request.data.get("userId")
 
-            vacation_days = UserData.objects.get(id=id).vacation_days
+            # Check if user is admin/manager
+            requesting_user = UserData.objects.get(id=token_user_id)
+            if requesting_user.role not in ["admin", "manager"]:
+                access_check = self.check_user_access(token_user_id, id)
+                if access_check:
+                    return access_check
 
-            vacation = Vacation.objects.get(id=id)
-            vacation.remaining_vacation = vacation_days
-            vacation.save()
+            user_data = UserData.objects.get(id=id)
+            user_vacation = Vacation.objects.get(id=id)
+            user_vacation.remaining_vacation = user_data.vacation_days
+            user_vacation.save()
 
-            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "futureVacations": user_vacation.future_vacation,
+                    "pastVacations": user_vacation.past_vacation,
+                    "remainingVacationDays": user_vacation.remaining_vacation,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except UserData.DoesNotExist:
+            return Response(
+                {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
+            print(f"Restore vacation error: {str(e)}")  # Debug print
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
-class RestoreLeaveTimeView(APIView):
+class RestoreLeaveTimeView(BaseAuthView):
     def post(self, request):
         try:
+            token_user_id, email = self.validate_token(request)
             id = request.data.get("userId")
 
-            personal_time = UserData.objects.get(id=id).personal_time * 360000
+            # Check if user is admin/manager
+            requesting_user = UserData.objects.get(id=token_user_id)
+            if requesting_user.role not in ["admin", "manager"]:
+                access_check = self.check_user_access(token_user_id, id)
+                if access_check:
+                    return access_check
 
-            leave = LeaveSlip.objects.get(id=id)
-            leave.remaining_time = personal_time
-            leave.save()
+            user_data = UserData.objects.get(id=id)
+            user_leave = LeaveSlip.objects.get(id=id)
+            user_leave.remaining_time = user_data.personal_time * 3600000
+            user_leave.save()
 
-            return Response({"detail": "ok"}, status=status.HTTP_200_OK)
+            return Response(
+                {
+                    "futureLeaves": user_leave.future_slip,
+                    "pastLeaves": user_leave.past_slip,
+                    "remainingTime": user_leave.remaining_time,
+                },
+                status=status.HTTP_200_OK,
+            )
+        except AuthenticationFailed as e:
+            return Response({"detail": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+        except UserData.DoesNotExist:
+            return Response(
+                {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
+            print(f"Restore leave error: {str(e)}")
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

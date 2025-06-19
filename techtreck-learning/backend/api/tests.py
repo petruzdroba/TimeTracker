@@ -895,7 +895,9 @@ class RestoreViewsTests(APITestCase):
 
         # after restore, remaining_time should match personal_time (10)
         self.leave.refresh_from_db()
-        self.assertEqual(self.leave.remaining_time, self.user.personal_time)
+        self.assertEqual(
+            self.leave.remaining_time, self.user.personal_time * 360000
+        )  # convert hours to milliseconds
 
     def test_restore_leave_not_found(self):
         """Non‑existent userId should raise a 500 (generic exception)."""
