@@ -31,16 +31,6 @@ export class UserDataService implements OnDestroy {
     this.checkRememberedUser();
   }
 
-  saveUserData(user: UserData, rememberMe: boolean): void {
-    this.userData.set(user);
-    if (rememberMe) {
-      localStorage.setItem(
-        'rememberMe',
-        JSON.stringify({ rememberMe: true, id: user.id })
-      );
-    }
-  }
-
   logIn(data: { email: string; password: string }): Observable<UserData> {
     return this.http
       .post<{ access: string; refresh: string; user: UserData }>(
@@ -52,7 +42,6 @@ export class UserDataService implements OnDestroy {
         tap((res) => {
           localStorage.setItem('authToken', res.access);
           localStorage.setItem('refreshToken', res.refresh);
-          localStorage.setItem('userData', JSON.stringify(res.user));
           this.userData.set(res.user);
         }),
         map((res) => res.user)
@@ -90,8 +79,6 @@ export class UserDataService implements OnDestroy {
   }
 
   logout(): void {
-    localStorage.removeItem('userData');
-    localStorage.removeItem('rememberMe');
     localStorage.removeItem('timerData');
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
@@ -106,11 +93,7 @@ export class UserDataService implements OnDestroy {
       role: 'NoRole',
     });
 
-    this.router.navigate(['/login']);
-  }
-
-  reloadPage(): void {
-    window.location.reload();
+    this.router.navigate(['/auth']);
   }
 
   ngOnDestroy(): void {

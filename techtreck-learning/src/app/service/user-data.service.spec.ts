@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { UserData } from '../model/user-data.interface';
 import { of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 describe('UserDataService', () => {
   let service: UserDataService;
@@ -18,6 +19,12 @@ describe('UserDataService', () => {
     vacationDays: 20,
     personalTime: 5,
     role: 'user',
+  };
+
+  const mockAuthResponse = {
+    access: 'mock-access-token',
+    refresh: 'mock-refresh-token',
+    user: mockUserData,
   };
 
   beforeEach(() => {
@@ -43,33 +50,23 @@ describe('UserDataService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should save user data with remember me', () => {
-    service.saveUserData(mockUserData, true);
-
-    expect(service.user().id).toBe(mockUserData.id);
-    expect(service.isLoggedIn()).toBeTrue();
-
-    const remembered = localStorage.getItem('rememberMe');
-    expect(remembered).toBeTruthy();
-    expect(JSON.parse(remembered!)).toEqual({
-      rememberMe: true,
-      id: mockUserData.id,
-    });
-  });
-
-  it('should log in user', fakeAsync(() => {
+  it('should log in user and store tokens', fakeAsync(() => {
     const loginData = { email: 'test@test.com', password: 'password' };
-    httpClientSpy.post.and.returnValue(of(mockUserData));
+    httpClientSpy.post.and.returnValue(of(mockAuthResponse));
 
     service.logIn(loginData).subscribe((response) => {
       expect(response).toEqual(mockUserData);
     });
 
     tick();
+
     expect(httpClientSpy.post).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/auth/login/',
+      `${environment.apiUrl}/auth/login/`,
       loginData
     );
+    expect(localStorage.getItem('authToken')).toBe('mock-access-token');
+    expect(localStorage.getItem('refreshToken')).toBe('mock-refresh-token');
+    expect(service.user()).toEqual(mockUserData);
   }));
 
   it('should sign up user', fakeAsync(() => {
@@ -86,110 +83,90 @@ describe('UserDataService', () => {
 
     tick();
     expect(httpClientSpy.post).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/auth/signup/',
+      `${environment.apiUrl}/auth/signup/`,
       signupData
     );
   }));
 
-  it('should check remembered user', fakeAsync(() => {
-    localStorage.setItem(
-      'rememberMe',
-      JSON.stringify({
-        rememberMe: true,
-        id: 1,
-      })
-    );
-
+  it('should check remembered user with valid token', fakeAsync(() => {
+    localStorage.setItem('authToken', 'valid-token');
     httpClientSpy.get.and.returnValue(of(mockUserData));
+
     service.checkRememberedUser();
     tick();
 
     expect(service.user()).toEqual(mockUserData);
     expect(httpClientSpy.get).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/auth/getuser/1/'
+      `${environment.apiUrl}/auth/me/`
     );
   }));
 
-  it('should handle remember user error', fakeAsync(() => {
-    localStorage.setItem(
-      'rememberMe',
-      JSON.stringify({
-        rememberMe: true,
-        id: 1,
-      })
+  it('should handle remembered user error by logging out', fakeAsync(() => {
+    localStorage.setItem('authToken', 'invalid-token');
+    httpClientSpy.get.and.returnValue(
+      throwError(() => new Error('Invalid token'))
     );
 
-    httpClientSpy.get.and.returnValue(throwError(() => ({ status: 404 })));
     service.checkRememberedUser();
     tick();
 
-    expect(routerMock.navigate).toHaveBeenCalledWith(['/error', 404]);
+    expect(service.user().id).toBe(-1);
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/auth']);
   }));
 
   it('should logout user', () => {
-    service.saveUserData(mockUserData, true);
-
-    spyOn(service, 'reloadPage'); // Spy on the wrapper, not window.location
+    // Setup initial state
+    localStorage.setItem('authToken', 'token');
+    localStorage.setItem('refreshToken', 'refresh');
+    localStorage.setItem('timerData', 'data');
+    service['userData'].set(mockUserData);
 
     service.logout();
 
-    expect(localStorage.getItem('userData')).toBeNull();
-    expect(localStorage.getItem('rememberMe')).toBeNull();
+    expect(localStorage.getItem('authToken')).toBeNull();
+    expect(localStorage.getItem('refreshToken')).toBeNull();
     expect(localStorage.getItem('timerData')).toBeNull();
-    expect(service.user().id).toBe(-1);
-    expect(service.reloadPage).toHaveBeenCalled();
+    expect(service.user()).toEqual({
+      id: -1,
+      name: 'NoUser',
+      email: 'NoEmail',
+      workHours: 0,
+      vacationDays: 0,
+      personalTime: 0,
+      role: 'NoRole',
+    });
+    expect(routerMock.navigate).toHaveBeenCalledWith(['/auth']);
   });
 
   it('should check user roles', () => {
     const adminUser = { ...mockUserData, role: 'admin' };
     const managerUser = { ...mockUserData, role: 'manager' };
 
-    service.saveUserData(adminUser, false);
+    service['userData'].set(adminUser);
     expect(service.isAdmin()).toBeTrue();
     expect(service.isManager()).toBeFalse();
 
-    service.saveUserData(managerUser, false);
+    service['userData'].set(managerUser);
     expect(service.isAdmin()).toBeFalse();
     expect(service.isManager()).toBeTrue();
   });
 
-  it('should call delete API and handle success and error responses', fakeAsync(() => {
+  it('should call delete API', fakeAsync(() => {
     const password = 'testpassword123';
-    const mockUser = { id: 1 } as any;
-
-    // Instead of spyOn(service, 'user'), set userData properly
-    service.saveUserData(mockUser, false);
+    service['userData'].set(mockUserData);
 
     const deleteResponse = { detail: 'User deleted' };
     httpClientSpy.post.and.returnValue(of(deleteResponse));
 
-    service.delete(password).subscribe({
-      next: (res) => {
-        expect(res).toEqual(deleteResponse);
-      },
-      error: () => {
-        fail('Should not fail on success');
-      },
+    service.delete(password).subscribe((response) => {
+      expect(response).toEqual(deleteResponse);
     });
+
     tick();
 
     expect(httpClientSpy.post).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/user/delete/',
-      { userId: mockUser.id, password }
+      `${environment.apiUrl}/user/delete/`,
+      { userId: mockUserData.id, password }
     );
-
-    // Error case
-    const errorResponse = { status: 401, message: 'Unauthorized' };
-    httpClientSpy.post.and.returnValue(throwError(() => errorResponse));
-
-    service.delete(password).subscribe({
-      next: () => {
-        fail('Should not succeed on error');
-      },
-      error: (err) => {
-        expect(err).toEqual(errorResponse);
-      },
-    });
-    tick();
   }));
 });

@@ -66,7 +66,6 @@ export class LoginComponent implements OnDestroy {
 
       this.subscription = this.authService.logIn(userData).subscribe({
         next: (response) => {
-          this.authService.saveUserData(response, true);
           this.form.reset();
           this.closeWindow();
           this.router.navigate(['/home']);

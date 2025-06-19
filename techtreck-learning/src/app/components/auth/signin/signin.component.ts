@@ -106,7 +106,6 @@ export class SigninComponent implements OnDestroy {
 
       this.subscription = this.authService.signUp(userData).subscribe({
         next: (response) => {
-          this.authService.saveUserData(response, false);
           this.form.reset();
           this.closeWindow();
           this.router.navigate(['/home']);
