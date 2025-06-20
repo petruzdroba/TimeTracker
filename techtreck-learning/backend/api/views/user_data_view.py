@@ -58,10 +58,6 @@ class GetUserDataView(BaseAuthView):
             token_user_id, email = self.validate_token(request)
 
             user_data = UserData.objects.get(id=id)
-            access_check = self.check_user_access(token_user_id, user_data.id)
-
-            if access_check:
-                return access_check
 
             return Response(
                 {
