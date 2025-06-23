@@ -57,8 +57,14 @@ db.sqlite3
 # VSCode settings (if used)
 .vscode/
 
-# Environment variables
+# Environment files
 .env
+<<<<<<< Updated upstream
+.env.*
+src/environments/*
+=======
+environments/
+>>>>>>> Stashed changes
 
 backend/venv/
 venv/

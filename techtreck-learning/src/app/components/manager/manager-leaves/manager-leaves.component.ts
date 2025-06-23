@@ -35,9 +35,6 @@ export class ManagerLeavesComponent implements OnInit {
     await this.managerService.initialize();
     this.futureLeaves = this.managerService.futureLeaves();
     this.pastLeaves = this.managerService.pastLeaves();
-
-    console.log('Future Leaves:', this.futureLeaves);
-    console.log('Past Leaves:', this.pastLeaves);
   }
 
   private get pendingLeaveRequests() {

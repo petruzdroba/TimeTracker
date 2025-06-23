@@ -3,12 +3,12 @@ import { UserData } from '../model/user-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { take } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService implements OnDestroy {
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private baseUrl = 'http://127.0.0.1:8000';
   private subscription: any;
 
   private adminData = signal<UserData[]>([] as UserData[]);
@@ -24,7 +24,7 @@ export class AdminService implements OnDestroy {
   private fetchAdminData(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<UserData[]>(`${this.baseUrl}/adminfe/get/`)
+        .get<UserData[]>(`${environment.apiUrl}/adminfe/get/`)
         .pipe(take(1))
         .subscribe({
           next: (res) => {
@@ -42,7 +42,7 @@ export class AdminService implements OnDestroy {
   updateUser(data: UserData): Promise<void> {
     return new Promise((resolve, reject) => {
       this.subscription = this.http
-        .put<UserData>(`${this.baseUrl}/user/update/`, { data: data })
+        .put<UserData>(`${environment.apiUrl}/user/update/`, { data: data })
         .subscribe({
           next: () => {
             this.fetchAdminData();
@@ -59,7 +59,7 @@ export class AdminService implements OnDestroy {
   restoreVacation(userId: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
-        .post(`${this.baseUrl}/vacation/restore/`, { userId: userId })
+        .post(`${environment.apiUrl}/vacation/restore/`, { userId: userId })
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -77,7 +77,7 @@ export class AdminService implements OnDestroy {
   restoreLeaveTime(userId: number): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
-        .post(`${this.baseUrl}/leaveslip/restore/`, { userId: userId })
+        .post(`${environment.apiUrl}/leaveslip/restore/`, { userId: userId })
         .pipe(take(1))
         .subscribe({
           next: () => {

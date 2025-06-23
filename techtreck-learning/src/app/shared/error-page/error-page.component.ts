@@ -40,11 +40,14 @@ export class ErrorPageComponent implements OnInit, OnDestroy {
       case 404:
         this.statusMessage = 'Page Not Found';
         break;
+      case 409:
+        this.statusMessage = 'Conflict';
+        break;
       case 500:
         this.statusMessage = 'Internal Server Error';
         break;
       default:
-        this.statusMessage = 'An Error Occurred';
+        this.statusMessage = 'Unexpected Error';
     }
   }
 
