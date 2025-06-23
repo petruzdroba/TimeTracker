@@ -31,14 +31,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cd backend
+          cd techtreck-learning/backend
           pip install -r requirements.txt
 
       # Optional: Add step to run tests here
 
       - name: Zip artifact for deployment
         run: |
-          cd backend
+          cd techtreck-learning
           zip -r ../release.zip ./*
 
       - name: Upload artifact for deployment jobs
