@@ -38,7 +38,7 @@ jobs:
 
       - name: Zip artifact for deployment
         run: |
-          cd backend
+          cd techtreck-learning/backend
           zip -r ../release.zip ./*
 
       - name: Upload artifact for deployment jobs
