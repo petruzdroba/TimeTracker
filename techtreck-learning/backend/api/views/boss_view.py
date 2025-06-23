@@ -39,7 +39,6 @@ class ManagerGetView(BaseAuthView):
                         }
                     )
                 except Exception as e:
-                    print(f"Error processing user {user_id}: {str(e)}")
                     continue
 
             return Response(
