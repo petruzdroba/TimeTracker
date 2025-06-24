@@ -79,3 +79,4 @@ jobs:
         with:
           app-name: "petruzdroba"
           slot-name: "Production"
+          package: release.zip
