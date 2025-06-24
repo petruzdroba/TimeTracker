@@ -80,3 +80,4 @@ jobs:
           app-name: "petruzdroba"
           slot-name: "Production"
           package: release.zip
+          type : zip
