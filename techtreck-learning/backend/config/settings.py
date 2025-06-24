@@ -120,7 +120,6 @@ CORS_ALLOW_ALL_ORIGINS = (
 )
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    os.environ.get("FE_URL"),
     "http://127.0.0.1:4200",
     "http://localhost:4200",
 ]
