@@ -156,3 +156,4 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
+CSRF_TRUSTED_ORIGINS = [os.environ.get("AZURE_DOMAIN")]
