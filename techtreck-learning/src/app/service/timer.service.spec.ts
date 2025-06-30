@@ -5,6 +5,7 @@ import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { TimerData } from '../model/timer-data.interface';
 import { of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 describe('TimerService', () => {
   let service: TimerService;
@@ -84,7 +85,7 @@ describe('TimerService', () => {
     tick();
 
     expect(httpClientSpy.get).toHaveBeenCalledWith(
-      'http://127.0.0.1:8000/timer/get/1/'
+      `${environment.apiUrl}/timer/get/1/`
     );
   }));
 
@@ -117,7 +118,7 @@ describe('TimerService', () => {
     tick();
 
     const putCall = httpClientSpy.put.calls.mostRecent();
-    expect(putCall.args[0]).toBe('http://127.0.0.1:8000/timer/sync/');
+    expect(putCall.args[0]).toBe(`${environment.apiUrl}/timer/sync/`);
 
     const callData = putCall.args[1];
     expect(callData.userId).toBe(1);

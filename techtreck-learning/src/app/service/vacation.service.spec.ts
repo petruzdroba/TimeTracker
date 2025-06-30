@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { Vacation } from '../model/vacation.interface';
 import { UserData } from '../model/user-data.interface';
 import { VacationData } from '../model/vacation-data.interface';
+import { environment } from '../../environments/environment';
 
 describe('VacationService', () => {
   let service: VacationService;
@@ -25,7 +26,7 @@ describe('VacationService', () => {
     personalTime: 5,
     role: 'user',
   };
-  const baseUrl = 'http://127.0.0.1:8000';
+  const baseUrl = `${environment.apiUrl}`;
 
   beforeEach(() => {
     const userDataSpy = jasmine.createSpyObj('UserDataService', [

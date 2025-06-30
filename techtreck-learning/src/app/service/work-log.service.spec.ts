@@ -7,6 +7,7 @@ import { WorkLogService } from './work-log.service';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { Session } from '../model/session.interface';
+import { environment } from '../../environments/environment';
 
 describe('WorkLogService', () => {
   let service: WorkLogService;
@@ -14,7 +15,7 @@ describe('WorkLogService', () => {
   let httpMock: HttpTestingController;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const baseUrl = 'http://127.0.0.1:8000';
+  const baseUrl = `${environment.apiUrl}`;
   const mockUser = {
     id: 1,
     name: 'Test User',

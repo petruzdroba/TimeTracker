@@ -8,6 +8,7 @@ import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { LeaveSlip } from '../model/leave-slip.interface';
 import { LeaveSlipData } from '../model/leaveslip-data.interface';
+import { environment } from '../../environments/environment';
 
 describe('LeaveSlipService', () => {
   let service: LeaveSlipService;
@@ -15,7 +16,7 @@ describe('LeaveSlipService', () => {
   let httpMock: HttpTestingController;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const baseUrl = 'http://127.0.0.1:8000';
+  const baseUrl = `${environment.apiUrl}`;
 
   const mockUser = {
     id: 1,

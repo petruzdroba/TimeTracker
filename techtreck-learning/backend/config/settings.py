@@ -128,7 +128,7 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_HEADERS = [
     "accept",
     "accept-encoding",
-    "authorization",  # Make sure this is included
+    "authorization",
     "content-type",
     "dnt",
     "origin",
@@ -137,7 +137,7 @@ CORS_ALLOW_HEADERS = [
     "x-requested-with",
 ]
 
-CORS_EXPOSE_HEADERS = ["authorization"]  # Add this line
+CORS_EXPOSE_HEADERS = ["authorization"]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -146,11 +146,9 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),  # adjust as needed
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
-    "AUTH_HEADER_TYPES": (
-        "Bearer",
-    ),  # <-- important, must match what your Angular sends
+    "AUTH_HEADER_TYPES": ("Bearer",),
     "AUTH_HEADER_NAME": "Authorization",  # default, keep this
     "SIGNING_KEY": SECRET_KEY,
     "USER_ID_FIELD": "id",
