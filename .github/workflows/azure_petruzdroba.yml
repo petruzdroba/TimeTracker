@@ -3,6 +3,7 @@ name: Build and deploy Python app to Azure Web App - petruzdroba
 on:
   push:
     branches:
+      - main
       - azure
   workflow_dispatch:
 
@@ -74,4 +75,4 @@ jobs:
           app-name: "petruzdroba"
           slot-name: "Production"
           package: release.zip
-          type : zip
+          type: zip
