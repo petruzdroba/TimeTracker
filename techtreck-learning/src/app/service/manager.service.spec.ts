@@ -14,13 +14,14 @@ import {
   LeaveWithUser,
 } from '../model/manager-data.interface';
 import { VacationData } from '../model/vacation-data.interface';
+import { environment } from '../../environments/environment';
 
 describe('ManagerService', () => {
   let service: ManagerService;
   let httpMock: HttpTestingController;
   let routerSpy: jasmine.SpyObj<Router>;
 
-  const baseUrl = 'http://127.0.0.1:8000';
+  const baseUrl = `${environment.apiUrl}`;
 
   beforeEach(() => {
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { UserData } from '../model/user-data.interface';
+import { environment } from '../../environments/environment';
 
 describe('AdminService', () => {
   let service: AdminService;
@@ -49,7 +50,7 @@ describe('AdminService', () => {
     service.initialize().then(() => {
       expect(service.getAdminData()).toEqual(mockUserList);
       expect(httpClientSpy.get).toHaveBeenCalledWith(
-        'http://127.0.0.1:8000/adminfe/get/'
+        `${environment.apiUrl}/adminfe/get/`
       );
     });
 
@@ -74,7 +75,7 @@ describe('AdminService', () => {
 
     service.updateUser(updatedUser).then(() => {
       expect(httpClientSpy.put).toHaveBeenCalledWith(
-        'http://127.0.0.1:8000/user/update/',
+        `${environment.apiUrl}/user/update/`,
         { data: updatedUser }
       );
       expect(httpClientSpy.get).toHaveBeenCalled(); // Ensures re-fetching after update
@@ -112,7 +113,7 @@ describe('AdminService', () => {
 
     service.restoreVacation(1).then(() => {
       expect(httpClientSpy.post).toHaveBeenCalledWith(
-        'http://127.0.0.1:8000/vacation/restore/',
+        `${environment.apiUrl}/vacation/restore/`,
         { userId: 1 }
       );
       expect(httpClientSpy.get).toHaveBeenCalled(); // Ensures fetchAdminData was called
@@ -140,7 +141,7 @@ describe('AdminService', () => {
 
     service.restoreLeaveTime(1).then(() => {
       expect(httpClientSpy.post).toHaveBeenCalledWith(
-        'http://127.0.0.1:8000/leaveslip/restore/',
+        `${environment.apiUrl}/leaveslip/restore/`,
         { userId: 1 }
       );
       expect(httpClientSpy.get).toHaveBeenCalled(); // Ensures fetchAdminData was called
