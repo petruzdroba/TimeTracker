@@ -1,3 +1,4 @@
+/// <reference types="cypress" />
 describe('User sign up, logout, login, and delete flow', () => {
   const randomEmail = `testuser_${Date.now()}@example.com`;
   const password = 'TestPassword123';

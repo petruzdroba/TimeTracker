@@ -29,5 +29,9 @@
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "cypress"           // ← exclude the entire Cypress folder
+  ]
 }
