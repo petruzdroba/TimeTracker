@@ -106,9 +106,23 @@ export class SigninComponent implements OnDestroy {
 
       this.subscription = this.authService.signUp(userData).subscribe({
         next: (response) => {
-          this.form.reset();
-          this.closeWindow();
-          this.router.navigate(['/home']);
+          // After successful sign up, log in the user automatically
+          this.authService
+            .logIn({
+              email: userData.email,
+              password: userData.password,
+            })
+            .subscribe({
+              next: () => {
+                this.form.reset();
+                this.closeWindow();
+                this.router.navigate(['/home']);
+              },
+              error: (loginError) => {
+                this.error = 'Login failed after sign up.';
+                console.error('Auto-login error:', loginError);
+              },
+            });
         },
         error: (error) => {
           if (error.status === 409) {
