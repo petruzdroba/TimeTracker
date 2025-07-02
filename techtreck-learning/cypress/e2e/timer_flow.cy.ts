@@ -3,6 +3,26 @@ describe('Sign up, start timer, stop timer, check, and delete flow', () => {
   const randomEmail = `testuser_${Date.now()}@example.com`;
   const password = 'TestPassword123';
   const name = 'Test User';
+  let userCreated = false;
+
+  beforeEach(() => {
+    Cypress.on('fail', (error, runnable) => {
+      if (userCreated) {
+        cy.request('/auth/me/').then((resp) => {
+          const userId = resp.body.id;
+          cy.request('POST', `/auth/delete/${userId}`, {
+            password: password,
+          }).then(() => {
+            Cypress.log({
+              name: 'Cleanup',
+              message: 'User deleted after failure',
+            });
+          });
+        });
+      }
+      throw error;
+    });
+  });
 
   function waitForTimerData(userId: number, retries = 10) {
     if (retries === 0) throw new Error('TimerData not found after waiting');
@@ -20,22 +40,16 @@ describe('Sign up, start timer, stop timer, check, and delete flow', () => {
 
   function waitForPath(retries = 20) {
     cy.get('body', { timeout: 0 }).then(($body) => {
-      // Use jQuery :contains to check if the Start button is in the DOM
       if ($body.find('.btn-timer:contains("Start")').length > 0) {
-        // Found it—test can proceed
         return;
       }
 
-      // Not found yet
       if (retries <= 0) {
         throw new Error('Start button never appeared after multiple retries');
       }
 
-      // Retry: re-visit the page in case you got bounced
       cy.visit('/timetrack', { failOnStatusCode: false });
       cy.wait(500);
-
-      // Recursive retry
       waitForPath(retries - 1);
     });
   }
@@ -54,6 +68,7 @@ describe('Sign up, start timer, stop timer, check, and delete flow', () => {
         cy.get('button[type="submit"]').contains('Submit').click();
       });
     cy.url({ timeout: 10000 }).should('include', '/home');
+    userCreated = true;
 
     // Wait for /auth/me to confirm login and get userId
     cy.request('/auth/me/').then((meResp) => {

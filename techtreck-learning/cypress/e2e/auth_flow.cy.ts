@@ -3,6 +3,26 @@ describe('User sign up, logout, login, and delete flow', () => {
   const randomEmail = `testuser_${Date.now()}@example.com`;
   const password = 'TestPassword123';
   const name = 'Test User';
+  let userCreated = false;
+
+  beforeEach(() => {
+    Cypress.on('fail', (error, runnable) => {
+      if (userCreated) {
+        cy.request('/auth/me/').then((resp) => {
+          const userId = resp.body.id;
+          cy.request('POST', `/auth/delete/${userId}`, {
+            password: password,
+          }).then(() => {
+            Cypress.log({
+              name: 'Cleanup',
+              message: 'User deleted after failure',
+            });
+          });
+        });
+      }
+      throw error;
+    });
+  });
 
   it('should sign up, log out, log in, and delete the user', () => {
     cy.log('Step 1: Sign up a new user');
@@ -18,6 +38,7 @@ describe('User sign up, logout, login, and delete flow', () => {
         cy.get('button[type="submit"]').contains('Submit').click();
       });
     cy.url({ timeout: 10000 }).should('include', '/home');
+    userCreated = true;
 
     cy.log('Step 2: Open menu, go to Account, and log out');
     cy.get('.btn-menu').first().should('be.visible').click();
