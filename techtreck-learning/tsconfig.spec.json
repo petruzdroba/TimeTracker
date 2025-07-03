@@ -8,7 +8,12 @@
     ]
   },
   "include": [
-    "src/**/*.spec.ts",
+    "src/**/*.spec.ts",              // ← ONLY your *.spec.ts unit tests
     "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "cypress",                       // ← totally ignore Cypress folder
+    "src/**/*.cy.ts"                 // ← any stray *.cy.ts files under src
   ]
 }

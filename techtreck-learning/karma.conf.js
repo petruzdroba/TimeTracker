@@ -1,18 +1,16 @@
 module.exports = function(config) {
-    config.set({
-        basePath: '',
-        frameworks: ['jasmine', 'karma-typescript'],
-        files: [
-            { pattern: 'src/**/*.ts' }
-        ],
-        preprocessors: {
-            '**/*.ts': ['karma-typescript']
-        },
-        reporters: ['progress', 'karma-typescript'],
-        browsers: ['Chrome'],
-        singleRun: true,
-        karmaTypescriptConfig: {
-            tsconfig: './tsconfig.spec.json'
-        }
-    });
+  config.set({
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    files: [
+      { pattern: 'src/**/*.spec.ts', watched: false }
+    ],
+    exclude: [
+      'cypress/**/*.ts',   // ignore Cypress
+      'src/**/*.cy.ts'
+    ],
+    preprocessors: {
+      'src/**/*.spec.ts': ['webpack', 'sourcemap']
+    },
+    // …rest of your existing Karma setup
+  });
 };

@@ -1,0 +1,19 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "es6",
+    "lib": ["esnext", "dom"],
+    "types": ["cypress"],          // ← only Cypress globals
+    "isolatedModules": false
+  },
+  "include": [
+    "**/*.ts",                     // ← all your .ts spec files under cypress/
+    "**/*.cy.ts"                   // ← explicitly include *.cy.ts if needed
+  ],
+  "exclude": [
+    "../node_modules"     // ← only exclude parent node_modules
+  ]
+}
+
+
+

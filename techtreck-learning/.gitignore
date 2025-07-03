@@ -59,13 +59,21 @@ db.sqlite3
 
 # Environment files
 .env
-<<<<<<< Updated upstream
 .env.*
 src/environments/*
-=======
 environments/
->>>>>>> Stashed changes
 
 backend/venv/
 venv/
 # Ignore all files in the backend directory
+
+# Cypress test artifacts
+cypress/screenshots/
+cypress/videos/
+
+# Cypress cache
+node_modules/
+.cypress/
+
+# Cypress config output (if you use plugins writing to this)
+cypress/downloads/
