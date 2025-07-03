@@ -13,7 +13,8 @@ import {
   withInterceptors,
   withInterceptorsFromDi,
 } from '@angular/common/http';
-import { authInterceptor } from './shared/interceptors/auth.interceptors';
+import { authInterceptor } from './shared/interceptors/auth.interceptor';
+import { loadingInterceptor } from './shared/interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -29,7 +30,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withFetch(),
       withInterceptorsFromDi(),
-      withInterceptors([authInterceptor])
+      withInterceptors([loadingInterceptor, authInterceptor])
     ),
   ],
 };
