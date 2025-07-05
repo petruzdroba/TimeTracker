@@ -76,4 +76,5 @@ jobs:
           app-name: "petruzdroba"
           package: release.zip
           type: zip
+          run-from-package: false
           
