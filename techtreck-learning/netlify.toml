@@ -11,6 +11,6 @@
 
 [[redirects]]
   from = "/*"
-  to = "/techtreck-learning/browser/index.html"
+  to = "/index.html"
   status = 200
   force = true
