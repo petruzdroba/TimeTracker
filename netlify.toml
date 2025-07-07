@@ -1,0 +1,7 @@
+[build]
+base = "techtreck-learning"
+publish = "dist/techtreck-learning"
+command = "npm run build -- --prod"
+
+[context.production.environment]
+NODE_VERSION = "18"
