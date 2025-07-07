@@ -9,7 +9,7 @@
   """
   publish = "dist/techtreck-learning"
 
-[[redirects]]
+[[redirect]]
   from   = "/*"
   to     = "/index.html"
   status = 200
