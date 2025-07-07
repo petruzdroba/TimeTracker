@@ -1,7 +1,12 @@
 [build]
-base = "techtreck-learning"
-publish = "dist/techtreck-learning"
-command = "npm run build -- --prod"
+  base = "techtreck-learning"
+  command = "mkdir -p src/environments && echo 'export const environment = { production: false, apiUrl: \"https://dummy-api.example.com\" };' > src/environments/environment.ts && npm run build"
+  publish = "dist/techtreck-learning"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [context.production.environment]
-NODE_VERSION = "18"
+  NODE_VERSION = "18"
