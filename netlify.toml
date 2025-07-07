@@ -1,7 +1,7 @@
 [build]
-  command = "echo 'export const environment = { production: false, apiUrl: \"https://dummy-api.example.com\" };' > src/environments/environment.ts && npm run build"
-  publish = "dist/techtreck-learning"
   base = "techtreck-learning"
+  command = "mkdir -p src/environments && echo 'export const environment = { production: false, apiUrl: \"https://dummy-api.example.com\" };' > src/environments/environment.ts && npm run build"
+  publish = "dist/techtreck-learning"
 
 [context.production.environment]
-NODE_VERSION = "18"
+  NODE_VERSION = "18"
