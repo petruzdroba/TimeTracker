@@ -13,5 +13,4 @@
   from = "/*"
   to = "/techtreck-learning/browser/index.html"
   status = 200
-  conditions = { Language = "en" }
   force = true
