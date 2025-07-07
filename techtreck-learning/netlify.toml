@@ -10,7 +10,8 @@
   publish = "dist/techtreck-learning/browser"
 
 [[redirects]]
-  from   = "/*"
-  to     = "/index.html"
+  from = "/*"
+  to = "/techtreck-learning/browser/index.html"
   status = 200
+  conditions = { Language = "en" }
   force = true
