@@ -7,7 +7,7 @@
     npm install &&
     ng build --configuration production
   """
-  publish = "dist/techtreck-learning"
+  publish = "dist/techtreck-learning/browser"
 
 [[redirects]]
   from   = "/*"
