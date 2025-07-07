@@ -1,12 +1,10 @@
 [build]
-  base = "techtreck-learning"
-  command = "mkdir -p src/environments && echo 'export const environment = { production: false, apiUrl: \"https://dummy-api.example.com\" };' > src/environments/environment.ts && npm run build"
+  base    = "techtreck-learning"
+  command = "npm install && ng build --configuration production"
   publish = "dist/techtreck-learning"
 
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from   = "/*"
+  to     = "/index.html"
   status = 200
 
-[context.production.environment]
-  NODE_VERSION = "18"
