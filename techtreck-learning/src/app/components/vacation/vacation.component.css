@@ -1,29 +1,24 @@
-
- .vacation
- {
+.vacation {
   position: absolute;
   top: 0;
-  margin-left: 12%;
   width: 80%;
   color: var(--text-color);
- }
+}
 
- .vacation-plan
- {
+.vacation-plan {
   position: absolute;
   margin-left: 5%;
   width: 80%;
   display: flex;
   flex-direction: row;
- }
+}
 
-.table{
+.table {
   margin-top: 5vh;
   margin-left: 5vw;
 }
 
- .table p
-{
+.table p {
   color: var(--primary-color);
   margin-left: 3vw;
   font-weight: bold;
@@ -33,5 +28,3 @@
   height: 58vh;
   width: 57vw;
 }
-
-

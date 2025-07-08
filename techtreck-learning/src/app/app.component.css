@@ -1,4 +1,16 @@
-.main
-{
-  background-color: var(--background-color);
+.layout {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  width: 12rem;
+  flex-shrink: 0;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 1rem;
+  overflow: auto;
+  margin-left: 10px;
 }
