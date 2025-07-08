@@ -2,7 +2,7 @@
   base    = "techtreck-learning"
   command = """
     mkdir -p src/environments &&
-    echo 'export const environment = { production: true, apiUrl: "https://your.api.url" };' \
+    echo 'export const environment = { production: true, apiUrl: "'$apiUrl'" };' \
       > src/environments/environment.ts &&
     npm install &&
     ng build --configuration production
