@@ -1,9 +1,13 @@
-<main class="main">
-  <app-nav-bar />
+<main class="main-container">
   @if (loading$ | async) {
   <mat-progress-bar mode="indeterminate" color="primary"
-    style="position: fixed; top: 0; left: 0; width: 100%; z-index: 10000;"></mat-progress-bar> }
-  <div>
-    <router-outlet />
+    style="position: fixed; top: 0; left: 0; width: 100%; z-index: 10000;"></mat-progress-bar>
+  }
+
+  <div class="layout">
+    <app-nav-bar class="sidebar"></app-nav-bar>
+    <div class="content">
+      <router-outlet />
+    </div>
   </div>
 </main>
