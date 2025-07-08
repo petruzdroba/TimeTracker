@@ -12,4 +12,5 @@
   flex-grow: 1;
   padding: 1rem;
   overflow: auto;
+  margin-left: 10px;
 }

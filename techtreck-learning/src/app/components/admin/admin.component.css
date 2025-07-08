@@ -2,7 +2,6 @@
   list-style-type: none;
   position: absolute;
   top: 0;
-  margin-left: 12%;
   width: 80%;
   color: var(--text-color);
   background-color: var(--background-color);
@@ -70,9 +69,8 @@
   color: var(--primary-hover-color);
 }
 
-.btn-icon-primary i
-{
-  font-size:large;
+.btn-icon-primary i {
+  font-size: large;
 }
 
 .search-field {

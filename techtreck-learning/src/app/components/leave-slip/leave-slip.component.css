@@ -1,19 +1,15 @@
-.leave
-{
+.leave {
   position: absolute;
   top: 0;
-  margin-left: 12%;
   width: 80%;
   color: var(--text-color);
 }
 
-.info
-{
+.info {
   color: var(--text-color);
 }
 
-.leave-plan
-{
+.leave-plan {
   position: absolute;
   /* top: 0; */
   margin-left: 12%;
@@ -22,14 +18,12 @@
   flex-direction: row;
 }
 
-.table
-{
+.table {
   margin-top: 5vh;
   margin-left: 5vw;
 }
 
-.table p
-{
+.table p {
   /* color: var(--primary-color); */
   margin-left: 3vw;
   /* font-weight: bold; */
@@ -39,4 +33,3 @@
   height: 53vh;
   width: 53vw;
 }
-

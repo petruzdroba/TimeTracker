@@ -1,16 +1,14 @@
-.dashboard
-{
+.dashboard {
   display: flex;
   flex-direction: column;
   list-style-type: none;
   position: absolute;
   top: 0;
-  margin-left: 12%;
   width: 87%;
   height: 100%;
 }
 
-.btn-refresh{
+.btn-refresh {
   color: var(--primary-color);
   border: none;
   background-color: transparent;
@@ -20,20 +18,18 @@
   transition: all 0.6 ease;
 }
 
-.btn-refresh:hover{
+.btn-refresh:hover {
   color: var(--primary-hover-color);
 }
 
-.info
-{
+.info {
   display: flex;
   flex-direction: row;
   width: 100%;
   height: 30%;
 }
 
-.timer-info
-{
+.timer-info {
   padding: 3% 2%;
   width: 38%;
   cursor: pointer;
@@ -43,10 +39,9 @@
   /* background-color: magenta; */
 }
 
-.days-info
-{
+.days-info {
   display: flex;
-  justify-content:left ;
+  justify-content: left;
   align-items: center;
   width: 38%;
   margin-right: 9%;
@@ -57,11 +52,10 @@
   /* background-color: aqua; */
 }
 
-.work-log-graph
-{
+.work-log-graph {
   /* display: flex; */
   height: 60%;
-  padding:0% 2%;
+  padding: 0% 2%;
   margin: 0% 15%;
   cursor: pointer;
 }
