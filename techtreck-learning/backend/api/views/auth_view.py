@@ -4,6 +4,8 @@ from rest_framework.exceptions import AuthenticationFailed  # type: ignore
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken  # type: ignore
 from rest_framework.response import Response  # type: ignore
 from rest_framework import status  # type: ignore
+from django.utils.decorators import method_decorator  # type: ignore
+from django.views.decorators.csrf import csrf_exempt  # type: ignore
 from django.contrib.auth.hashers import make_password, check_password  # type: ignore
 from ..models import TimerData, UserData, UserAuth, WorkLog, Vacation, LeaveSlip
 
@@ -110,6 +112,7 @@ class UserSignInView(APIView):
             )
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class UserLogInView(APIView):
     permission_classes = [AllowAny]
 
