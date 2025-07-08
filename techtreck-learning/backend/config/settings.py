@@ -119,10 +119,8 @@ CORS_ALLOW_ALL_ORIGINS = (
     False  # Only for development! Configure properly for production
 )
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:4200",
-    "http://localhost:4200",
-]
+CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED_ORIGINS", "").split(",")
+
 
 # Allow Authorization header
 CORS_ALLOW_HEADERS = [
