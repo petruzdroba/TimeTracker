@@ -118,7 +118,9 @@ CORS_ALLOW_ALL_ORIGINS = (
     False  # Only for development! Configure properly for production
 )
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = os.getenv("DJANGO_CORS_ALLOWED_ORIGINS", "").split(",")
+CORS_ALLOWED_ORIGINS = os.getenv(
+    "DJANGO_CORS_ALLOWED_ORIGINS", "http://localhost:4200,http://127.0.0.1:4200"
+).split(",")
 
 
 # Allow Authorization header
@@ -151,4 +153,6 @@ SIMPLE_JWT = {
     "USER_ID_FIELD": "id",
     "USER_ID_CLAIM": "user_id",
 }
-CSRF_TRUSTED_ORIGINS = os.environ.get("AZURE_DOMAIN", "").split(",")
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "AZURE_DOMAIN", "http://localhost:4200,http://127.0.0.1:4200"
+).split(",")
