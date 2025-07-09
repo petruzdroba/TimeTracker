@@ -6,11 +6,17 @@ import { EditBoxComponent } from '../edit-box/edit-box.component';
 import { AuthComponent } from '../../components/auth/auth.component';
 import { filter, Subscription } from 'rxjs';
 import { UserDataService } from '../../service/user-data.service';
+import { ServerStatusComponent } from '../server-status/server-status.component';
 
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [MatSidenavModule, EditBoxComponent, AuthComponent],
+  imports: [
+    MatSidenavModule,
+    EditBoxComponent,
+    AuthComponent,
+    ServerStatusComponent,
+  ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.sass',
 })
