@@ -201,4 +201,4 @@ class ServerStatusView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        pass
+        return Response({"status": "ok"}, status=200)
