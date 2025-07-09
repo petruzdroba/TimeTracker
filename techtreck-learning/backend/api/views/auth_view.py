@@ -160,7 +160,7 @@ class UserLogInView(APIView):
 
 
 class UserMeView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow all to debug
+    permission_classes = [AllowAny]
 
     def get(self, request):
         auth_header = request.headers.get("Authorization", "")
@@ -194,3 +194,11 @@ class UserMeView(APIView):
         except Exception as e:
             print(f"Token decode error: {str(e)}")
             return Response({"error": str(e)}, status=401)
+
+
+@method_decorator(csrf_exempt, name="dispatch")
+class ServerStatusView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        pass

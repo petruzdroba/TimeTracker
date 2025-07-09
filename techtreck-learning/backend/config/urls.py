@@ -21,6 +21,7 @@ from api.views.auth_view import (
     UserMeView,
     UserSignInView,
     UserLogInView,
+    ServerStatusView,
 )
 from api.views.user_data_view import (
     GetUserDataView,
@@ -60,4 +61,5 @@ urlpatterns = [
     path("adminfe/benefits/<int:id>/", GetUserBenefits.as_view(), name="user_benefits"),
     path("vacation/restore/", RestoreVacationView.as_view(), name="vacation_restore"),
     path("leaveslip/restore/", RestoreLeaveTimeView.as_view(), name="leave_restore"),
+    path("server/status/", ServerStatusView.as_view(), name="server_status"),
 ]
