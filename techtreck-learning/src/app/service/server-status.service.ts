@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { take } from 'rxjs';
+import { take, timeout } from 'rxjs';
 import { interval, Subscription } from 'rxjs';
 import { OnDestroy } from '@angular/core';
 
@@ -18,7 +18,7 @@ export class ServerStatusService implements OnDestroy {
     return new Promise((resolve, reject) => {
       this.http
         .get<boolean>(environment.apiUrl + '/server/status/')
-        .pipe(take(1))
+        .pipe(take(1), timeout(5000)) // Timeout after 5 seconds
         .subscribe({
           next: () => {
             this.serverStatus.set(true);
@@ -33,9 +33,9 @@ export class ServerStatusService implements OnDestroy {
   }
 
   constructor() {
-    this.fetchServerStatus();
+    this.fetchServerStatus().catch(() => {});
 
-    this.pollingSubscription = interval(10000).subscribe(() => {
+    this.pollingSubscription = interval(100000).subscribe(() => {
       this.fetchServerStatus().catch(() => {});
     });
   }
