@@ -29,7 +29,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   standalone: true,
   imports: [EditBoxComponent, DatePipe, ReactiveFormsModule],
   templateUrl: './edit-session.component.html',
-  styleUrl: './edit-session.component.sass',
+  styleUrl: './edit-session.component.css',
 })
 export class EditSessionComponent implements OnChanges {
   @Input({ required: true }) isOpen!: boolean;

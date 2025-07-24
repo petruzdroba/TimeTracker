@@ -33,7 +33,7 @@ import { Subscription } from 'rxjs';
     MatButtonModule,
   ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.sass',
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnDestroy {
   @Output() close = new EventEmitter<void>();

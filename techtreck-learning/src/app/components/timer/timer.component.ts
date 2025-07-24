@@ -12,7 +12,7 @@ import { TimerData } from '../../model/timer-data.interface';
   standalone: true,
   imports: [DatePipe, ProgressBarComponent],
   templateUrl: './timer.component.html',
-  styleUrl: './timer.component.sass',
+  styleUrl: './timer.component.css',
 })
 export class TimerComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);

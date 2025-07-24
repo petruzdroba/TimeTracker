@@ -41,7 +41,7 @@ import { CommonModule } from '@angular/common';
     MatSelectModule,
   ],
   templateUrl: './leave-form.component.html',
-  styleUrl: './leave-form.component.sass',
+  styleUrl: './leave-form.component.css',
 })
 export class LeaveFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) leaveSlip!: LeaveSlip | null;

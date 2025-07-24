@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [],
   templateUrl: './not-found.component.html',
-  styleUrl: './not-found.component.sass',
+  styleUrl: './not-found.component.css',
 })
 export class NotFoundComponent {
   private routerService = inject(Router);

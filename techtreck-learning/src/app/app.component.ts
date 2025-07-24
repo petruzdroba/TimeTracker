@@ -12,7 +12,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   standalone: true,
   imports: [RouterOutlet, NavBarComponent, MatProgressBarModule, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.sass',
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   title = 'techtreck-learning';

@@ -8,7 +8,7 @@ import { Vacation } from '../../../model/vacation.interface';
   standalone: true,
   imports: [VacationFormComponent],
   templateUrl: './vacation-picker.component.html',
-  styleUrl: './vacation-picker.component.sass',
+  styleUrl: './vacation-picker.component.css',
 })
 export class VacationPickerComponent {
   @Output() addVacation = new EventEmitter<Vacation>();

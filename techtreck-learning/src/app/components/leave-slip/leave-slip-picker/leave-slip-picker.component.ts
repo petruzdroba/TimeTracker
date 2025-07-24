@@ -7,7 +7,7 @@ import { LeaveSlip } from '../../../model/leave-slip.interface';
   standalone: true,
   imports: [LeaveFormComponent],
   templateUrl: './leave-slip-picker.component.html',
-  styleUrl: './leave-slip-picker.component.sass',
+  styleUrl: './leave-slip-picker.component.css',
 })
 export class LeaveSlipPickerComponent {
   @Output() addLeave = new EventEmitter<LeaveSlip>();

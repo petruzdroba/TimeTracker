@@ -10,7 +10,7 @@ import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
   imports: [],
   providers: [DatePipe],
   templateUrl: './days-info.component.html',
-  styleUrl: './days-info.component.sass',
+  styleUrl: './days-info.component.css',
 })
 export class DaysInfoComponent {
   private workLogService = inject(WorkLogService);

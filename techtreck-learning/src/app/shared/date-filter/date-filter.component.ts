@@ -26,7 +26,7 @@ import { DateFilter } from '../../model/date-filter.interface';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './date-filter.component.html',
-  styleUrl: './date-filter.component.sass',
+  styleUrl: './date-filter.component.css',
 })
 export class DateFilterComponent {
   @Input({ required: true }) calendarPicker!: 'past' | 'future' | 'all';

@@ -16,7 +16,7 @@ import { formatMilliseconds } from '../../../shared/utils/time.utils';
   standalone: true,
   imports: [],
   templateUrl: './graph.component.html',
-  styleUrl: './graph.component.sass',
+  styleUrl: './graph.component.css',
 })
 export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   private workLogService = inject(WorkLogService);

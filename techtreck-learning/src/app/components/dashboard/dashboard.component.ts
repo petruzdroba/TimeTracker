@@ -15,7 +15,7 @@ import { DaysInfoComponent } from './days-info/days-info.component';
     DaysInfoComponent,
   ],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.sass',
+  styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
   private routerService = inject(Router);

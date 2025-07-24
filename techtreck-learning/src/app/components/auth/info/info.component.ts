@@ -33,7 +33,7 @@ import { MatInputModule } from '@angular/material/input';
     MatInputModule,
   ],
   templateUrl: './info.component.html',
-  styleUrl: './info.component.sass',
+  styleUrl: './info.component.css',
 })
 export class InfoComponent implements OnInit {
   @Output() close = new EventEmitter<void>();

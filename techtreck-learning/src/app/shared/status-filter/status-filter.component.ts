@@ -15,7 +15,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
   standalone: true,
   imports: [FormsModule, MatButtonToggleModule],
   templateUrl: './status-filter.component.html',
-  styleUrl: './status-filter.component.sass',
+  styleUrl: './status-filter.component.css',
 })
 export class StatusFilterComponent implements OnChanges {
   @Input() omitted?: StatusFilter[];

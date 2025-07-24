@@ -9,7 +9,7 @@ import { WorkLogService } from '../../../service/work-log.service';
   standalone: true,
   imports: [MatProgressSpinnerModule, DatePipe],
   templateUrl: './timer-info.component.html',
-  styleUrl: './timer-info.component.sass',
+  styleUrl: './timer-info.component.css',
 })
 export class TimerInfoComponent implements OnInit {
   private timerService = inject(TimerService);

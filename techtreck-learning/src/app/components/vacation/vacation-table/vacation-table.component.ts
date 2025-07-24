@@ -20,7 +20,7 @@ import { StatusFilterComponent } from '../../../shared/status-filter/status-filt
     StatusFilterComponent,
   ],
   templateUrl: './vacation-table.component.html',
-  styleUrl: './vacation-table.component.sass',
+  styleUrl: './vacation-table.component.css',
 })
 export class VacationTableComponent {
   @Input({ required: true }) vacationList!: Vacation[];

@@ -30,7 +30,7 @@ import {
     MatInputModule,
   ],
   templateUrl: './add-session.component.html',
-  styleUrl: './add-session.component.sass',
+  styleUrl: './add-session.component.css',
 })
 export class AddSessionComponent {
   @Input({ required: true }) isOpen!: boolean;
