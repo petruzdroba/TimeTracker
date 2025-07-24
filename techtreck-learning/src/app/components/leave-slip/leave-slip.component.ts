@@ -19,7 +19,7 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatTabsModule,
   ],
   templateUrl: './leave-slip.component.html',
-  styleUrl: './leave-slip.component.sass',
+  styleUrl: './leave-slip.component.css',
 })
 export class LeaveSlipComponent implements OnInit {
   protected leaveData = signal<LeaveSlipData>({} as LeaveSlipData);

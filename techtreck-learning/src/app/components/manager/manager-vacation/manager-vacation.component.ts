@@ -14,7 +14,7 @@ import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
   standalone: true,
   imports: [CommonModule, DateFilterComponent, StatusFilterComponent],
   templateUrl: './manager-vacation.component.html',
-  styleUrl: './manager-vacation.component.sass',
+  styleUrl: './manager-vacation.component.css',
 })
 export class ManagerVacationComponent implements OnInit {
   private managerService = inject(ManagerService);

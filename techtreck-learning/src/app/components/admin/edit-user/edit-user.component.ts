@@ -31,7 +31,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatSelectModule,
   ],
   templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.sass',
+  styleUrl: './edit-user.component.css',
 })
 export class EditUserComponent implements OnChanges {
   @Input({ required: true }) isOpen!: boolean;

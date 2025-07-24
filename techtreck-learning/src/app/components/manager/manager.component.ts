@@ -8,6 +8,6 @@ import { ManagerLeavesComponent } from './manager-leaves/manager-leaves.componen
   standalone: true,
   imports: [ManagerVacationComponent, MatTabsModule, ManagerLeavesComponent],
   templateUrl: './manager.component.html',
-  styleUrl: './manager.component.sass',
+  styleUrl: './manager.component.css',
 })
 export class ManagerComponent {}

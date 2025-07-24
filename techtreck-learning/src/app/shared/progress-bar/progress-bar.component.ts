@@ -6,7 +6,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   standalone: true,
   imports: [MatProgressBarModule],
   templateUrl: './progress-bar.component.html',
-  styleUrl: './progress-bar.component.sass',
+  styleUrl: './progress-bar.component.css',
 })
 export class ProgressBarComponent {
   @Input({ required: true }) currentValue!: number;

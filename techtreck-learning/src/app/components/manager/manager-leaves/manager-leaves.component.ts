@@ -12,7 +12,7 @@ import { StatusFilterComponent } from '../../../shared/status-filter/status-filt
   standalone: true,
   imports: [CommonModule, DateFilterComponent, StatusFilterComponent],
   templateUrl: './manager-leaves.component.html',
-  styleUrl: './manager-leaves.component.sass',
+  styleUrl: './manager-leaves.component.css',
 })
 export class ManagerLeavesComponent implements OnInit {
   private managerService = inject(ManagerService);

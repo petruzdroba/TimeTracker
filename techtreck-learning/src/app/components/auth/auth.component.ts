@@ -11,7 +11,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [MatTabsModule, LoginComponent, SigninComponent, InfoComponent],
   templateUrl: './auth.component.html',
-  styleUrl: './auth.component.sass',
+  styleUrl: './auth.component.css',
 })
 export class AuthComponent {
   @Output() close = new EventEmitter<void>();

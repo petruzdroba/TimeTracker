@@ -24,7 +24,7 @@ import { MatAccordion, MatExpansionModule } from '@angular/material/expansion';
     MatAccordion,
   ],
   templateUrl: './admin.component.html',
-  styleUrl: './admin.component.sass',
+  styleUrl: './admin.component.css',
 })
 export class AdminComponent implements OnInit {
   private adminService = inject(AdminService);

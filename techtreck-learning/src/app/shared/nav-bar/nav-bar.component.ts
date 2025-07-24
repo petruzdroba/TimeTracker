@@ -12,7 +12,7 @@ import { UserDataService } from '../../service/user-data.service';
   standalone: true,
   imports: [MatSidenavModule, EditBoxComponent, AuthComponent],
   templateUrl: './nav-bar.component.html',
-  styleUrl: './nav-bar.component.sass',
+  styleUrl: './nav-bar.component.css',
 })
 export class NavBarComponent implements OnInit, OnDestroy {
   private routerService = inject(Router);

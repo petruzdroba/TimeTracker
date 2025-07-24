@@ -35,7 +35,7 @@ import { validateDateRange } from '../../../shared/utils/time.utils';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './vacation-form.component.html',
-  styleUrl: './vacation-form.component.sass',
+  styleUrl: './vacation-form.component.css',
 })
 export class VacationFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) vacation!: Vacation | null;

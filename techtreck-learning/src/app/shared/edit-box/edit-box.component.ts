@@ -5,7 +5,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   standalone: true,
   imports: [],
   templateUrl: './edit-box.component.html',
-  styleUrl: './edit-box.component.sass',
+  styleUrl: './edit-box.component.css',
 })
 export class EditBoxComponent {
   @Input({ required: true }) isOpen!: boolean;

@@ -20,7 +20,7 @@ import { AddSessionComponent } from './add-session/add-session.component';
     AddSessionComponent,
   ],
   templateUrl: './work-log.component.html',
-  styleUrl: './work-log.component.sass',
+  styleUrl: './work-log.component.css',
 })
 export class WorkLogComponent implements OnInit {
   private workLogService = inject(WorkLogService);

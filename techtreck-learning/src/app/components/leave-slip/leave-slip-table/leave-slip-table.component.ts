@@ -20,7 +20,7 @@ import { StatusFilter } from '../../../model/status-filter.interface';
     StatusFilterComponent,
   ],
   templateUrl: './leave-slip-table.component.html',
-  styleUrl: './leave-slip-table.component.sass',
+  styleUrl: './leave-slip-table.component.css',
 })
 export class LeaveSlipTableComponent {
   @Input({ required: true }) leaveList!: LeaveSlip[];
