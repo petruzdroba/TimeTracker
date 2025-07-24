@@ -1,16 +1,22 @@
-module.exports = function(config) {
+module.exports = function (config) {
   config.set({
+    basePath: '',
     frameworks: ['jasmine', '@angular-devkit/build-angular'],
-    files: [
-      { pattern: 'src/**/*.spec.ts', watched: false }
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
+      require('karma-coverage'),
+      require('@angular-devkit/build-angular/plugins/karma')
     ],
-    exclude: [
-      'cypress/**/*.ts',   // ignore Cypress
-      'src/**/*.cy.ts'
-    ],
-    preprocessors: {
-      'src/**/*.spec.ts': ['webpack', 'sourcemap']
-    },
-    // …rest of your existing Karma setup
+    client: { clearContext: false },
+    reporters: ['progress', 'kjhtml'],
+    port: 9876,
+    colors: true,
+    logLevel: config.LOG_INFO,
+    autoWatch: true,
+    browsers: ['Chrome'],
+    singleRun: false,
+    restartOnFileChange: true
   });
 };
