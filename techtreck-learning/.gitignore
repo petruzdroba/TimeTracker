@@ -59,6 +59,7 @@ db.sqlite3
 
 # Environment files
 .env
+env.py
 .env.*
 src/environments/*
 environments/
