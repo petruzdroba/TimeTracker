@@ -31,6 +31,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Django tests
+        env:
+          DJANGO_SECRET_KEY: dummy
         run: |
           cd techtreck-learning/backend
           python manage.py test
