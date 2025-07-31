@@ -29,7 +29,11 @@ jobs:
         run: |
           cd techtreck-learning/backend
           pip install -r requirements.txt
-      # Optional: Add step to run tests here
+
+      - name: Run Django tests
+        run: |
+          cd techtreck-learning/backend
+          python manage.py test
 
       - name: Zip artifact for deployment
         run: |
