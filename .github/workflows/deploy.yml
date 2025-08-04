@@ -31,7 +31,7 @@ jobs:
         uses: nwtgck/actions-netlify@v2
         with:
           publish-dir: ./techtreck-learning/dist/techtreck-learning/browser
-          production: true
+          production-deploy: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
