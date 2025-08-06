@@ -20,6 +20,8 @@ jobs:
           node-version: 20
 
       - name: Install dependencies and build
+        env: 
+          apiUrl: ${{ secrets.API_URL }}
         run: |
           cd techtreck-learning
           mkdir -p src/environments
