@@ -1,0 +1,44 @@
+name: Deploy Angular to Netlify
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies and build
+        run: |
+          cd techtreck-learning
+          mkdir -p src/environments
+          echo 'export const environment = { production: true, apiUrl: "'$apiUrl'" };' > src/environments/environment.ts
+          npm ci
+          npm run build -- --configuration production
+          
+      # - name: Run tests
+      #   run: |
+      #     cd techtreck-learning
+      #     npm install
+      #     npm test
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: ./techtreck-learning/dist/techtreck-learning/browser
+          production-deploy: true
+          deploy-message: "Deploy from GitHub Actions - ${{ github.sha }}"
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
