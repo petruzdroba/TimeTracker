@@ -7,7 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies (including Cypress)
+        run: |
+          cd techtreck-learning
+          npm ci
+          npm install cypress --save-dev
+
+      - name: Run unit tests (headless)
+        run: |
+          cd techtreck-learning
+          npm run test:ci
+
+      - name: Run e2e tests (start server & run Cypress)
+        run: |
+          cd techtreck-learning
+          npm run test:e2e
+
   deploy:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -20,7 +48,7 @@ jobs:
           node-version: 20
 
       - name: Install dependencies and build
-        env: 
+        env:
           apiUrl: ${{ secrets.apiUrl }}
         run: |
           cd techtreck-learning
@@ -28,12 +56,6 @@ jobs:
           echo 'export const environment = { production: true, apiUrl: "'$apiUrl'" };' > src/environments/environment.ts
           npm ci
           npm run build -- --configuration production
-          
-      # - name: Run tests
-      #   run: |
-      #     cd techtreck-learning
-      #     npm install
-      #     npm test
 
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v2
