@@ -8,6 +8,7 @@
     "build:prod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
+    "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "e2e": "cypress open",
     "serve:ssr:techtreck-learning": "node dist/techtreck-learning/server/server.mjs"
   },
