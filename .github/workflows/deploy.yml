@@ -17,6 +17,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      
+      - name: Setup environment
+        env:
+          apiUrl: ${{ secrets.apiUrl }}
+        run: |
+          cd techtreck-learning
+          mkdir -p src/environments
+          echo 'export const environment = { production: false, apiUrl: "'$apiUrl'" };' > src/environments/environment.ts
 
       - name: Install dependencies (including Cypress)
         run: |
