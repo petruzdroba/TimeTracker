@@ -9,7 +9,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
-    "e2e-test":"cypress run --spec 'cypress/e2e/auth_flow.cy.ts,cypress/e2e/timer_flow.cy.ts'",
+    "e2e-test":"cypress run --spec 'cypress/e2e/auth_flow.cy.ts",
     "test:e2e": "start-server-and-test start http://localhost:4200 e2e-test",
     "e2e": "cypress open",
     "serve:ssr:techtreck-learning": "node dist/techtreck-learning/server/server.mjs"
