@@ -8,8 +8,32 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          cd techtreck-learning/backend
+          pip install -r requirements.txt
+      - name: Run Django tests
+        env:
+          AZURE_DOMAIN: "https://dummy-azure-app.azurewebsites.net,https://dummy-frontend.netlify.app"
+          DJANGO_ALLOWED_HOSTS: "dummy-frontend.netlify.app,localhost,dummy-azure-app.azurewebsites.net"
+          DJANGO_CORS_ALLOWED_ORIGINS: "https://dummy-frontend.netlify.app"
+          DJANGO_DEBUG: "False"
+          DJANGO_SECRET_KEY: "dummysecretkey1234567890"
+        run: |
+          cd techtreck-learning/backend
+          python manage.py test
+
   build:
     runs-on: ubuntu-latest
+    needs: test
     permissions:
       contents: read
 
@@ -29,17 +53,6 @@ jobs:
         run: |
           cd techtreck-learning/backend
           pip install -r requirements.txt
-
-      - name: Run Django tests
-        env:
-          AZURE_DOMAIN: "https://dummy-azure-app.azurewebsites.net,https://dummy-frontend.netlify.app"
-          DJANGO_ALLOWED_HOSTS: "dummy-frontend.netlify.app,localhost,dummy-azure-app.azurewebsites.net"
-          DJANGO_CORS_ALLOWED_ORIGINS: "https://dummy-frontend.netlify.app"
-          DJANGO_DEBUG: "False"
-          DJANGO_SECRET_KEY: "dummysecretkey1234567890"
-        run: |
-          cd techtreck-learning/backend
-          python manage.py test
 
       - name: Zip artifact for deployment
         run: |
