@@ -1,4 +1,4 @@
-import { enviornmentTest } from './../../src/environments/environment';
+import { enviornmentTest } from '../../src/environments/environment';
 /// <reference types="cypress" />
 
 describe('Employee–Manager Vacation Approval Flow', () => {
