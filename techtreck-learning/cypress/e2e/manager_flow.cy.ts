@@ -1,28 +1,17 @@
-import { enviornmentTest } from '../../src/environments/environment';
+import { environmentTest } from '../../src/environments/environment';
 /// <reference types="cypress" />
 
 describe('Employee–Manager Vacation Approval Flow', () => {
   const empEmail = `emp_${Date.now()}@example.com`;
-  const mgrEmail = `mgr_${Date.now()}@example.com`;
   const password = 'TestPassword123';
   const nameEmp = 'Employee User';
-  const nameMgr = 'Manager User';
 
   // Using emails as IDs directly
   let empId = empEmail;
-  let mgrId = mgrEmail;
 
   beforeEach(() => {
     // On failure, clean up using emails as IDs
     Cypress.on('fail', (err, runnable) => {
-      if (mgrId) {
-        cy.request('POST', `/auth/delete/${mgrId}`, { password }).then(() => {
-          Cypress.log({
-            name: 'Cleanup',
-            message: 'Manager deleted after failure',
-          });
-        });
-      }
       if (empId) {
         cy.request('POST', `/auth/delete/${empId}`, { password }).then(() => {
           Cypress.log({
@@ -102,11 +91,11 @@ describe('Employee–Manager Vacation Approval Flow', () => {
       .first()
       .within(() => {
         cy.get('input[formcontrolname="email"]').type(
-          enviornmentTest.managerEmail,
+          environmentTest.managerEmail,
           { log: false }
         );
         cy.get('input[formcontrolname="password"]').type(
-          enviornmentTest.managerPassword,
+          environmentTest.managerPassword,
           { log: false }
         );
         cy.get('button[type="submit"]').contains('Submit').click();
@@ -178,12 +167,12 @@ describe('Employee–Manager Vacation Approval Flow', () => {
 
     cy.log('Manager: Accept own vacation');
     cy.get('.pending-table')
-      .contains('td', enviornmentTest.managerEmail)
+      .contains('td', environmentTest.managerEmail)
       .parent('tr')
       .within(() => {
         cy.get('button.deny').click();
       });
-    cy.get('.completed-table').should('contain', enviornmentTest.managerEmail);
+    cy.get('.completed-table').should('contain', environmentTest.managerEmail);
 
     // --- Manager logs out first ---
     cy.log('Manager: Log out');
