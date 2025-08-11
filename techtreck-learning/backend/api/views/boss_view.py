@@ -86,10 +86,9 @@ class UserUpdateData(BaseAuthView):
             # Add token validation
             token_user_id, _ = self.validate_token(request)
             data = request.data.get("data", {})
-            requesting_user = UserData.objects.get(id=token_user_id)
-
-            if requesting_user.role not in ["admin", "manager"]:
-              return Response({"detail": "Permission denied."}, status=403)
+            access_check = self.check_user_access(token_user_id, data.get("id"))
+            if access_check:
+                return access_check
 
             current_user = UserData.objects.get(id=data.get("id"))
             vacation = Vacation.objects.get(id=data.get("id"))
@@ -172,7 +171,9 @@ class RestoreVacationView(BaseAuthView):
             # Check if user is admin/manager
             requesting_user = UserData.objects.get(id=token_user_id)
             if requesting_user.role not in ["admin", "manager"]:
-              return Response({"detail": "Permission denied."}, status=403)
+                access_check = self.check_user_access(token_user_id, id)
+                if access_check:
+                    return access_check
 
             user_data = UserData.objects.get(id=id)
             user_vacation = Vacation.objects.get(id=id)
@@ -207,7 +208,9 @@ class RestoreLeaveTimeView(BaseAuthView):
             # Check if user is admin/manager
             requesting_user = UserData.objects.get(id=token_user_id)
             if requesting_user.role not in ["admin", "manager"]:
-              return Response({"detail": "Permission denied."}, status=403)
+                access_check = self.check_user_access(token_user_id, id)
+                if access_check:
+                    return access_check
 
             user_data = UserData.objects.get(id=id)
             user_leave = LeaveSlip.objects.get(id=id)
