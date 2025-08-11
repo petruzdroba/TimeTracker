@@ -175,7 +175,7 @@ class UserUpdateDataViewTestCase(APITestCase):
             work_hours=8,
             vacation_days=14,
             personal_time=6,
-            role="employee",
+            role="manager",
         )
         self.vacation = Vacation.objects.create(
             id=self.user_data.id,
