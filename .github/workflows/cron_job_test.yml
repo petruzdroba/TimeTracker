@@ -6,7 +6,24 @@ on:
   workflow_dispatch:
 
 jobs:
+  init:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Prepare test results file
+      run: |
+        FILE="test_results.txt"
+        touch "$FILE"
+        DATE_LINE=$(date '+%Y-%m-%d %H:%M:%S')
+        TMPFILE=$(mktemp)
+        echo "$DATE_LINE" > "$TMPFILE"
+        cat "$FILE" >> "$TMPFILE"
+        mv "$TMPFILE" "$FILE"
+
+
   frontend-tests:
+    needs: init
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -26,12 +43,13 @@ jobs:
           npm install cypress --save-dev
       - run: |
           cd techtreck-learning
-          npm run test:ci
+          npm run test:ci | grep TOTAL: | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> ../test_summary.txt
       - run: |
           cd techtreck-learning
           npm run test:e2e
 
   backend-tests:
+    needs: init
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -49,4 +67,4 @@ jobs:
           DJANGO_SECRET_KEY: "dummysecretkey1234567890"
         run: |
           cd techtreck-learning/backend
-          python manage.py test
+          python manage.py test 2>&1 | tee test_output.log ; ran=$(grep -Eo 'Ran [0-9]+ tests' test_output.log | tail -n1 | grep -Eo '[0-9]+') ; fails=$(grep -Eo 'failures=[0-9]+' test_output.log | tail -n1 | cut -d= -f2) ; [ -z "$fails" ] && fails=0 ; [ -z "$ran" ] && ran=0 ; success=$((ran - fails)) ; echo "TOTAL: $ran SUCCESS: $success FAILED: $fails" >> ../test_summary.txt
