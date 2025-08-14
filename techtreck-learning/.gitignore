@@ -78,3 +78,6 @@ node_modules/
 
 # Cypress config output (if you use plugins writing to this)
 cypress/downloads/
+
+#Test reports
+test_sumarry.txt

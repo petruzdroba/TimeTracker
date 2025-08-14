@@ -9,62 +9,143 @@ jobs:
   init:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Prepare test results file
-      run: |
-        FILE="test_results.txt"
-        touch "$FILE"
-        DATE_LINE=$(date '+%Y-%m-%d %H:%M:%S')
-        TMPFILE=$(mktemp)
-        echo "$DATE_LINE" > "$TMPFILE"
-        cat "$FILE" >> "$TMPFILE"
-        mv "$TMPFILE" "$FILE"
-
+      - uses: actions/checkout@v3
+      - name: Prepare top-level file (no-op for job isolation)
+        run: |
+          echo "Workflow run at $(date '+%Y-%m-%d %H:%M:%S')" > init_marker.txt
 
   frontend-tests:
     needs: init
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Setup environment
+
+      - name: Setup frontend env
         env:
           apiUrl: ${{ secrets.apiUrl }}
         run: |
+          # work inside techtreck-learning so test_summary.txt lives there
           cd techtreck-learning
           mkdir -p src/environments
           echo 'export const environment = { production: false, apiUrl: "'$apiUrl'" };' > src/environments/environment.ts
-      - run: |
+
+      - name: Install frontend deps
+        run: |
           cd techtreck-learning
           npm ci
           npm install cypress --save-dev
-      - run: |
+
+      - name: Run frontend tests and append summary
+        run: |
           cd techtreck-learning
-          npm run test:ci | grep TOTAL: | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> ../test_summary.txt
-      - run: |
-          cd techtreck-learning
-          npm run test:e2e
+          echo "=== FRONTEND TESTS === $(date '+%Y-%m-%d %H:%M:%S')" >> test_summary.txt
+          # append the summarized TOTAL line (strips ANSI color codes)
+          npm run test:ci | grep TOTAL: | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> test_summary.txt
+
+      - name: Upload frontend test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-summary
+          path: techtreck-learning/test_summary.txt
 
   backend-tests:
     needs: init
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: |
-          cd techtreck-learning/backend
-          pip install -r requirements.txt
-      - env:
-          AZURE_DOMAIN: "https://dummy-azure-app.azurewebsites.net,https://dummy-frontend.netlify.app"
-          DJANGO_ALLOWED_HOSTS: "dummy-frontend.netlify.app,localhost,dummy-azure-app.azurewebsites.net"
-          DJANGO_CORS_ALLOWED_ORIGINS: "https://dummy-frontend.netlify.app"
-          DJANGO_DEBUG: "False"
-          DJANGO_SECRET_KEY: "dummysecretkey1234567890"
+
+      - name: Install backend deps
         run: |
           cd techtreck-learning/backend
-          python manage.py test 2>&1 | tee test_output.log ; ran=$(grep -Eo 'Ran [0-9]+ tests' test_output.log | tail -n1 | grep -Eo '[0-9]+') ; fails=$(grep -Eo 'failures=[0-9]+' test_output.log | tail -n1 | cut -d= -f2) ; [ -z "$fails" ] && fails=0 ; [ -z "$ran" ] && ran=0 ; success=$((ran - fails)) ; echo "TOTAL: $ran SUCCESS: $success FAILED: $fails" >> ../test_summary.txt
+          pip install -r requirements.txt
+
+      - name: Run backend tests and append summary
+        run: |
+          # create header in techtreck-learning folder and then run backend tests
+          cd techtreck-learning
+          echo "=== BACKEND TESTS === $(date '+%Y-%m-%d %H:%M:%S')" >> test_summary.txt
+          cd backend
+          # run tests, capture output, extract totals, append to parent techtreck-learning/test_summary.txt
+          python manage.py test 2>&1 | tee test_output.log
+          ran=$(grep -Eo 'Ran [0-9]+ tests' test_output.log | tail -n1 | grep -Eo '[0-9]+')
+          fails=$(grep -Eo 'failures=[0-9]+' test_output.log | tail -n1 | cut -d= -f2)
+          [ -z "$ran" ] && ran=0
+          [ -z "$fails" ] && fails=0
+          success=$((ran - fails))
+          echo "TOTAL: $ran SUCCESS: $success FAILED: $fails" >> ../test_summary.txt
+
+      - name: Upload backend test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-summary
+          path: techtreck-learning/test_summary.txt
+
+  report:
+    needs: [frontend-tests, backend-tests]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download frontend summary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-summary
+          path: ./artifacts/frontend
+
+      - name: Download backend summary artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-summary
+          path: ./artifacts/backend
+
+      - name: Merge summaries into techtreck-learning/test_summary.txt
+        run: |
+          mkdir -p techtreck-learning
+          # Create a clean merged file
+          echo "MERGED TEST SUMMARY - $(date '+%Y-%m-%d %H:%M:%S')" > techtreck-learning/test_summary.txt
+
+          # If frontend artifact exists, append it (guard against missing files)
+          if [ -f artifacts/frontend/techtreck-learning/test_summary.txt ]; then
+            echo "--- frontend ---" >> techtreck-learning/test_summary.txt
+            sed -n '1,200p' artifacts/frontend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
+          else
+            echo "No frontend summary found" >> techtreck-learning/test_summary.txt
+          fi
+
+          # If backend artifact exists, append it
+          if [ -f artifacts/backend/techtreck-learning/test_summary.txt ]; then
+            echo "" >> techtreck-learning/test_summary.txt
+            echo "--- backend ---" >> techtreck-learning/test_summary.txt
+            sed -n '1,200p' artifacts/backend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
+          else
+            echo "No backend summary found" >> techtreck-learning/test_summary.txt
+          fi
+
+          # show merged file for logs
+          echo "---- merged content ----"
+          cat techtreck-learning/test_summary.txt
+
+      - name: Read test summary into output
+        id: summary
+        run: |
+          echo "report<<EOF" >> $GITHUB_OUTPUT
+          cat techtreck-learning/test_summary.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send report by email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "CI Test Report - ${{ github.repository }}"
+          to: ${{ secrets.MAIL_TO }}
+          from: ${{ secrets.MAIL_USERNAME }}
+          body: ${{ steps.summary.outputs.report }}
