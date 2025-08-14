@@ -118,7 +118,7 @@ jobs:
           echo "MERGED TEST SUMMARY - $(date '+%Y-%m-%d %H:%M:%S')" > techtreck-learning/test_summary.txt
 
           # If frontend artifact exists, append it (guard against missing files)
-          if [ -f artifacts/frontend/techtreck-learning/test_summary.txt ]; then
+          if [ -f artifacts/frontend/test_summary.txt ]; then
             echo "--- frontend ---" >> techtreck-learning/test_summary.txt
             sed -n '1,200p' artifacts/frontend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
           else
@@ -126,7 +126,7 @@ jobs:
           fi
 
           # If backend artifact exists, append it
-          if [ -f artifacts/backend/techtreck-learning/test_summary.txt ]; then
+          if [ -f artifacts/backend/test_summary.txt ]; then
             echo "" >> techtreck-learning/test_summary.txt
             echo "--- backend ---" >> techtreck-learning/test_summary.txt
             sed -n '1,200p' artifacts/backend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
