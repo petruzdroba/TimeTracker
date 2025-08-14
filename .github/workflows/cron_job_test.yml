@@ -47,7 +47,7 @@ jobs:
           npm run test:ci | grep TOTAL: | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> test_summary.txt
 
       - name: Upload frontend test summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: frontend-summary
           path: techtreck-learning/test_summary.txt
@@ -83,7 +83,7 @@ jobs:
           echo "TOTAL: $ran SUCCESS: $success FAILED: $fails" >> ../test_summary.txt
 
       - name: Upload backend test summary
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: backend-summary
           path: techtreck-learning/test_summary.txt
@@ -93,13 +93,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download frontend summary artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: frontend-summary
           path: ./artifacts/frontend
 
       - name: Download backend summary artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: backend-summary
           path: ./artifacts/backend
