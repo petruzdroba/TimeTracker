@@ -68,6 +68,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run backend tests and append summary
+        env:
+          AZURE_DOMAIN: "https://dummy-azure-app.azurewebsites.net,https://dummy-frontend.netlify.app"
+          DJANGO_ALLOWED_HOSTS: "dummy-frontend.netlify.app,localhost,dummy-azure-app.azurewebsites.net"
+          DJANGO_CORS_ALLOWED_ORIGINS: "https://dummy-frontend.netlify.app"
+          DJANGO_DEBUG: "False"
+          DJANGO_SECRET_KEY: "dummysecretkey1234567890"
         run: |
           # create header in techtreck-learning folder and then run backend tests
           cd techtreck-learning
@@ -91,6 +97,7 @@ jobs:
   report:
     needs: [frontend-tests, backend-tests]
     runs-on: ubuntu-latest
+    if: always()
     steps:
       - name: Download frontend summary artifact
         uses: actions/download-artifact@v4
