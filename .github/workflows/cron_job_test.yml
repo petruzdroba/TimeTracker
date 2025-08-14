@@ -120,7 +120,7 @@ jobs:
           # If frontend artifact exists, append it (guard against missing files)
           if [ -f artifacts/frontend/test_summary.txt ]; then
             echo "--- frontend ---" >> techtreck-learning/test_summary.txt
-            sed -n '1,200p' artifacts/frontend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
+            cat artifacts/frontend/test_summary.txt >> techtreck-learning/test_summary.txt
           else
             echo "No frontend summary found" >> techtreck-learning/test_summary.txt
           fi
@@ -129,7 +129,7 @@ jobs:
           if [ -f artifacts/backend/test_summary.txt ]; then
             echo "" >> techtreck-learning/test_summary.txt
             echo "--- backend ---" >> techtreck-learning/test_summary.txt
-            sed -n '1,200p' artifacts/backend/techtreck-learning/test_summary.txt >> techtreck-learning/test_summary.txt
+            cat artifacts/backend/test_summary.txt >> techtreck-learning/test_summary.txt
           else
             echo "No backend summary found" >> techtreck-learning/test_summary.txt
           fi
