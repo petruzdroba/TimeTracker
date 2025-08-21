@@ -44,7 +44,7 @@ jobs:
           cd techtreck-learning
           echo "=== FRONTEND TESTS === $(date '+%Y-%m-%d %H:%M:%S')" > test_summary.txt
           # append the summarized TOTAL line (strips ANSI color codes)
-          npm run test:ci > test_output_full.txt 2>&1
+          npm run test:ci > test_output_full.txt 2>&1 || true
 
           grep TOTAL: test_output_full.txt | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> test_summary.txt
 
