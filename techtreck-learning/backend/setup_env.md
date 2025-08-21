@@ -19,7 +19,6 @@ os.environ["DJANGO_ALLOWED_HOSTS"] = "your-frontend.netlify.app,localhost,your-a
 os.environ["DJANGO_CORS_ALLOWED_ORIGINS"] = "https://your-frontend.netlify.app"
 os.environ["DJANGO_DEBUG"] = "True"
 os.environ["DJANGO_SECRET_KEY"] = "your-local-dev-secret-key"
-os.environ["SUPABASE_DB_PASSWORD"] = "your-password"
 
 # 5. Run your Django project
 
