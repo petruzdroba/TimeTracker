@@ -156,7 +156,7 @@ describe('AdminService', () => {
       .and.returnValue(throwError(() => ({ status: 404 })));
 
     service.restoreLeaveTime(1).catch((err) => {
-      expect(err.status).toBe(404);
+      expect(err.status).toBe(402);
       expect(routerSpy.navigate).toHaveBeenCalledWith(['/error/404']);
     });
 

@@ -203,7 +203,7 @@ class UserUpdateDataViewTestCase(APITestCase):
         response = self.client.put(
             self.url, payload, format="json", **self.auth_headers
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
         self.user_data.refresh_from_db()
         self.assertEqual(self.user_data.role, "manager")
         self.assertEqual(self.user_data.work_hours, 9)
