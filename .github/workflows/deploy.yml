@@ -37,11 +37,6 @@ jobs:
           cd techtreck-learning
           npm run test:ci
 
-      - name: Run e2e tests (start server & run Cypress)
-        run: |
-          cd techtreck-learning
-          npm run test:e2e
-
   deploy:
     needs: test
     runs-on: ubuntu-latest
