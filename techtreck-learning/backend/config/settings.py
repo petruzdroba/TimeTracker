@@ -80,17 +80,18 @@ if 'test' in sys.argv or 'pytest' in sys.modules:
 else:
 
   DATABASES = {
-  'default': {
-  'ENGINE': 'django.db.backends.postgresql',
-  'NAME': 'postgres',
-  'USER': 'postgres',
-  'PASSWORD': os.environ.get("SUPABASE_DB_PASSWORD", ""),
-  'HOST': 'db.hihdbvjzciwfoklcalvw.supabase.co',
-  'PORT': '5432',
-  'OPTIONS': {
-              'sslmode': 'require',
-          },
-  }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres.hihdbvjzciwfoklcalvw',
+        'PASSWORD': os.environ.get('SUPABASE_DB_PASSWORD'),
+        'HOST': 'aws-1-eu-north-1.pooler.supabase.com',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 0,
+        'OPTIONS': {
+            'sslmode': 'require',
+        },
+    }
   }
 
 
