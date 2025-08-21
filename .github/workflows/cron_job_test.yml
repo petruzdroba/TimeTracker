@@ -44,7 +44,15 @@ jobs:
           cd techtreck-learning
           echo "=== FRONTEND TESTS === $(date '+%Y-%m-%d %H:%M:%S')" > test_summary.txt
           # append the summarized TOTAL line (strips ANSI color codes)
-          npm run test:ci | grep TOTAL: | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> test_summary.txt
+          npm run test:ci > test_output_full.txt 2>&1
+
+          grep TOTAL: test_output_full.txt | tail -n 1 | sed 's/\x1B\[[0-9;]*[mK]//g' >> test_summary.txt
+
+          if grep -q "FAILED" test_output_full.txt; then
+            echo "" >> test_summary.txt
+            echo "FAILED TESTS:" >> test_summary.txt
+            grep "FAILED$" test_output_full.txt | sed 's/^.*Chrome[^)]*) \(.*\) FAILED$/\1/' >> test_summary.txt
+          fi
 
       - name: Upload frontend test summary
         uses: actions/upload-artifact@v4
@@ -79,14 +87,21 @@ jobs:
           cd techtreck-learning
           echo "=== BACKEND TESTS === $(date '+%Y-%m-%d %H:%M:%S')" > test_summary.txt
           cd backend
-          # run tests, capture output, extract totals, append to parent techtreck-learning/test_summary.txt
+
           python manage.py test 2>&1 | tee test_output.log
+
           ran=$(grep -Eo 'Ran [0-9]+ tests' test_output.log | tail -n1 | grep -Eo '[0-9]+')
           fails=$(grep -Eo 'failures=[0-9]+' test_output.log | tail -n1 | cut -d= -f2)
           [ -z "$ran" ] && ran=0
           [ -z "$fails" ] && fails=0
           success=$((ran - fails))
           echo "TOTAL: $ran SUCCESS: $success FAILED: $fails" >> ../test_summary.txt
+
+          if [ "$fails" -gt 0 ]; then
+            echo "" >> ../test_summary.txt
+            echo "FAILED TESTS:" >> ../test_summary.txt
+            grep "^FAIL:" test_output.log | sed 's/^FAIL: \([^(]*\).*/\1/' >> ../test_summary.txt
+          fi
 
       - name: Upload backend test summary
         uses: actions/upload-artifact@v4
