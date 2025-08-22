@@ -130,7 +130,7 @@ describe('VacationService', () => {
     service.deleteVacation(0, 'future');
 
     expect(service.futureVacations.length).toBe(0);
-    expect(service.remainingDays).toBeGreaterThan(14); // Days restored
+    expect(service.remainingDays).toBe(14); // Days restored
 
     // Expect one or more PUT requests to update vacation data
     const reqs = httpMock.match(`${baseUrl}/vacation/update/`);
