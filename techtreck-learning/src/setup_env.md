@@ -16,9 +16,16 @@ export const environment = {
   production: false, // false for dev mode
   apiUrl: 'https:/dummy-website.azurewebsites.net', // API base URL
 };
-EOF
 
-# Summary:
-# - npm install dependencies
-# - mkdir src/environments
-# - create environment.ts  with the above content
+# for manager_flow.cy.ts
+// Test environment settings
+
+// NOTE: These accounts MUST exist ONLY in your local/test database.
+// They should NEVER be created, synced, or accessible in production.
+export const environmentTest = {
+  managerEmail: 'manager.email@example.com',
+  managerPassword: 'managerPassword123',
+  adminEmail : 'admin.email@example.com',
+  adminPassword: 'adminPassword123'
+};
+EOF
