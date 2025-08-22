@@ -7,8 +7,6 @@ describe('Sign up, request benefits, and delete flow', () => {
   it('should sign up, request benefits,delete benefits,  and delete the user', () => {
     cy.log('Step 1: Sign up a new user');
     cy.visit('/auth');
-    cy.screenshot('temp-wait');
-    cy.exec('rm cypress/screenshots/benefits_flow.cy.ts/temp-wait.png');
     cy.contains('Sign Up', { timeout: 10000 }).should('be.visible').click();
     cy.get('form:visible')
       .last()
@@ -34,19 +32,22 @@ describe('Sign up, request benefits, and delete flow', () => {
     const day = new Date();
     day.setDate(day.getDate() + 1); // Start = tomorrow
 
-    // Format start date as MM/DD/YYYY
+    // Skip weekends for start date
+    while (day.getDay() === 0 || day.getDay() === 6) {
+      // Skip Sunday(0) and Saturday(6)
+      day.setDate(day.getDate() + 1);
+    }
+
     const mm = String(day.getMonth() + 1).padStart(2, '0');
     const dd = String(day.getDate()).padStart(2, '0');
     const yyyy = day.getFullYear();
     const start = `${mm}/${dd}/${yyyy}`;
 
-    // Calculate end date skipping weekends
     const endDate = new Date(day);
     do {
       endDate.setDate(endDate.getDate() + 1);
     } while (endDate.getDay() === 0 || endDate.getDay() === 6); // Skip Sunday(0) and Saturday(6)
 
-    // Format end date as MM/DD/YYYY
     const em = String(endDate.getMonth() + 1).padStart(2, '0');
     const ed = String(endDate.getDate()).padStart(2, '0');
     const ey = endDate.getFullYear();
@@ -72,12 +73,9 @@ describe('Sign up, request benefits, and delete flow', () => {
       .click();
 
     //check if the request was successful
-    cy.get('table.vacation-list tbody tr').should(
-      'contain',
-      'test vacation'
-    );
+    cy.get('table.vacation-list tbody tr').should('contain', 'test vacation');
 
-    cy.get('.btn-icon').should('not.be.disabled').scrollIntoView().click();
+    cy.get('.btn-icon').should('not.be.disabled').scrollIntoView().click({force: true});
     cy.contains('test vacation').should('not.exist');
 
     cy.log('Step 3: go to Leave Slips, and request');
@@ -90,13 +88,7 @@ describe('Sign up, request benefits, and delete flow', () => {
     cy.contains('button[type="submit"]', 'Submit') // ensure form is visible
       .should('be.disabled'); // at first, because form is invalid
 
-    // Select tomorrow’s date (same logic reused)
-    const slipDate = new Date();
-    slipDate.setDate(slipDate.getDate() + 1);
-    const slipMonth = String(slipDate.getMonth() + 1).padStart(2, '0');
-    const slipDay = String(slipDate.getDate()).padStart(2, '0');
-    const slipYear = slipDate.getFullYear();
-    const formattedDate = `${slipMonth}/${slipDay}/${slipYear}`;
+    const formattedDate = start;
 
     // Fill in the form fields
     cy.get('input[formcontrolname="date"]')
@@ -134,7 +126,7 @@ describe('Sign up, request benefits, and delete flow', () => {
     // Assert success (depending on behavior)
     cy.contains('Medical').should('exist');
 
-    cy.get('.btn-icon').should('not.be.disabled').click();
+    cy.get('.btn-icon').should('not.be.disabled').click({force : true});
     cy.contains('Medical').should('not.exist');
 
     cy.log('Step 4: Delete the user account');

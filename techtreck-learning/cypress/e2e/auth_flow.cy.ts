@@ -27,8 +27,6 @@ describe('User sign up, logout, login, and delete flow', () => {
   it('should sign up, log out, log in, and delete the user', () => {
     cy.log('Step 1: Sign up a new user');
     cy.visit('/auth');
-    cy.screenshot('temp-wait');
-    cy.exec('rm cypress/screenshots/auth_flow.cy.ts/temp-wait.png');
     cy.contains('Sign Up', { timeout: 10000 }).should('be.visible').click();
     cy.get('form:visible')
       .last()
