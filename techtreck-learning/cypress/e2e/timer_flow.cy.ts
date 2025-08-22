@@ -57,8 +57,6 @@ describe('Sign up, start timer, stop timer, check, and delete flow', () => {
   it('should sign up, start timer, stop timer, check timer, and delete the user', () => {
     // Sign up
     cy.visit('/auth');
-    cy.screenshot('temp-wait');
-    cy.exec('rm cypress/screenshots/timer_flow.cy.ts/temp-wait.png');
     cy.contains('Sign Up', { timeout: 10000 }).should('be.visible').click();
     cy.get('form:visible')
       .last()
