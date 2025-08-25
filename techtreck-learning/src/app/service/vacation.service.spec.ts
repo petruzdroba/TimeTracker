@@ -120,7 +120,7 @@ describe('VacationService', () => {
     const acceptedVacation: Vacation = {
       startDate: new Date(Date.now() + 86400000),
       endDate: new Date(Date.now() + 172800000),
-      status: 'accepted',
+      status: 'pending',
       description: 'Accepted Vacation',
     };
 
