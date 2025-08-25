@@ -66,9 +66,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# Check if running tests
 if 'test' in sys.argv or 'pytest' in sys.modules:
     DATABASES = {
         'default': {
@@ -76,22 +74,30 @@ if 'test' in sys.argv or 'pytest' in sys.modules:
             'NAME': ':memory:',
         }
     }
-else:
-
-  DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.hihdbvjzciwfoklcalvw',
-        'PASSWORD': os.environ.get('SUPABASE_DB_PASSWORD'),
-        'HOST': 'aws-1-eu-north-1.pooler.supabase.com',
-        'PORT': '5432',
-        'CONN_MAX_AGE': 0,
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+# Check if in production (DEBUG=False on Azure)
+elif not os.environ.get("DEBUG", "True") == "True":
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'postgres',
+            'USER': os.environ.get('SUPABASE_DB_USER'),
+            'PASSWORD': os.environ.get('SUPABASE_DB_PASSWORD'),
+            'HOST': os.environ.get('SUPABASE_DB_HOST'),
+            'PORT': os.environ.get('SUPABASE_DB_PORT'),
+            'CONN_MAX_AGE': 0,
+            'OPTIONS': {
+                'sslmode': 'require',
+            },
+        }
     }
-  }
+# Local development (DEBUG=True)
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',  # Assumes BASE_DIR is defined
+        }
+    }
 
 
 
