@@ -21,6 +21,7 @@ class TimerDataSyncViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Timer User",
             email=self.email,
             work_hours=8,
@@ -30,6 +31,7 @@ class TimerDataSyncViewTestCase(APITestCase):
         )
         self.timer_data = TimerData.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             start_time="2025-01-01T09:00:00Z",
             end_time="2025-01-01T17:00:00Z",
             remaining_time=28800000,

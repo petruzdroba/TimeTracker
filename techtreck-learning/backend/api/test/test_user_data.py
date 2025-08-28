@@ -22,6 +22,7 @@ class UserDeleteViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Delete User",
             email=self.email,
             work_hours=8,
@@ -29,21 +30,24 @@ class UserDeleteViewTestCase(APITestCase):
             personal_time=6,
             role="employee",
         )
-        self.work_log = WorkLog.objects.create(id=self.user_auth.id, work_log="")
+        self.work_log = WorkLog.objects.create(id=self.user_auth.id,user=self.user_auth, work_log="")
         self.vacation = Vacation.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             future_vacation=[],
             past_vacation=[],
             remaining_vacation=14,
         )
         self.leave = LeaveSlip.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             future_slip=[],
             past_slip=[],
             remaining_time=21600000,
         )
         self.timer = TimerData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             remaining_time=21600000,
             start_time="",
             end_time="",
@@ -99,6 +103,7 @@ class GetUserDataViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Get User",
             email=self.email,
             work_hours=8,
