@@ -192,7 +192,6 @@ class RestoreVacationView(BaseAuthView):
                 {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print(f"Restore vacation error: {str(e)}")  # Debug print
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
@@ -229,7 +228,6 @@ class RestoreLeaveTimeView(BaseAuthView):
                 {"detail": "User not found"}, status=status.HTTP_404_NOT_FOUND
             )
         except Exception as e:
-            print(f"Restore leave error: {str(e)}")
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

@@ -196,5 +196,4 @@ class UserMeView(APIView):
                 }
             )
         except Exception as e:
-            print(f"Token decode error: {str(e)}")
             return Response({"error": str(e)}, status=401)
