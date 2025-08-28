@@ -53,12 +53,13 @@ class UserSignInView(APIView):
         try:
             hashed_password = make_password(data.get("password"))
 
-            UserAuth.objects.create(
+            user_auth = UserAuth.objects.create(
                 email=email,
                 password=hashed_password,
             )
 
             user_data = UserData.objects.create(
+                user = user_auth,
                 name=data.get("name"),
                 email=email,
                 work_hours=8,
@@ -66,15 +67,17 @@ class UserSignInView(APIView):
                 personal_time=6,
             )
 
-            WorkLog.objects.create(id=user_data.id, work_log=[])
+            WorkLog.objects.create(id=user_data.id,user=user_auth, work_log=[])
             Vacation.objects.create(
                 id=user_data.id,
+                user=user_auth,
                 future_vacation=[],
                 past_vacation=[],
                 remaining_vacation=user_data.vacation_days,
             )
             LeaveSlip.objects.create(
                 id=user_data.id,
+                user = user_auth,
                 future_slip=[],
                 past_slip=[],
                 remaining_time=user_data.personal_time
@@ -83,6 +86,7 @@ class UserSignInView(APIView):
 
             TimerData.objects.create(
                 id=user_data.id,
+                user=user_auth,
                 end_time="",
                 remaining_time=user_data.personal_time * 3600000,
                 start_time="",
