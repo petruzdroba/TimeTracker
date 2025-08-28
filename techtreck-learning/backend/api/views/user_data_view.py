@@ -72,19 +72,16 @@ class GetUserDataView(BaseAuthView):
                 status=status.HTTP_200_OK,
             )
         except UserData.DoesNotExist:
-            print(f"User {id} not found")
             return Response(
                 {"detail": "User not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except AuthenticationFailed as e:
-            print(f"Authentication failed: {str(e)}")
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
         except Exception as e:
-            print(f"Error getting user data: {str(e)}")
             return Response(
                 {"detail": str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -21,6 +21,7 @@ class WorkLogGetViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="WorkLog User",
             email=self.email,
             work_hours=8,
@@ -29,7 +30,7 @@ class WorkLogGetViewTestCase(APITestCase):
             role="employee",
         )
         self.work_log = WorkLog.objects.create(
-            id=self.user_data.id, work_log=[{"date": "2025-11-01", "hours": 8}]
+            id=self.user_data.id,user=self.user_auth, work_log=[{"date": "2025-11-01", "hours": 8}]
         )
         self.token = create_token(self.user_data.id, self.user_data.email)
         self.auth_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.token}"}
@@ -63,6 +64,7 @@ class WorkLogUpdateViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="WorkLog Updater",
             email=self.email,
             work_hours=8,
@@ -71,7 +73,7 @@ class WorkLogUpdateViewTestCase(APITestCase):
             role="employee",
         )
         self.work_log = WorkLog.objects.create(
-            id=self.user_data.id, work_log=[{"date": "2025-11-01", "hours": 8}]
+            id=self.user_data.id,user=self.user_auth, work_log=[{"date": "2025-11-01", "hours": 8}]
         )
         self.token = create_token(self.user_data.id, self.user_data.email)
         self.auth_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.token}"}

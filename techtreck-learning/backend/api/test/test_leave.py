@@ -21,6 +21,7 @@ class LeaveSlipGetViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Leave User",
             email=self.email,
             work_hours=8,
@@ -30,6 +31,7 @@ class LeaveSlipGetViewTestCase(APITestCase):
         )
         self.leave_slip = LeaveSlip.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_slip=[{"date": "2025-09-01"}],
             past_slip=[{"date": "2025-02-01"}],
             remaining_time=7200000,
@@ -68,6 +70,7 @@ class LeaveSlipUpdateViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Leave Updater",
             email=self.email,
             work_hours=8,
@@ -77,6 +80,7 @@ class LeaveSlipUpdateViewTestCase(APITestCase):
         )
         self.leave_slip = LeaveSlip.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_slip=[],
             past_slip=[],
             remaining_time=7200000,

@@ -22,6 +22,7 @@ class ManagerGetViewTestCase(APITestCase):
         )
         self.manager_data = UserData.objects.create(
             id=self.manager_auth.id,
+            user=self.manager_auth,
             name="Manager User",
             email=self.manager_email,
             work_hours=8,
@@ -39,6 +40,7 @@ class ManagerGetViewTestCase(APITestCase):
         )
         self.emp_data = UserData.objects.create(
             id=self.emp_auth.id,
+            user=self.emp_auth,
             name="Employee User",
             email=self.emp_email,
             work_hours=8,
@@ -48,24 +50,28 @@ class ManagerGetViewTestCase(APITestCase):
         )
         Vacation.objects.create(
             id=self.manager_data.id,
+            user=self.manager_auth,
             future_vacation=[{"date": "2025-12-01"}],
             past_vacation=[{"date": "2025-01-01"}],
             remaining_vacation=15,
         )
         Vacation.objects.create(
             id=self.emp_data.id,
+            user=self.emp_auth,
             future_vacation=[{"date": "2025-11-01"}],
             past_vacation=[{"date": "2025-02-01"}],
             remaining_vacation=10,
         )
         LeaveSlip.objects.create(
             id=self.manager_data.id,
+            user=self.manager_auth,
             future_slip=[{"date": "2025-12-10"}],
             past_slip=[{"date": "2025-01-10"}],
             remaining_time=3600000,
         )
         LeaveSlip.objects.create(
             id=self.emp_data.id,
+            user=self.emp_auth,
             future_slip=[{"date": "2025-11-10"}],
             past_slip=[{"date": "2025-02-10"}],
             remaining_time=7200000,
@@ -108,6 +114,7 @@ class AdminGetViewTestCase(APITestCase):
         )
         self.admin_data = UserData.objects.create(
             id=self.admin_auth.id,
+            user=self.admin_auth,
             name="Admin User",
             email=self.admin_email,
             work_hours=8,
@@ -125,6 +132,7 @@ class AdminGetViewTestCase(APITestCase):
         )
         self.emp_data = UserData.objects.create(
             id=self.emp_auth.id,
+            user=self.emp_auth,
             name="Employee User 2",
             email=self.emp_email,
             work_hours=8,
@@ -170,6 +178,7 @@ class UserUpdateDataViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Update User",
             email=self.email,
             work_hours=8,
@@ -179,12 +188,13 @@ class UserUpdateDataViewTestCase(APITestCase):
         )
         self.vacation = Vacation.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_vacation=[],
             past_vacation=[],
             remaining_vacation=10,
         )
         self.leave = LeaveSlip.objects.create(
-            id=self.user_data.id, future_slip=[], past_slip=[], remaining_time=4
+            id=self.user_data.id,user=self.user_auth, future_slip=[], past_slip=[], remaining_time=4
         )
         self.token = create_token(self.user_data.id, self.user_data.email)
         self.auth_headers = {"HTTP_AUTHORIZATION": f"Bearer {self.token}"}
@@ -268,6 +278,7 @@ class RestoreVacationViewTestCase(APITestCase):
         )
         self.admin_data = UserData.objects.create(
             id=self.admin_auth.id,
+            user=self.admin_auth,
             name="Admin Restore",
             email=self.admin_email,
             work_hours=8,
@@ -285,6 +296,7 @@ class RestoreVacationViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Vacation Restore",
             email=self.user_email,
             work_hours=8,
@@ -294,6 +306,7 @@ class RestoreVacationViewTestCase(APITestCase):
         )
         self.vacation = Vacation.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_vacation=[],
             past_vacation=[],
             remaining_vacation=5,
@@ -340,6 +353,7 @@ class RestoreLeaveTimeViewTestCase(APITestCase):
         )
         self.admin_data = UserData.objects.create(
             id=self.admin_auth.id,
+            user=self.admin_auth,
             name="Admin Restore Time",
             email=self.admin_email,
             work_hours=8,
@@ -357,6 +371,7 @@ class RestoreLeaveTimeViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Time Restore",
             email=self.user_email,
             work_hours=8,
@@ -366,6 +381,7 @@ class RestoreLeaveTimeViewTestCase(APITestCase):
         )
         self.leave = LeaveSlip.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_slip=[],
             past_slip=[],
             remaining_time=1000,  # less than default

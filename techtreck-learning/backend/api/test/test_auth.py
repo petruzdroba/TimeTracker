@@ -34,6 +34,7 @@ class TestBaseAuthViewCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Test User",
             email="test@example.com",
             work_hours=8,
@@ -119,6 +120,7 @@ class UserLogInViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Test Login",
             email=self.email,
             work_hours=8,
@@ -161,6 +163,7 @@ class UserMeViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Me User",
             email=self.email,
             work_hours=8,

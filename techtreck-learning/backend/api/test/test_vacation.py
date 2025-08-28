@@ -21,6 +21,7 @@ class VacationGetViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Vacation User",
             email=self.email,
             work_hours=8,
@@ -30,6 +31,7 @@ class VacationGetViewTestCase(APITestCase):
         )
         self.vacation = Vacation.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_vacation=[{"date": "2025-07-01"}],
             past_vacation=[{"date": "2025-01-01"}],
             remaining_vacation=10,
@@ -69,6 +71,7 @@ class VacationUpdateViewTestCase(APITestCase):
         )
         self.user_data = UserData.objects.create(
             id=self.user_auth.id,
+            user=self.user_auth,
             name="Vacation Updater",
             email=self.email,
             work_hours=8,
@@ -78,6 +81,7 @@ class VacationUpdateViewTestCase(APITestCase):
         )
         self.vacation = Vacation.objects.create(
             id=self.user_data.id,
+            user=self.user_auth,
             future_vacation=[],
             past_vacation=[],
             remaining_vacation=14,
