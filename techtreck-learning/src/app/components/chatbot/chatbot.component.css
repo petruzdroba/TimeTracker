@@ -1,0 +1,88 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 600px; /* Set a reasonable max height for popup */
+}
+
+.mat-toolbar {
+  flex-shrink: 0; /* Prevent toolbar from shrinking */
+}
+
+/* Chat container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  min-height: 0;
+  overflow: hidden; /* Hide overflow on container */
+}
+
+.messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  padding-right: 0.5rem; /* Space for scrollbar */
+  margin-bottom: 1rem;
+}
+
+.bubble {
+  padding: 0.5rem 0.75rem;
+  border-radius: 16px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.bubble.bot {
+  background-color: #e5e5ea;
+  color: black;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+}
+
+.bubble.user {
+  background-color: #0b93f6;
+  color: white;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+}
+
+.choices {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: auto;
+  border-top: 1px solid #ccc;
+  padding-top: 0.5rem;
+  overflow-y: auto;
+  max-height: 30%;
+}
+
+.reset-container {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+/* Custom scrollbar styling */
+.messages::-webkit-scrollbar,
+.choices::-webkit-scrollbar {
+  width: 6px;
+}
+
+.messages::-webkit-scrollbar-thumb,
+.choices::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.messages::-webkit-scrollbar-track,
+.choices::-webkit-scrollbar-track {
+  background-color: transparent;
+}

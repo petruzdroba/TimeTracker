@@ -1,0 +1,22 @@
+<div class="chat-container">
+
+  <div class="messages">
+    <div *ngFor="let text of history; let i = index"
+         [ngClass]="i % 2 === 0 ? 'bubble bot' : 'bubble user'">
+      {{ text }}
+    </div>
+  </div>
+
+  <div class="choices" *ngIf="choices()?.length">
+    <mat-chip-listbox>
+      <mat-chip-option *ngFor="let choice of choices()" (click)="select(choice)">
+        {{ choice.question }}
+      </mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  <div class="reset-container">
+    <button mat-stroked-button color="warn" (click)="reset()">Reset Chat</button>
+  </div>
+
+</div>
