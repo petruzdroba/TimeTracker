@@ -1,4 +1,4 @@
-<div class="chat-container">
+<div class="chat-container" [ngClass]="{'popup-mode': isPopup}">
 
   <div class="messages">
     <div *ngFor="let text of history; let i = index"

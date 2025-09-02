@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -28,6 +28,7 @@ import { CommonModule } from '@angular/common';
 })
 export class ChatbotComponent implements OnInit {
   @Output() close = new EventEmitter<void>();
+  @Input() isPopup = false;
   protected chatbot = inject(ChatbotService);
   history: string[] = [];
 
