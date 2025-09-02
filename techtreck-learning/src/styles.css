@@ -147,3 +147,8 @@ div.mat-mdc-select-panel {
 mat-toolbar.mat-primary {
     --mat-toolbar-container-background-color: var(--primary-color) !important;
 }
+
+.mat-mdc-standard-chip {
+    --mdc-chip-elevated-container-color: var(--background-hover-color) !important;
+    --mdc-chip-label-text-color: var(--text-color) !important;
+}

@@ -37,15 +37,15 @@
 }
 
 .bubble.bot {
-  background-color: #e5e5ea;
-  color: black;
+  background-color: var(--background-hover-color);
+  color: var(--text-color);
   align-self: flex-start;
   border-top-left-radius: 0;
 }
 
 .bubble.user {
-  background-color: #0b93f6;
-  color: white;
+  background-color: var(--primary-color);
+  color: var(--background-color);
   align-self: flex-end;
   border-top-right-radius: 0;
 }
