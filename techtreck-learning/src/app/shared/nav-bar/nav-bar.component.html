@@ -55,9 +55,15 @@
         <button class="btn-txt" (click)="navPress('admin')">Admin</button>
       </div>
       }
+      <div [class]="'nav-bar-item'">
+        <i class="fa-solid fa-circle-info"></i>
+        <button class="btn-txt" (click)="openHelpWindow()">Help</button>
+      </div>
     </mat-drawer>
   </mat-drawer-container>
 </div>
 
 <app-edit-box [isOpen]="loginWindow" title="Account information" (close)="closeLoginWindow()"><app-auth
     (close)="closeLoginWindow()" /></app-edit-box>
+
+<app-edit-box [isOpen]="helpWindow" title="Help" (close)="closeHelpWindow()"><app-chatbot/></app-edit-box>
