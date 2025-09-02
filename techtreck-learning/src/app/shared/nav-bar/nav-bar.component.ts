@@ -11,7 +11,12 @@ import { UserDataService } from '../../service/user-data.service';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [MatSidenavModule, EditBoxComponent, AuthComponent, ChatbotComponent],
+  imports: [
+    MatSidenavModule,
+    EditBoxComponent,
+    AuthComponent,
+    ChatbotComponent,
+  ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.css',
 })
@@ -75,7 +80,9 @@ export class NavBarComponent implements OnInit, OnDestroy {
   }
 
   openHelpWindow() {
-    this.helpWindow = true;
+    if (this.currentRoute !== '/help') {
+      this.helpWindow = true;
+    }
   }
 
   closeHelpWindow() {

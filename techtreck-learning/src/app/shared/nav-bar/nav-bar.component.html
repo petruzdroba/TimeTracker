@@ -66,4 +66,4 @@
 <app-edit-box [isOpen]="loginWindow" title="Account information" (close)="closeLoginWindow()"><app-auth
     (close)="closeLoginWindow()" /></app-edit-box>
 
-<app-edit-box [isOpen]="helpWindow" title="Help" (close)="closeHelpWindow()"><app-chatbot/></app-edit-box>
+<app-edit-box [isOpen]="helpWindow" title="Help" (close)="closeHelpWindow()"><app-chatbot (close)="closeHelpWindow()"/></app-edit-box>
