@@ -1,13 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { ChatbotService } from './chatbot.service';
-import { FAQ_GRAPH } from '../data/faq-graph.data';
 
 describe('ChatbotService', () => {
   let service: ChatbotService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ChatbotService]
+      providers: [ChatbotService],
     });
     service = TestBed.inject(ChatbotService);
   });
@@ -16,52 +15,96 @@ describe('ChatbotService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should initialize with root node (id: 0)', () => {
-    expect(service.currentNode()).toBe(FAQ_GRAPH['0']);
+  it('should start at root node (id: 0)', () => {
+    expect(service.currentNode().id).toBe('0');
   });
 
-  it('should show children of current node as available choices', () => {
-    // Root node should show its children
-    const rootChoices = service.availableChoices();
-    expect(rootChoices.length).toBe(FAQ_GRAPH['0'].children.length);
-    expect(rootChoices).toEqual(FAQ_GRAPH['0'].children.map(id => FAQ_GRAPH[id]));
-  });
-
-  it('should navigate to selected node', () => {
+  it('should navigate to a child node', () => {
     service.selectNode('1');
-    expect(service.currentNode()).toBe(FAQ_GRAPH['1']);
+    expect(service.currentNode().id).toBe('1');
   });
 
-  it('should show siblings as choices when at leaf node', () => {
-    // Navigate to a leaf node (node 11)
-    service.selectNode('1');
-    service.selectNode('11');
-
-    const choices = service.availableChoices();
-    const parent = FAQ_GRAPH['1'];
-    expect(choices).toEqual(parent.children.map(id => FAQ_GRAPH[id]));
-  });
-
-  it('should maintain navigation history', () => {
+  it('should push history when navigating', () => {
     service.selectNode('1');
     service.selectNode('11');
     service.goBack();
-    expect(service.currentNode()).toBe(FAQ_GRAPH['1']);
+    expect(service.currentNode().id).toBe('1');
     service.goBack();
-    expect(service.currentNode()).toBe(FAQ_GRAPH['0']);
+    expect(service.currentNode().id).toBe('0');
   });
 
-  it('should reset to root node when going back from root', () => {
-    service.selectNode('1');
+  it('should stay at root when going back from root', () => {
     service.goBack();
-    service.goBack(); // Already at root, should stay at root
-    expect(service.currentNode()).toBe(FAQ_GRAPH['0']);
+    expect(service.currentNode().id).toBe('0');
   });
 
-  it('should reset navigation to root node', () => {
+  it('should clear history and asked questions on reset', () => {
     service.selectNode('1');
     service.selectNode('11');
     service.reset();
-    expect(service.currentNode()).toBe(FAQ_GRAPH['0']);
+
+    expect(service.currentNode().id).toBe('0');
+    service.goBack();
+    expect(service.currentNode().id).toBe('0');
+  });
+
+  it('should filter out already asked questions from available choices', () => {
+    service.selectNode('1');
+    const firstChoices = service.availableChoices();
+    const firstChoiceIds = firstChoices.map((c) => c.id);
+
+    // select one of the children
+    service.selectNode(firstChoiceIds[0]);
+    const nextChoices = service.availableChoices().map((c) => c.id);
+
+    expect(nextChoices).not.toContain(firstChoiceIds[0]);
+  });
+
+  it('should prefer children over siblings when available', () => {
+    service.selectNode('3'); // parent node (children: 31, 32)
+    service.selectNode('31'); // child (has child 311)
+
+    const choices = service.availableChoices().map((c) => c.id);
+
+    // Service should return child 311 first, not sibling 32
+    expect(choices).toContain('311');
+    expect(choices).not.toContain('32');
+  });
+
+  it('should fall back to root choices if all children and siblings are asked', () => {
+    service.selectNode('1');
+    service.selectNode('11'); // only child, now asked
+
+    const choices = service.availableChoices().map((c) => c.id);
+
+    // should jump back to unasked root-level ids (not include 1 anymore)
+    expect(choices).toContain('2');
+    expect(choices).toContain('3');
+    expect(choices).not.toContain('1');
+  });
+
+  it('should not duplicate history entries when revisiting same node', () => {
+    service.selectNode('1');
+    service.selectNode('11');
+    service.goBack(); // back to 1
+    service.selectNode('11'); // go to 11 again
+
+    // history should not blow up with duplicates
+    service.goBack();
+    expect(service.currentNode().id).toBe('1');
+  });
+
+  it('should allow navigating deep then fully back to root', () => {
+    service.selectNode('3');
+    service.selectNode('31');
+    service.selectNode('311'); // deep child
+    expect(service.currentNode().id).toBe('311');
+
+    service.goBack();
+    expect(service.currentNode().id).toBe('31');
+    service.goBack();
+    expect(service.currentNode().id).toBe('3');
+    service.goBack();
+    expect(service.currentNode().id).toBe('0');
   });
 });
