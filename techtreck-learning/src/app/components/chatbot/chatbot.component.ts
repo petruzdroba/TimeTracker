@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild, AfterViewChecked } from '@angular/core';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -26,9 +26,12 @@ import { CommonModule } from '@angular/common';
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css'],
 })
-export class ChatbotComponent implements OnInit {
+export class ChatbotComponent implements OnInit, AfterViewChecked {
   @Output() close = new EventEmitter<void>();
   @Input() isPopup = false;
+  @ViewChild('messageContainer') private messageContainer!: ElementRef;
+  private shouldScroll = true;
+
   protected chatbot = inject(ChatbotService);
   history: string[] = [];
 
@@ -36,25 +39,44 @@ export class ChatbotComponent implements OnInit {
     this.history.push(this.chatbot.currentNode().question);
   }
 
+  ngAfterViewChecked() {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+    }
+  }
+
+  private scrollToBottom(): void {
+    try {
+      const element = this.messageContainer.nativeElement;
+      element.scrollTop = element.scrollHeight;
+    } catch (err) { }
+  }
+
    choices(): FaqNode[] {
     return this.chatbot.availableChoices();
   }
 
   select(choice: FaqNode) {
-  this.history.push(choice.question);
+    this.history.push(choice.question);
 
-  this.chatbot.selectNode(choice.id);
+    this.chatbot.selectNode(choice.id);
 
-  const answer = this.chatbot.currentNode().answer;
-  if (answer) this.history.push(answer);
-}
+    const answer = this.chatbot.currentNode().answer;
+    if (answer) this.history.push(answer);
+    this.shouldScroll = true;
+  }
 
 
   reset() {
     this.history = [];
     this.chatbot.reset();
+    this.shouldScroll = true;
+  }
 
-    this.history.push(this.chatbot.currentNode().question);
+  onScroll(event: any): void {
+    const element = this.messageContainer.nativeElement;
+    const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
+    this.shouldScroll = atBottom;
   }
 
   closeHelpWindow(){

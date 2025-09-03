@@ -28,8 +28,9 @@
   flex-direction: column;
   gap: 0.5rem;
   overflow-y: auto;
-  padding-right: 0.5rem; /* Space for scrollbar */
   margin-bottom: 1rem;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 .bubble {
@@ -63,6 +64,8 @@
   padding-top: 0.5rem;
   overflow-y: auto;
   max-height: 30%;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
 .reset-container {
@@ -73,19 +76,16 @@
   padding: 0.5rem 0;
 }
 
-/* Custom scrollbar styling */
+/* Hide scrollbar for Chrome, Safari and Opera */
 .messages::-webkit-scrollbar,
 .choices::-webkit-scrollbar {
-  width: 6px;
+  display: none;
 }
 
+/* Remove unused scrollbar styles */
 .messages::-webkit-scrollbar-thumb,
-.choices::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-}
-
+.choices::-webkit-scrollbar-thumb,
 .messages::-webkit-scrollbar-track,
 .choices::-webkit-scrollbar-track {
-  background-color: transparent;
+  display: none;
 }
