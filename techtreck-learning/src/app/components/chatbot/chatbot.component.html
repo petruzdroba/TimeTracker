@@ -1,0 +1,27 @@
+<div class="chat-container" [ngClass]="{'popup-mode': isPopup}">
+
+  <div #messageContainer class="messages" (scroll)="onScroll($event)">
+    @for (text of history; track text; let i = $index) {
+      <div [ngClass]="i % 2 === 0 ? 'bubble bot' : 'bubble user'">
+        {{ text }}
+      </div>
+    }
+  </div>
+
+  @if (choices().length) {
+    <div class="choices">
+      <mat-chip-listbox>
+        @for (choice of choices(); track choice.id) {
+          <mat-chip-option (click)="select(choice)">
+            {{ choice.question }}
+          </mat-chip-option>
+        }
+      </mat-chip-listbox>
+    </div>
+  }
+
+  <div class="reset-container">
+    <button mat-stroked-button color="warn" (click)="reset()">Reset Chat</button>
+  </div>
+
+</div>

@@ -77,6 +77,11 @@ export const routes: Routes = [
     title: 'Authentication',
   },
   {
+    path: 'help',
+    loadChildren: () => import('./components/chatbot/chatbot.routes').then(m => m.CHATBOT_ROUTES),
+    title: 'Help',
+  },
+  {
     path: 'error/:code',
     component: ErrorPageComponent,
     title: 'Error',

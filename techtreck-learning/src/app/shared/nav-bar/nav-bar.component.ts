@@ -1,3 +1,4 @@
+import { ChatbotComponent } from './../../components/chatbot/chatbot.component';
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { Router, NavigationEnd } from '@angular/router';
@@ -10,7 +11,12 @@ import { UserDataService } from '../../service/user-data.service';
 @Component({
   selector: 'app-nav-bar',
   standalone: true,
-  imports: [MatSidenavModule, EditBoxComponent, AuthComponent],
+  imports: [
+    MatSidenavModule,
+    EditBoxComponent,
+    AuthComponent,
+    ChatbotComponent,
+  ],
   templateUrl: './nav-bar.component.html',
   styleUrl: './nav-bar.component.css',
 })
@@ -21,6 +27,7 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   protected navBarStatus: 'OPEN' | 'CLOSE' = 'CLOSE';
   protected loginWindow: boolean = false;
+  protected helpWindow: boolean = false;
   private routerSubscription?: Subscription;
   protected currentRoute: string = '';
 
@@ -70,5 +77,15 @@ export class NavBarComponent implements OnInit, OnDestroy {
 
   closeLoginWindow() {
     this.loginWindow = false;
+  }
+
+  openHelpWindow() {
+    if (this.currentRoute !== '/help') {
+      this.helpWindow = true;
+    }
+  }
+
+  closeHelpWindow() {
+    this.helpWindow = false;
   }
 }

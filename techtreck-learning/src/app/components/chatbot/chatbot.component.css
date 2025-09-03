@@ -1,0 +1,91 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 95vh; /* Full height for route mode */
+}
+
+:host .popup-mode {
+  height: 100%;
+  max-height: 600px; /* Set a reasonable max height for popup */
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-container.popup-mode {
+  height: 600px; /* Fixed height for popup */
+}
+
+.messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.bubble {
+  padding: 0.5rem 0.75rem;
+  border-radius: 16px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.bubble.bot {
+  background-color: var(--background-hover-color);
+  color: var(--text-color);
+  align-self: flex-start;
+  border-top-left-radius: 0;
+}
+
+.bubble.user {
+  background-color: var(--primary-color);
+  color: var(--background-color);
+  align-self: flex-end;
+  border-top-right-radius: 0;
+}
+
+.choices {
+  flex-shrink: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: auto;
+  border-top: 1px solid #ccc;
+  padding-top: 0.5rem;
+  overflow-y: auto;
+  max-height: 30%;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+
+.reset-container {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.messages::-webkit-scrollbar,
+.choices::-webkit-scrollbar {
+  display: none;
+}
+
+/* Remove unused scrollbar styles */
+.messages::-webkit-scrollbar-thumb,
+.choices::-webkit-scrollbar-thumb,
+.messages::-webkit-scrollbar-track,
+.choices::-webkit-scrollbar-track {
+  display: none;
+}
