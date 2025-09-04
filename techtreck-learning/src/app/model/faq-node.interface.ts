@@ -1,7 +1,7 @@
 export interface FaqNode{
   id: string;
   question: string;
-  topic : "basic"| "timer" | "requests" | "boss";
   answer: string| null;
+  keywords?: string[];
   children: string[];
 }

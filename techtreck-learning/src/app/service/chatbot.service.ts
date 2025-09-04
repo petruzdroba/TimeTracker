@@ -1,6 +1,7 @@
 import { computed, Injectable, signal } from '@angular/core';
 import { FAQ_GRAPH } from '../data/faq-graph.data';
 import { FaqNode } from '../model/faq-node.interface';
+import Fuse from 'fuse.js';
 
 @Injectable({
   providedIn: 'root',
@@ -67,5 +68,17 @@ export class ChatbotService {
     return (
       Object.values(FAQ_GRAPH).find((n) => n.children.includes(childId)) || null
     );
+  }
+
+  findClosestFaq(input: string): FaqNode | null {
+    const faqs = Object.values(FAQ_GRAPH);
+
+    const fuse = new Fuse(faqs, {
+      keys: ['question', 'keywords', 'answer'],
+      threshold: 0.4,
+    });
+
+    const result = fuse.search(input);
+    return result.length > 0 ? result[0].item : null;
   }
 }
