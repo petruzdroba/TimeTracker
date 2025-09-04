@@ -71,14 +71,28 @@ export class ChatbotService {
   }
 
   findClosestFaq(input: string): FaqNode | null {
-    const faqs = Object.values(FAQ_GRAPH);
+  if (!input?.trim()) return null;
 
-    const fuse = new Fuse(faqs, {
-      keys: ['question', 'keywords', 'answer'],
-      threshold: 0.4,
-    });
+  const STOP_WORDS = ['how','do','i','the','a','an','please','can','you','me','my','to','for'];
+  const processedInput = input
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '')
+    .split(/\s+/)
+    .filter(word => !STOP_WORDS.includes(word))
+    .join(' ');
 
-    const result = fuse.search(input);
-    return result.length > 0 ? result[0].item : null;
-  }
+  if (!processedInput) return null;
+
+  const faqs = Object.values(FAQ_GRAPH);
+
+  const fuse = new Fuse(faqs, {
+    keys: ['question', 'keywords'],
+    threshold: 0.5,
+    useExtendedSearch: true,
+  });
+
+  const result = fuse.search(processedInput);
+
+  return result.length > 0 ? result[0].item : null;
+}
 }
