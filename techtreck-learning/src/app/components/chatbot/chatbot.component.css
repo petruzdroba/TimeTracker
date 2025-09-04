@@ -102,3 +102,16 @@
 .choices::-webkit-scrollbar-track {
   display: none;
 }
+
+.input-toggle-container {
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid var(--border-color);
+}
+
+.input-toggle-container button {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}

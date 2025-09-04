@@ -42,6 +42,7 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
   protected chatbot = inject(ChatbotService);
   history: string[] = [];
   protected messageForm: FormGroup;
+  protected showInput = false;
 
   constructor(
     private fb: FormBuilder
@@ -118,5 +119,9 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
 
   closeHelpWindow(){
     this.close.emit();
+  }
+
+  toggleInput() {
+    this.showInput = !this.showInput;
   }
 }

@@ -20,20 +20,31 @@
     </div>
   }
 
-  <form [formGroup]="messageForm" (ngSubmit)="onSubmit()" class="message-form" autocomplete="off">
-    <mat-form-field appearance="outline" class="message-input">
-      <input matInput
-             placeholder="Type your question..."
-             formControlName="message"
-             (keyup.enter)="onSubmit()">
-      <button matSuffix
-              mat-icon-button
-              type="submit"
-              [disabled]="!messageForm.valid || !messageForm.value.message?.trim()">
-        <mat-icon>send</mat-icon>
+  @if (!showInput) {
+    <div class="input-toggle-container">
+      <button mat-stroked-button color="primary" (click)="toggleInput()">
+        <mat-icon>chat</mat-icon>
+        Type a question
       </button>
-    </mat-form-field>
-  </form>
+    </div>
+  }
+
+  @if (showInput) {
+    <form [formGroup]="messageForm" (ngSubmit)="onSubmit()" class="message-form" autocomplete="off">
+      <mat-form-field appearance="outline" class="message-input">
+        <input matInput
+               placeholder="Type your question..."
+               formControlName="message"
+               (keyup.enter)="onSubmit()">
+        <button matSuffix
+                mat-icon-button
+                type="submit"
+                [disabled]="!messageForm.valid || !messageForm.value.message?.trim()">
+          <mat-icon>send</mat-icon>
+        </button>
+      </mat-form-field>
+    </form>
+  }
 
   <div class="reset-container">
     <button mat-stroked-button color="warn" (click)="reset()">Reset Chat</button>
