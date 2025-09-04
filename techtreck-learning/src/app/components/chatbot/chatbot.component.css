@@ -77,16 +77,25 @@
 }
 
 .message-form {
-  padding: 1rem;
+  padding: 0.5rem 1rem;  /* Reduced padding */
   border-top: 1px solid var(--border-color);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .message-input {
-  width: 100%;
+  flex: 1;
+  color: var(--text-color);
 }
 
-:host ::ng-deep .message-input .mat-form-field-wrapper {
-  margin-bottom: -1.25em;
+.message-input input, .message-input input::placeholder, .message-input button{
+  color: var(--text-color)
+}
+
+.close-input-button {
+  margin-left: -8px;  /* Align with form field */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
