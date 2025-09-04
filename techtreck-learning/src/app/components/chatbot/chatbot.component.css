@@ -76,6 +76,19 @@
   padding: 0.5rem 0;
 }
 
+.message-form {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.message-input {
+  width: 100%;
+}
+
+:host ::ng-deep .message-input .mat-form-field-wrapper {
+  margin-bottom: -1.25em;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .messages::-webkit-scrollbar,
 .choices::-webkit-scrollbar {

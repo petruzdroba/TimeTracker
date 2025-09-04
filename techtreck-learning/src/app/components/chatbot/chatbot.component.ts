@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, ViewChild, AfterViewChecked } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +11,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ChatbotService } from '../../service/chatbot.service';
 import { FaqNode } from '../../model/faq-node.interface';
 import { CommonModule } from '@angular/common';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-chatbot',
@@ -22,7 +25,11 @@ import { CommonModule } from '@angular/common';
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
-    MatTooltipModule,],
+    MatTooltipModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
   templateUrl: './chatbot.component.html',
   styleUrls: ['./chatbot.component.css'],
 })
@@ -34,6 +41,15 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
 
   protected chatbot = inject(ChatbotService);
   history: string[] = [];
+  protected messageForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder
+  ) {
+    this.messageForm = this.fb.group({
+      message: ['']
+    });
+  }
 
   ngOnInit(): void {
     this.history.push(this.chatbot.currentNode().question);
@@ -77,6 +93,27 @@ export class ChatbotComponent implements OnInit, AfterViewChecked {
     const element = this.messageContainer.nativeElement;
     const atBottom = element.scrollHeight - element.scrollTop === element.clientHeight;
     this.shouldScroll = atBottom;
+  }
+
+  onSubmit(): void {
+    if (this.messageForm.valid && this.messageForm.value.message.trim()) {
+      const userMessage = this.messageForm.value.message.trim();
+      this.history.push(userMessage);
+
+      const closestFaq = this.chatbot.findClosestFaq(userMessage);
+      console.log('User message:', userMessage);
+      console.log('Found FAQ:', closestFaq);
+
+      if (closestFaq) {
+        this.history.push(closestFaq.answer || "Error: No answer available.");
+      } else {
+        // Handle case when no matching FAQ is found
+        this.history.push("I'm sorry, I don't understand that question. Please try rephrasing or select from the available options.");
+      }
+
+      this.messageForm.reset();
+      this.shouldScroll = true;
+    }
   }
 
   closeHelpWindow(){
