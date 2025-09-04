@@ -16,6 +16,7 @@
 
 - **Employee Dashboard:** Log daily working hours, track attendance, submit vacation and leave requests.  
 - **Manager/Admin Dashboard:** Approve/reject leave requests, monitor team attendance, generate reports.  
+- **Chatbot Helper:** Provides in-app guidance for using the dashboard, submitting requests, and navigating features.
 - **Real-Time Updates:** Track work hours and leave requests instantly.  
 - **Full-Stack Functionality:** Seamless integration between front-end and back-end.  
 - **Testing:** Unit tests with Django, front-end end-to-end tests using Jasmine and Cypress.  
