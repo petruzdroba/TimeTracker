@@ -88,7 +88,7 @@ export class ChatbotService {
   const fuse = new Fuse(faqs, {
     keys: ['question', 'keywords'],
     threshold: 0.5,
-    useExtendedSearch: true,
+    // useExtendedSearch: true,
   });
 
   const result = fuse.search(processedInput);
