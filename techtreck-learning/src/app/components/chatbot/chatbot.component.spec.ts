@@ -15,30 +15,34 @@ describe('ChatbotComponent', () => {
     '0': {
       id: '0',
       question: 'Root Question',
-      answer: null,
+      answer: 'Root Answer',
       children: ['1', '2'],
-      topic: 'basic'
     },
     '1': {
       id: '1',
       question: 'Child Question 1',
       answer: 'Answer 1',
       children: [],
-      topic: 'basic'
     },
     '2': {
       id: '2',
       question: 'Child Question 2',
       answer: 'Answer 2',
       children: [],
-      topic: 'basic'
     }
   };
 
   beforeEach(async () => {
-    const spy = jasmine.createSpyObj('ChatbotService', ['currentNode', 'availableChoices', 'selectNode', 'reset']);
+    const spy = jasmine.createSpyObj('ChatbotService', [
+      'currentNode',
+      'availableChoices',
+      'selectNode',
+      'reset',
+      'findClosestFaq'
+    ]);
     spy.currentNode.and.returnValue(mockFaqGraph['0']);
     spy.availableChoices.and.returnValue([mockFaqGraph['1'], mockFaqGraph['2']]);
+    spy.findClosestFaq.and.returnValue(null);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -58,6 +62,8 @@ describe('ChatbotComponent', () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
+
+  // ------------------- Basic Component Tests -------------------
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -87,7 +93,6 @@ describe('ChatbotComponent', () => {
   });
 
   it('should reset to initial state', () => {
-    // Add some history
     const selectedNode = mockFaqGraph['1'];
     component.select(selectedNode);
 
@@ -115,7 +120,8 @@ describe('ChatbotComponent', () => {
     const mockElementRef = {
       nativeElement: {
         scrollTop: 0,
-        scrollHeight: 100
+        scrollHeight: 100,
+        clientHeight: 100
       }
     };
 
@@ -126,4 +132,115 @@ describe('ChatbotComponent', () => {
     expect(mockElementRef.nativeElement.scrollTop)
       .toBe(mockElementRef.nativeElement.scrollHeight);
   });
+
+  // ------------------- Input Form Tests -------------------
+
+  describe('Input form (messageForm)', () => {
+
+    it('should toggle the input form visibility via toggleInput()', () => {
+      const formBefore = fixture.nativeElement.querySelector('form');
+      expect(formBefore).toBeNull();
+
+      component.toggleInput();
+      fixture.detectChanges();
+      const formAfter = fixture.nativeElement.querySelector('form');
+      expect(formAfter).toBeTruthy();
+
+      component.toggleInput();
+      fixture.detectChanges();
+      const formFinal = fixture.nativeElement.querySelector('form');
+      expect(formFinal).toBeNull();
+    });
+
+    it('should render input and submit button when toggled', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      const inputEl = fixture.nativeElement.querySelector('input[formControlName="message"]');
+      expect(inputEl).toBeTruthy();
+
+      const buttonEl = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(buttonEl).toBeTruthy();
+    });
+
+    it('should disable submit button when input is empty', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      const buttonEl: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(buttonEl.disabled).toBeTrue();
+    });
+
+    it('should enable submit button when input has text', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      const inputEl: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="message"]');
+      inputEl.value = 'Hello';
+      inputEl.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      const buttonEl: HTMLButtonElement = fixture.nativeElement.querySelector('button[type="submit"]');
+      expect(buttonEl.disabled).toBeFalse();
+    });
+
+    it('should call findClosestFaq and update history on submit', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      const faqNode = { id: '1', question: 'Q1', answer: 'A1', children: [] };
+      chatbotService.findClosestFaq.and.returnValue(faqNode);
+
+      const inputEl: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="message"]');
+      inputEl.value = 'Q1';
+      inputEl.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(chatbotService.findClosestFaq).toHaveBeenCalledWith('Q1');
+      expect(component.history).toContain('Q1');
+      expect(component.history).toContain('A1');
+    });
+
+    it('should show fallback message when findClosestFaq returns null', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      chatbotService.findClosestFaq.and.returnValue(null);
+
+      const inputEl: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="message"]');
+      inputEl.value = 'Unknown question';
+      inputEl.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(component.history).toContain(
+        "I'm sorry, I don't understand that question. Please try rephrasing or select from the available options."
+      );
+    });
+
+    it('should reset the form after submit', () => {
+      component.toggleInput();
+      fixture.detectChanges();
+
+      const inputEl: HTMLInputElement = fixture.nativeElement.querySelector('input[formControlName="message"]');
+      inputEl.value = 'Test';
+      inputEl.dispatchEvent(new Event('input'));
+      fixture.detectChanges();
+
+      const form: HTMLFormElement = fixture.nativeElement.querySelector('form');
+      form.dispatchEvent(new Event('submit'));
+      fixture.detectChanges();
+
+      expect(inputEl.value).toBe('');
+    });
+
+  });
+
 });

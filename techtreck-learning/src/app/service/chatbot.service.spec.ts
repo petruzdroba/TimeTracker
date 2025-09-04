@@ -107,4 +107,52 @@ describe('ChatbotService', () => {
     service.goBack();
     expect(service.currentNode().id).toBe('0');
   });
+
+  describe('TestChatbotService - findClosestFaq', () => {
+
+    it('should return null for empty input', () => {
+      expect(service.findClosestFaq('')).toBeNull();
+      expect(service.findClosestFaq('   ')).toBeNull();
+    });
+
+    it('should match exact question', () => {
+      const node = service.findClosestFaq('Edit Time Entries');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('22');
+    });
+
+    it('should match keywords', () => {
+      const node = service.findClosestFaq('edit logs');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('22');
+    });
+
+    it('should match longer natural input', () => {
+      const node = service.findClosestFaq('how do I edit my time logs in the app?');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('22');
+    });
+
+    it('should match root-level node', () => {
+      const node = service.findClosestFaq('getting started guide');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('0');
+    });
+
+    it('should return null for unrelated input', () => {
+      expect(service.findClosestFaq('I want pizza')).toBeNull();
+    });
+
+    it('should match vacation-related keyword', () => {
+      const node = service.findClosestFaq('submit vacation request');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('41');
+    });
+
+    it('should handle input with stop words', () => {
+      const node = service.findClosestFaq('Can you please show me the dashboard overview?');
+      expect(node).toBeTruthy();
+      expect(node?.id).toBe('11');
+    });
+  });
 });
