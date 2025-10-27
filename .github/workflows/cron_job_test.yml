@@ -1,8 +1,9 @@
 name: Cron Job Test
 
 on:
-  schedule:
-    - cron: '0 3 * * *'  # 3AM UTC
+  #uncomment these 2 lines for actual sending of info at 3 am
+  #schedule:
+    #- cron: '0 3 * * *'  # 3AM UTC
   workflow_dispatch:
 
 jobs:
