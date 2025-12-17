@@ -39,6 +39,12 @@ public class UserData {
         this.name = name;
     }
 
+    public UserData(UserAuth user, String name, String email) {
+        this.user = user;
+        this.name = name;
+        this.email = email;
+    }
+
     public Long getId() {
         return id;
     }
