@@ -81,3 +81,5 @@ cypress/downloads/
 
 #Test reports
 test_sumarry.txt
+
+application.properties
