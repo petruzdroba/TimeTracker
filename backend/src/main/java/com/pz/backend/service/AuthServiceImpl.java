@@ -26,8 +26,15 @@ public class AuthServiceImpl implements AuthService{
             throw new Exception("Email already exists");
         }
 
-        UserAuth auth = userAuthRepository.save(new UserAuth(email, passwordEncoder.encode(password)));
-        return userDataRepository.save(new UserData(auth, name, email));
+        UserAuth auth = new UserAuth(email, passwordEncoder.encode(password));
+        userAuthRepository.save(auth);
+
+        UserData userData = new UserData(auth, name, email);
+        userDataRepository.save(userData);
+
+        auth.setUserData(userData);
+
+        return userData;
     }
 
     @Override

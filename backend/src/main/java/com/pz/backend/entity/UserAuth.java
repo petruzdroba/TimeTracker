@@ -49,5 +49,11 @@ public class UserAuth {
         this.password = password;
     }
 
+    public UserData getUserData() {
+        return userData;
+    }
 
+    public void setUserData(UserData user) {
+        this.userData = user;
+    }
 }

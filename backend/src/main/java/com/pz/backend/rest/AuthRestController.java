@@ -30,10 +30,38 @@ public class AuthRestController {
         this.jwtService = jwtService;
     }
 
-//    @PostMapping("/signup")
-//    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
-//        return ResponseEntity.ok();
-//    }
+    @PostMapping("/signup")
+    public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
+        try {
+            UserData user = authService.signUp(request.name(), request.email(), request.password());
+            UserAuth auth = user.getUser();
+
+            String accessToken = jwtService.generateAccessToken(auth);
+            String refreshToken = jwtService.generateRefreshToken(auth);
+
+            UserResponse userResponse = new UserResponse(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getWorkHours(),
+                    user.getVacationDays(),
+                    user.getPersonalTime(),
+                    user.getRole()
+            );
+
+            return ResponseEntity.status(201).body(Map.of(
+                    "access", accessToken,
+                    "refresh", refreshToken,
+                    "user", userResponse
+            ));
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("exists")) {
+                return ResponseEntity.status(409).body(Map.of("error", msg));
+            }
+            return ResponseEntity.status(500).body(Map.of("error", msg));
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequest request) {
