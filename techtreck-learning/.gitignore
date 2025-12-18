@@ -82,4 +82,4 @@ cypress/downloads/
 #Test reports
 test_sumarry.txt
 
-application.properties
+../backend/src/resources/application.properties
