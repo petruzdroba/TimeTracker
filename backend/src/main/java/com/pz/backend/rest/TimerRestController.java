@@ -42,8 +42,8 @@ public class TimerRestController {
         }
     }
 
-    @PutMapping("/sync/")
-    public ResponseEntity<?> syncTimerData(){
-
-    }
+//    @PutMapping("/sync/")
+//    public ResponseEntity<?> syncTimerData(){
+//        return;
+//    }
 }

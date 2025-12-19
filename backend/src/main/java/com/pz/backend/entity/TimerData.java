@@ -6,10 +6,10 @@ import jakarta.persistence.*;
 @Table(name="timer_data")
 public class TimerData {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne
+    @MapsId
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private UserAuth user;
 
@@ -17,6 +17,17 @@ public class TimerData {
     private String endTime;
     private Integer remainingTime; // in ms
     private String timerType = "OFF";
+
+    protected TimerData() {
+    }
+
+    public TimerData(UserAuth user, Integer remainingTime) {
+        this.user = user;
+        this.remainingTime = remainingTime;
+        this.endTime = "";
+        this.startTime = "";
+        this.timerType = "OFF";
+    }
 
     public Long getId() {
         return id;

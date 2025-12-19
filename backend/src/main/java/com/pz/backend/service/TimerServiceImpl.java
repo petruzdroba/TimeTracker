@@ -2,7 +2,9 @@ package com.pz.backend.service;
 
 import com.pz.backend.dao.TimerDataRepository;
 import com.pz.backend.entity.TimerData;
+import org.springframework.stereotype.Service;
 
+@Service
 public class TimerServiceImpl implements TimerService{
 
     private final TimerDataRepository timerDataRepository;

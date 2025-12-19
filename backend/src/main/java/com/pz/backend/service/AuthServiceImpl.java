@@ -1,7 +1,9 @@
 package com.pz.backend.service;
 
+import com.pz.backend.dao.TimerDataRepository;
 import com.pz.backend.dao.UserAuthRepository;
 import com.pz.backend.dao.UserDataRepository;
+import com.pz.backend.entity.TimerData;
 import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -12,11 +14,13 @@ public class AuthServiceImpl implements AuthService{
 
     private final UserAuthRepository userAuthRepository;
     private final UserDataRepository userDataRepository;
+    private final TimerDataRepository timerDataRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, TimerDataRepository timerDataRepository, PasswordEncoder passwordEncoder) {
         this.userAuthRepository = userAuthRepository;
         this.userDataRepository = userDataRepository;
+        this.timerDataRepository = timerDataRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -31,6 +35,9 @@ public class AuthServiceImpl implements AuthService{
 
         UserData userData = new UserData(auth, name, email);
         userDataRepository.save(userData);
+
+        TimerData timerData = new TimerData(auth, userData.getWorkHours()*3600000);
+        timerDataRepository.save(timerData);
 
         auth.setUserData(userData);
 
