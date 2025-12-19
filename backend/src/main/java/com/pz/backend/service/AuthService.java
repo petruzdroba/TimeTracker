@@ -7,4 +7,6 @@ public interface AuthService {
     public UserData signUp(String name, String email, String password) throws Exception;
 
     public UserAuth logIn(String email, String password) throws Exception;
+
+    UserData getMe(Long userId) throws Exception;
 }

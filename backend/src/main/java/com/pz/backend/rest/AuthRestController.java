@@ -10,10 +10,7 @@ import com.pz.backend.service.AuthService;
 import com.pz.backend.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -30,7 +27,7 @@ public class AuthRestController {
         this.jwtService = jwtService;
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/signup/")
     public ResponseEntity<?> signup(@RequestBody SignupRequest request) {
         try {
             UserData user = authService.signUp(request.name(), request.email(), request.password());
@@ -57,13 +54,13 @@ public class AuthRestController {
         } catch (Exception e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("exists")) {
-                return ResponseEntity.status(409).body(Map.of("error", msg));
+                return ResponseEntity.status(409).body(Map.of("detail", msg));
             }
-            return ResponseEntity.status(500).body(Map.of("error", msg));
+            return ResponseEntity.status(500).body(Map.of("detail", msg));
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping("/login/")
     public ResponseEntity<Object> login(@RequestBody LoginRequest request) {
         try {
             UserAuth auth = authService.logIn(request.email(), request.password());
@@ -88,7 +85,38 @@ public class AuthRestController {
                     "user", userResponse
             ));
         } catch (Exception e) {
-            return ResponseEntity.status(401).body(null);
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("not found")) {
+                return ResponseEntity.status(404).body(Map.of("detail", msg));
+            }
+            return ResponseEntity.status(401).body(Map.of("detail", "Invalid credentials"));
+        }
+    }
+
+    @GetMapping("/me/")
+    public ResponseEntity<Object> me(@RequestHeader(value = "Authorization", required = false) String authHeader){
+        if(authHeader == null || !authHeader.startsWith("Bearer ")){
+            return ResponseEntity.status(401).body(Map.of("detail", "No token provided"));
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            Long userId = jwtService.getUserIdFromToken(token);
+            UserData user = authService.getMe(userId);
+
+            return ResponseEntity.ok(new UserResponse(
+                    user.getId(),
+                    user.getName(),
+                    user.getEmail(),
+                    user.getWorkHours(),
+                    user.getVacationDays(),
+                    user.getPersonalTime(),
+                    user.getRole()
+            ));
+
+        } catch (Exception e) {
+            return ResponseEntity.status(401).body(Map.of("detail", e.getMessage()));
         }
     }
 }

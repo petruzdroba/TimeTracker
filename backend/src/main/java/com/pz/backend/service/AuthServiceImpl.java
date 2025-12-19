@@ -47,4 +47,13 @@ public class AuthServiceImpl implements AuthService{
         }
         return auth;
     }
+
+    @Override
+    public UserData getMe(Long userId) throws Exception {
+        if(userId == null)
+            throw new Exception("User not found");
+
+        return userDataRepository.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+    }
 }
