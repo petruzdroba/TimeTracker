@@ -43,14 +43,14 @@ public class WorkLogRestController {
         }
     }
 
-    @PutMapping("/worklog/update/")
+    @PutMapping("/update/")
     public ResponseEntity<?> putWorkLog(@RequestBody WorkLogRequest request) {
         try {
             WorkLog workLog = workLogService.put(request.userId(), request.data());
 
             return ResponseEntity.status(200).body(Map.of(
                     "id", workLog.getId(),
-                    "worklog", mapper.readValue(workLog.getWorkLog(), Object.class)
+                    "worklog", workLog.getWorkLog()
             ));
         }catch (Exception e) {
             String msg = e.getMessage();
