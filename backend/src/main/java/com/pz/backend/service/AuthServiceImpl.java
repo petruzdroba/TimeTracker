@@ -3,9 +3,11 @@ package com.pz.backend.service;
 import com.pz.backend.dao.TimerDataRepository;
 import com.pz.backend.dao.UserAuthRepository;
 import com.pz.backend.dao.UserDataRepository;
+import com.pz.backend.dao.WorkLogRepository;
 import com.pz.backend.entity.TimerData;
 import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
+import com.pz.backend.entity.WorkLog;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +17,14 @@ public class AuthServiceImpl implements AuthService{
     private final UserAuthRepository userAuthRepository;
     private final UserDataRepository userDataRepository;
     private final TimerDataRepository timerDataRepository;
+    private final WorkLogRepository workLogRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, TimerDataRepository timerDataRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, TimerDataRepository timerDataRepository, WorkLogRepository workLogRepository, PasswordEncoder passwordEncoder) {
         this.userAuthRepository = userAuthRepository;
         this.userDataRepository = userDataRepository;
         this.timerDataRepository = timerDataRepository;
+        this.workLogRepository = workLogRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -38,6 +42,9 @@ public class AuthServiceImpl implements AuthService{
 
         TimerData timerData = new TimerData(auth, userData.getWorkHours()*3600000);
         timerDataRepository.save(timerData);
+
+        WorkLog workLog = new WorkLog(auth, "[]");
+        workLogRepository.save(workLog);
 
         auth.setUserData(userData);
 
