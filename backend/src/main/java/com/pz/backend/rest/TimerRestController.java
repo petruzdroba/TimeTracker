@@ -3,7 +3,6 @@ package com.pz.backend.rest;
 import com.pz.backend.dto.TimerDataRequest;
 import com.pz.backend.entity.TimerData;
 import com.pz.backend.service.TimerService;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +41,7 @@ public class TimerRestController {
     }
 
     @PutMapping("/sync/")
-    public ResponseEntity<?> syncTimerData(@RequestBody @Valid TimerDataRequest request) {
+    public ResponseEntity<?> syncTimerData(@RequestBody TimerDataRequest request) {
         try {
             TimerData timerData = timerService.sync(
                     request.userId(),
