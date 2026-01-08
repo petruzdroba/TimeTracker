@@ -18,4 +18,13 @@ public class WorkLogServiceImpl implements WorkLogService {
     public WorkLog get(Long workLogId) throws Exception {
         return workLogRepository.findById(workLogId).orElseThrow(() -> new Exception("Work Log not found"));
     }
+
+    @Override
+    public WorkLog put(Long userId, String workLog) throws Exception {
+        WorkLog existing = workLogRepository.findById(userId)
+                .orElseThrow(() -> new Exception("Work log not found"));
+
+        existing.setWorkLog(workLog);
+        return workLogRepository.save(existing);
+    }
 }
