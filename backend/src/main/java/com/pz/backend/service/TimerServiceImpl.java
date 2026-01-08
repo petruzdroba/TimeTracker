@@ -16,11 +16,19 @@ public class TimerServiceImpl implements TimerService{
     @Override
     public TimerData get(Long timerId) throws Exception {
         return timerDataRepository.findById(timerId)
-                .orElseThrow(() -> new Exception("Timer data nout found"));
+                .orElseThrow(() -> new Exception("Timer data not found"));
     }
 
     @Override
-    public TimerData sync(Long userId, TimerData data) throws Exception {
-        return null;
+    public TimerData sync(Long userId, String startTime, String endTime, Integer requiredTime, String timerType) throws Exception {
+        TimerData existing =  timerDataRepository.findById(userId)
+                .orElseThrow(() -> new Exception("Timer data not found"));
+
+        existing.setStartTime(startTime);
+        existing.setEndTime(endTime);
+        existing.setRemainingTime(requiredTime);
+        existing.setTimerType(timerType);
+
+        return timerDataRepository.save(existing);
     }
 }
