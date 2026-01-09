@@ -81,7 +81,22 @@ export class TimerComponent implements OnInit, OnDestroy {
       timeWorked: this.elapsedTime,
     };
 
-    this.workLogService.addSession(newSession);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const existingSession = this.workLogService.getWorkLog.find((s) => {
+      const sessionDate = new Date(s.date);
+      sessionDate.setHours(0, 0, 0, 0);
+      return sessionDate.getTime() === today.getTime();
+    });
+
+    if (!existingSession) {
+      const newSession = {
+        date: new Date(),
+        timeWorked: this.elapsedTime,
+      };
+      this.workLogService.addSession(newSession);
+    }
 
     this.interval = setInterval(() => {
       const updatedTimer = {
@@ -104,11 +119,12 @@ export class TimerComponent implements OnInit, OnDestroy {
     clearInterval(this.interval);
 
     const newSession: Session = {
+      id: -1, // placeholder until backend returns real id
       date: new Date(),
       timeWorked: this.TIME_REQ - currentTimer.requiredTime,
     };
 
-    this.workLogService.addSession(newSession);
+    this.workLogService.updateWorkLog(newSession);
     this.timerService.updateTimerData(updatedTimer);
 
     this.timerData.set(updatedTimer);

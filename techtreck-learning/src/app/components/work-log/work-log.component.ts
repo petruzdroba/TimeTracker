@@ -143,7 +143,7 @@ export class WorkLogComponent implements OnInit {
   }
 
   onDeleteSession(session: Session) {
-    this.workLogService.deleteSession(session);
+    this.workLogService.deleteWorkLog(session.id);
     this.workLog.set(this.workLogService.getWorkLog);
     this.updatePaginatedData();
   }

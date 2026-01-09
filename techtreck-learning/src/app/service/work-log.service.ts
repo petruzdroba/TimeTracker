@@ -40,25 +40,17 @@ export class WorkLogService implements OnDestroy {
       return new Promise((resolve, reject) => {
         this.http
           .get<Session[]>(
-            `${environment.apiUrl}/worklog/get/${this.userData.user().id}/`
+            `${environment.apiUrl}/worklog/${this.userData.user().id}`
           )
           .pipe(take(1))
           .subscribe({
             next: (res) => {
-              if (
-                Array.isArray(res) &&
-                !(res.length === 1 && Object.keys(res[0]).length === 0)
-              ) {
-                this.workLog.set(res);
-              } else {
-                this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-              }
+              this.workLog.set(res || []);
               this.initialized.set(true);
-              resolve();
             },
             error: (err) => {
+              console.error(err);
               this.routerService.navigate(['/error', err.status]);
-              reject(err);
             },
           });
       });
@@ -83,84 +75,43 @@ export class WorkLogService implements OnDestroy {
     return this._firstClockIn();
   }
 
-  addSession(newSession: Session) {
-    this.workLog.update((sessions) => {
-      const currentSessions = [...sessions];
-
-      const index = currentSessions.findIndex((session) => {
-        const currentTime = new Date(newSession.date);
-        const dateLastSession = new Date(session.date);
-        currentTime.setHours(0, 0, 0, 0);
-        dateLastSession.setHours(0, 0, 0, 0);
-        return currentTime.getTime() === dateLastSession.getTime();
-      });
-      if (index !== -1) {
-        return [
-          ...currentSessions.slice(0, index),
-          {
-            ...currentSessions[index],
-            timeWorked: newSession.timeWorked,
-          },
-          ...currentSessions.slice(index + 1),
-        ];
-      }
-      return [...currentSessions, newSession];
-    });
-    this.updateWorkLog();
-  }
-
-  deleteSession(erasedSession: Session) {
-    this.workLog.update((sessions) =>
-      sessions.filter((session) => session !== erasedSession)
-    );
-    this.updateWorkLog();
-  }
-
-  editSession(oldSession: Session, startTime: Date, endTime: Date) {
-    this.workLog.update((sessions) => {
-      const index = sessions.findIndex((session) => {
-        const dateA = new Date(session.date);
-        const dateB = new Date(oldSession.date);
-        return (
-          dateA.getTime() === dateB.getTime() &&
-          session.timeWorked === oldSession.timeWorked
-        );
-      });
-
-      if (index !== -1) {
-        const oldDate = new Date(oldSession.date);
-        const newDate = new Date(oldDate);
-        newDate.setHours(startTime.getHours());
-        newDate.setMinutes(startTime.getMinutes());
-        newDate.setSeconds(startTime.getSeconds());
-
-        const timeWorked = endTime.getTime() - startTime.getTime();
-
-        return [
-          ...sessions.slice(0, index),
-          {
-            date: newDate,
-            timeWorked: timeWorked,
-          },
-          ...sessions.slice(index + 1),
-        ];
-      }
-      return sessions;
-    });
-    this.updateWorkLog();
-  }
-  updateWorkLog() {
-    this.subscription = this.http
-      .put(`${environment.apiUrl}/worklog/update/`, {
+  addSession(newSession: Omit<Session, 'id'>) {
+    this.http
+      .post<Session>(`${environment.apiUrl}/worklog`, {
         userId: this.userData.user().id,
-        data: this.workLog(),
+        ...newSession,
       })
       .subscribe({
-        next: (res) => {},
-        error: (err) => {
-          this.routerService.navigate(['/error', err.status]);
+        next: (saved) => {
+          this.workLog.update((logs) => [...logs, saved]);
         },
+        error: (err) => this.routerService.navigate(['/error', err.status]),
       });
+  }
+
+  deleteWorkLog(sessionId: number) {
+    this.http.delete(`${environment.apiUrl}/worklog/${sessionId}`).subscribe({
+      next: () => {
+        this.workLog.update((logs) => logs.filter((wl) => wl.id !== sessionId));
+      },
+      error: (err) => this.routerService.navigate(['/error', err.status]),
+    });
+  }
+
+  updateWorkLog(session: Session) {
+    this.http.put<Session>(`${environment.apiUrl}/worklog`,
+      {
+        userId: this.userData.user().id,
+        ...session,
+      })
+    .subscribe({
+      next: (updated) => {
+        this.workLog.update((logs) =>
+          logs.map((wl) => (wl.id === updated.id ? updated : wl))
+        );
+      },
+      error: (err) => this.routerService.navigate(['/error', err.status]),
+    });
   }
 
   ngOnDestroy(): void {

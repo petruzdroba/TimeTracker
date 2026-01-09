@@ -1,8 +1,8 @@
 package com.pz.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.time.Instant;
 import java.time.LocalDate;
 
 @Entity
@@ -17,6 +17,7 @@ public class WorkLog {
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private UserAuth user;
 
     @Column(name = "work_date", nullable = false)
