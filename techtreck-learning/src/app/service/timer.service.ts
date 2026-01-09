@@ -127,7 +127,7 @@ export class TimerService implements OnDestroy {
   syncTimerData() {
     const currentTime = new Date();
     if (
-      currentTime.getTime() - this.lastSync.getTime() < 90000 &&
+      currentTime.getTime() - this.lastSync.getTime() > 90000 &&
       this.userData.user().id !== -1
     ) {
       // Prevent syncing more than once every 15 minutes

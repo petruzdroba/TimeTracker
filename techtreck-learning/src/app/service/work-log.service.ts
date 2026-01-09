@@ -5,10 +5,9 @@ import {
   computed,
   inject,
   OnDestroy,
-  effect,
 } from '@angular/core';
 import { Session } from '../model/session.interface';
-import { take, firstValueFrom } from 'rxjs';
+import { take } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -21,12 +20,10 @@ export class WorkLogService implements OnDestroy {
   private routerService = inject(Router);
   private http = inject(HttpClient);
   private subscription: any;
-
-  private workLog = signal<Session[]>([]);
+  public workLog = signal<Session[]>([]);
   private initialized = signal<boolean>(false);
 
   constructor() {
-    // Start initialization but don't block constructor
     this.initialize().catch((err) => {
       console.error('Failed to initialize WorkLogService:', err);
       this.routerService.navigate(['/error']);
@@ -35,7 +32,6 @@ export class WorkLogService implements OnDestroy {
 
   async initialize(): Promise<void> {
     if (this.initialized()) return;
-
     if (this.userData.isLoggedIn()) {
       return new Promise((resolve, reject) => {
         this.http
@@ -47,10 +43,12 @@ export class WorkLogService implements OnDestroy {
             next: (res) => {
               this.workLog.set(res || []);
               this.initialized.set(true);
+              resolve();
             },
             error: (err) => {
               console.error(err);
               this.routerService.navigate(['/error', err.status]);
+              reject(err);
             },
           });
       });
@@ -76,42 +74,77 @@ export class WorkLogService implements OnDestroy {
   }
 
   addSession(newSession: Omit<Session, 'id'>) {
+    const localDate = new Date(newSession.date);
+    const dateString = localDate.toISOString().split('T')[0];
+
+    const payload = {
+      userId: this.userData.user().id,
+      date: dateString,
+      timeWorked: newSession.timeWorked,
+    };
+
+    console.log('POST /worklog payload:', payload);
+
     this.http
-      .post<Session>(`${environment.apiUrl}/worklog`, {
-        userId: this.userData.user().id,
-        ...newSession,
-      })
+      .post<Session>(`${environment.apiUrl}/worklog`, payload)
       .subscribe({
-        next: (saved) => {
-          this.workLog.update((logs) => [...logs, saved]);
+        next: (res) => {
+          console.log('POST /worklog response:', res);
+          const updatedLog = [...this.workLog(), res];
+          this.workLog.set(updatedLog);
+        },
+        error: (err) => {
+          console.error('POST /worklog error:', err);
+          this.routerService.navigate(['/error', err.status]);
+        },
+      });
+  }
+
+  deleteWorkLog(sessionId: number) {
+    this.http
+      .delete(`${environment.apiUrl}/worklog/${sessionId}`)
+      .subscribe({
+        next: () => {
+          this.workLog.update((logs) =>
+            logs.filter((wl) => wl.id !== sessionId)
+          );
         },
         error: (err) => this.routerService.navigate(['/error', err.status]),
       });
   }
 
-  deleteWorkLog(sessionId: number) {
-    this.http.delete(`${environment.apiUrl}/worklog/${sessionId}`).subscribe({
-      next: () => {
-        this.workLog.update((logs) => logs.filter((wl) => wl.id !== sessionId));
-      },
-      error: (err) => this.routerService.navigate(['/error', err.status]),
-    });
-  }
-
   updateWorkLog(session: Session) {
-    this.http.put<Session>(`${environment.apiUrl}/worklog`,
-      {
-        userId: this.userData.user().id,
-        ...session,
-      })
-    .subscribe({
-      next: (updated) => {
-        this.workLog.update((logs) =>
-          logs.map((wl) => (wl.id === updated.id ? updated : wl))
-        );
-      },
-      error: (err) => this.routerService.navigate(['/error', err.status]),
-    });
+    if (session.id === undefined) {
+      console.warn('Cannot update session without ID', session);
+      return;
+    }
+
+    const localDate = new Date(session.date);
+    const dateString = localDate.toISOString().split('T')[0];
+
+    const payload = {
+      workLogId: session.id,
+      userId: this.userData.user().id,
+      date: dateString,
+      timeWorked: session.timeWorked,
+    };
+
+    console.log('PUT /worklog payload:', payload);
+
+    this.http
+      .put<Session>(`${environment.apiUrl}/worklog`, payload)
+      .subscribe({
+        next: (updated) => {
+          console.log('PUT /worklog response:', updated);
+          this.workLog.update((logs) =>
+            logs.map((wl) => (wl.id === updated.id ? updated : wl))
+          );
+        },
+        error: (err) => {
+          console.error('PUT /worklog error:', err);
+          this.routerService.navigate(['/error', err.status]);
+        },
+      });
   }
 
   ngOnDestroy(): void {

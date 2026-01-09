@@ -143,9 +143,13 @@ export class WorkLogComponent implements OnInit {
   }
 
   onDeleteSession(session: Session) {
-    this.workLogService.deleteWorkLog(session.id);
-    this.workLog.set(this.workLogService.getWorkLog);
-    this.updatePaginatedData();
+    if (session.id !== undefined) {
+      this.workLogService.deleteWorkLog(session.id);
+      this.workLog.set(this.workLogService.getWorkLog);
+      this.updatePaginatedData();
+    } else {
+      console.warn('Cannot delete session without ID', session);
+    }
   }
 
   onChangeDateFilter(newDateFilter: DateFilter) {

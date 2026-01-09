@@ -31,6 +31,7 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.timerData.set(this.timerService.timer);
     this.workLog.set(this.workLogService.getWorkLog);
     this.TIME_REQ = this.timerService.workingHoursFull();
+
     if (this.timerData().timerType === 'ON') {
       this.startTimer();
     }
@@ -45,14 +46,18 @@ export class TimerComponent implements OnInit, OnDestroy {
   get elapsedTime() {
     const elapsed = this.TIME_REQ - this.timerData().requiredTime;
     if (elapsed < 0) {
-      return this.timerData().requiredTime;
+      return 0;
     }
     return elapsed;
   }
 
   get firstClockIn(): Date | undefined {
-    return this.workLogService.firstClockIn?.date;
+  const todaySession = this.workLogService.firstClockIn;
+  if (todaySession && this.timerData().startTime) {
+    return new Date(this.timerData().startTime);
   }
+  return undefined;
+}
 
   get workedTimeToday(): Date | undefined {
     const timeWorked = this.workLogService.firstClockIn?.timeWorked;
@@ -76,10 +81,71 @@ export class TimerComponent implements OnInit, OnDestroy {
     this.timerService.updateTimerData(updatedTimer);
     this.timerData.set(updatedTimer);
 
-    const newSession = {
-      date: new Date(),
-      timeWorked: this.elapsedTime,
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const existingSession = this.workLogService.getWorkLog.find((s) => {
+      const sessionDate = new Date(s.date);
+      sessionDate.setHours(0, 0, 0, 0);
+      return sessionDate.getTime() === today.getTime();
+    });
+
+    console.log('Starting timer. Elapsed time:', this.elapsedTime);
+    console.log('Existing session:', existingSession);
+
+    if (existingSession && existingSession.id) {
+      console.log('Found existing session with id:', existingSession.id);
+    } else {
+      console.log('Creating new session for today');
+      const newSession = {
+        date: today,
+        timeWorked: 0,
+      };
+      this.workLogService.addSession(newSession);
+
+      setTimeout(() => {
+        this.workLog.set(this.workLogService.getWorkLog);
+      }, 1000);
+    }
+
+    this.interval = setInterval(() => {
+      this.timerData.update(current => ({
+        ...current,
+        requiredTime: current.requiredTime - 1000,
+      }));
+
+      // Update local workLog display for today's session
+      const todaySession = this.workLogService.getWorkLog.find((s) => {
+        const sessionDate = new Date(s.date);
+        sessionDate.setHours(0, 0, 0, 0);
+        return sessionDate.getTime() === today.getTime();
+      });
+
+      if (todaySession && todaySession.id) {
+        const currentElapsed = this.elapsedTime;
+        // Update the service's internal state
+        this.workLogService['workLog'].update((logs: Session[]) =>
+          logs.map((s: Session) =>
+            s.id === todaySession.id
+              ? { ...s, timeWorked: currentElapsed }
+              : s
+          )
+        );
+        // Update local state
+        this.workLog.set(this.workLogService.getWorkLog);
+      }
+    }, 1000);
+  }
+
+  pauseTimer() {
+    const currentTimer = this.timerData();
+    const updatedTimer: TimerData = {
+      ...currentTimer,
+      timerType: 'OFF',
+      endTime: new Date(),
     };
+
+    clearInterval(this.interval);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -90,54 +156,42 @@ export class TimerComponent implements OnInit, OnDestroy {
       return sessionDate.getTime() === today.getTime();
     });
 
-    if (!existingSession) {
+    const elapsedTime = this.TIME_REQ - currentTimer.requiredTime;
+
+    console.log('Pausing timer. Elapsed time (ms):', elapsedTime);
+    console.log('Elapsed time (formatted):', new Date(elapsedTime).toISOString());
+    console.log('Existing session:', existingSession);
+
+    if (existingSession && existingSession.id) {
+      console.log('Updating session with id:', existingSession.id);
+      const updatedSession: Session = {
+        ...existingSession,
+        timeWorked: elapsedTime,
+      };
+      this.workLogService.updateWorkLog(updatedSession);
+    } else {
+      console.log('Creating new session on pause');
       const newSession = {
-        date: new Date(),
-        timeWorked: this.elapsedTime,
+        date: today,
+        timeWorked: elapsedTime,
       };
       this.workLogService.addSession(newSession);
     }
 
-    this.interval = setInterval(() => {
-      const updatedTimer = {
-        ...this.timerData(),
-        requiredTime: this.timerData().requiredTime - 1000,
-      };
-      this.timerData.set(updatedTimer);
-    }, 1000);
-  }
-
-  pauseTimer() {
-    const currentTimer = this.timerData();
-
-    const updatedTimer: TimerData = {
-      ...currentTimer,
-      timerType: 'OFF',
-      endTime: new Date(),
-    };
-
-    clearInterval(this.interval);
-
-    const newSession: Session = {
-      id: -1, // placeholder until backend returns real id
-      date: new Date(),
-      timeWorked: this.TIME_REQ - currentTimer.requiredTime,
-    };
-
-    this.workLogService.updateWorkLog(newSession);
     this.timerService.updateTimerData(updatedTimer);
-
     this.timerData.set(updatedTimer);
-    this.workLog.set(this.workLogService.getWorkLog);
 
-    if (window.localStorage.getItem('timerData')) {
-      this.snackBar.open('Session recorded successfully!', '', {
-        duration: 2000,
-      });
-    }
-
+    // Wait for save to complete
     setTimeout(() => {
-      window.location.reload();
-    }, 2000);
+      if (window.localStorage.getItem('timerData')) {
+        this.snackBar.open('Session recorded successfully!', '', {
+          duration: 2000,
+        });
+      }
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }, 500);
   }
 }

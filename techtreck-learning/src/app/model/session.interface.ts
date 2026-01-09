@@ -1,5 +1,5 @@
 export interface Session {
-  id: number;
+  id?: number;
   date: Date;
   timeWorked: number;
 }
