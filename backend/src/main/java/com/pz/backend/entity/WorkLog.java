@@ -2,27 +2,36 @@ package com.pz.backend.entity;
 
 import jakarta.persistence.*;
 
+import java.time.Instant;
+import java.time.LocalDate;
+
 @Entity
-@Table(name="work_log")
+@Table(
+        name = "work_log",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "work_date"})
+)
 public class WorkLog {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserAuth user;
 
-    @Lob
-    @Column(name = "work_log", columnDefinition = "TEXT")
-    private String workLog = "[]";
+    @Column(name = "work_date", nullable = false)
+    private LocalDate date;
+
+    @Column(name = "time_worked", nullable = false)
+    private Long timeWorked;
 
     public WorkLog() {
     }
 
-    public WorkLog(UserAuth user, String workLog) {
+    public WorkLog(UserAuth user, LocalDate date, Long timeWorked) {
         this.user = user;
-        this.workLog = workLog;
+        this.date = date;
+        this.timeWorked = timeWorked;
     }
 
     public Long getId() {
@@ -41,11 +50,19 @@ public class WorkLog {
         this.user = user;
     }
 
-    public String getWorkLog() {
-        return workLog;
+    public LocalDate getDate() {
+        return date;
     }
 
-    public void setWorkLog(String workLog) {
-        this.workLog = workLog;
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    public Long getTimeWorked() {
+        return timeWorked;
+    }
+
+    public void setTimeWorked(Long timeWorked) {
+        this.timeWorked = timeWorked;
     }
 }
