@@ -14,6 +14,10 @@ public class AlreadyExistsException extends RuntimeException {
         super(String.format("%s with id: %d already exists",className, id));
     }
 
+    public AlreadyExistsException(String className, String id){
+        super(String.format("%s with id: %s already exists",className, id));
+    }
+
     public AlreadyExistsException(String message) {
         super(message);
     }

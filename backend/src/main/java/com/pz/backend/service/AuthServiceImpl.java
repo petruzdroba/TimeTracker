@@ -8,11 +8,13 @@ import com.pz.backend.entity.TimerData;
 import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
 import com.pz.backend.entity.WorkLog;
+import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.InvalidCredentialsException;
+import com.pz.backend.exceptions.NotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Service
 public class AuthServiceImpl implements AuthService{
@@ -32,9 +34,9 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public UserData signUp(String name, String email, String password) throws Exception {
+    public UserData signUp(String name, String email, String password) throws AlreadyExistsException {
         if (userAuthRepository.findByEmail(email).isPresent() || userDataRepository.findByEmail(email).isPresent()) {
-            throw new Exception("Email already exists");
+            throw new AlreadyExistsException(UserAuth.class.getName(), email);
         }
 
         UserAuth auth = new UserAuth(email, passwordEncoder.encode(password));
@@ -55,22 +57,22 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public UserAuth logIn(String email, String password) throws Exception {
+    public UserAuth logIn(String email, String password) throws NotFoundException,InvalidCredentialsException {
         UserAuth auth = userAuthRepository.findByEmail(email)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new NotFoundException(UserAuth.class.getName(), email));
 
         if (!passwordEncoder.matches(password, auth.getPassword())) {
-            throw new Exception("Invalid credentials");
+            throw new InvalidCredentialsException();
         }
         return auth;
     }
 
     @Override
-    public UserData getMe(Long userId) throws Exception {
+    public UserData getMe(Long userId) throws NotFoundException {
         if(userId == null)
-            throw new Exception("User not found");
+            throw new NotFoundException("User cannot have id null");
 
         return userDataRepository.findById(userId)
-                .orElseThrow(() -> new Exception("User not found"));
+                .orElseThrow(() -> new NotFoundException(UserData.class.getName(), userId));
     }
 }

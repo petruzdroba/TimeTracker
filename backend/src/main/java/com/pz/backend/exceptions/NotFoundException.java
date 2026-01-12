@@ -13,6 +13,10 @@ public class NotFoundException extends RuntimeException {
         super(String.format("%s with id: %d not found", className,id));
     }
 
+    public NotFoundException(String className, String id) {
+        super(String.format("%s with id: %s not found", className,id));
+    }
+
     public NotFoundException(String message) {
         super(message);
     }
