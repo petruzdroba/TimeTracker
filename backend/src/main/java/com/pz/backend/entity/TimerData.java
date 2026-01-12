@@ -1,5 +1,6 @@
 package com.pz.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,6 +12,7 @@ public class TimerData {
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @JsonIgnore
     private UserAuth user;
 
     private String startTime;

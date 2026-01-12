@@ -1,5 +1,6 @@
 package com.pz.backend.dto;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-public record WorkLogRequest(Long userId, List<WorkLogPayload> data) {}
+public record WorkLogRequest(Long workLogId, Long userId, LocalDateTime date, long timeWorked) {
+}

@@ -11,6 +11,9 @@ import com.pz.backend.entity.WorkLog;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 public class AuthServiceImpl implements AuthService{
 
@@ -43,7 +46,7 @@ public class AuthServiceImpl implements AuthService{
         TimerData timerData = new TimerData(auth, userData.getWorkHours()*3600000);
         timerDataRepository.save(timerData);
 
-        WorkLog workLog = new WorkLog(auth, "[]");
+        WorkLog workLog = new WorkLog(auth, LocalDate.now().atStartOfDay(), 0L);
         workLogRepository.save(workLog);
 
         auth.setUserData(userData);

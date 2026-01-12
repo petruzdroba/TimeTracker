@@ -5,10 +5,9 @@ import {
   computed,
   inject,
   OnDestroy,
-  effect,
 } from '@angular/core';
 import { Session } from '../model/session.interface';
-import { take, firstValueFrom } from 'rxjs';
+import { take } from 'rxjs';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -21,12 +20,10 @@ export class WorkLogService implements OnDestroy {
   private routerService = inject(Router);
   private http = inject(HttpClient);
   private subscription: any;
-
-  private workLog = signal<Session[]>([]);
+  public workLog = signal<Session[]>([]);
   private initialized = signal<boolean>(false);
 
   constructor() {
-    // Start initialization but don't block constructor
     this.initialize().catch((err) => {
       console.error('Failed to initialize WorkLogService:', err);
       this.routerService.navigate(['/error']);
@@ -35,28 +32,21 @@ export class WorkLogService implements OnDestroy {
 
   async initialize(): Promise<void> {
     if (this.initialized()) return;
-
     if (this.userData.isLoggedIn()) {
       return new Promise((resolve, reject) => {
         this.http
           .get<Session[]>(
-            `${environment.apiUrl}/worklog/get/${this.userData.user().id}/`
+            `${environment.apiUrl}/worklog/${this.userData.user().id}`
           )
           .pipe(take(1))
           .subscribe({
             next: (res) => {
-              if (
-                Array.isArray(res) &&
-                !(res.length === 1 && Object.keys(res[0]).length === 0)
-              ) {
-                this.workLog.set(res);
-              } else {
-                this.workLog.set([{ date: new Date(), timeWorked: 0 }]);
-              }
+              this.workLog.set(res || []);
               this.initialized.set(true);
               resolve();
             },
             error: (err) => {
+              console.error(err);
               this.routerService.navigate(['/error', err.status]);
               reject(err);
             },
@@ -83,81 +73,70 @@ export class WorkLogService implements OnDestroy {
     return this._firstClockIn();
   }
 
-  addSession(newSession: Session) {
-    this.workLog.update((sessions) => {
-      const currentSessions = [...sessions];
+  addSession(session: Omit<Session, 'id'>) {
 
-      const index = currentSessions.findIndex((session) => {
-        const currentTime = new Date(newSession.date);
-        const dateLastSession = new Date(session.date);
-        currentTime.setHours(0, 0, 0, 0);
-        dateLastSession.setHours(0, 0, 0, 0);
-        return currentTime.getTime() === dateLastSession.getTime();
-      });
-      if (index !== -1) {
-        return [
-          ...currentSessions.slice(0, index),
-          {
-            ...currentSessions[index],
-            timeWorked: newSession.timeWorked,
-          },
-          ...currentSessions.slice(index + 1),
-        ];
-      }
-      return [...currentSessions, newSession];
-    });
-    this.updateWorkLog();
-  }
+    const payload = {
+      userId: this.userData.user().id,
+      date: session.date,
+      timeWorked: session.timeWorked,
+    };
 
-  deleteSession(erasedSession: Session) {
-    this.workLog.update((sessions) =>
-      sessions.filter((session) => session !== erasedSession)
-    );
-    this.updateWorkLog();
-  }
+    console.log('POST /worklog payload:', payload);
 
-  editSession(oldSession: Session, startTime: Date, endTime: Date) {
-    this.workLog.update((sessions) => {
-      const index = sessions.findIndex((session) => {
-        const dateA = new Date(session.date);
-        const dateB = new Date(oldSession.date);
-        return (
-          dateA.getTime() === dateB.getTime() &&
-          session.timeWorked === oldSession.timeWorked
-        );
-      });
-
-      if (index !== -1) {
-        const oldDate = new Date(oldSession.date);
-        const newDate = new Date(oldDate);
-        newDate.setHours(startTime.getHours());
-        newDate.setMinutes(startTime.getMinutes());
-        newDate.setSeconds(startTime.getSeconds());
-
-        const timeWorked = endTime.getTime() - startTime.getTime();
-
-        return [
-          ...sessions.slice(0, index),
-          {
-            date: newDate,
-            timeWorked: timeWorked,
-          },
-          ...sessions.slice(index + 1),
-        ];
-      }
-      return sessions;
-    });
-    this.updateWorkLog();
-  }
-  updateWorkLog() {
-    this.subscription = this.http
-      .put(`${environment.apiUrl}/worklog/update/`, {
-        userId: this.userData.user().id,
-        data: this.workLog(),
-      })
+    this.http
+      .post<Session>(`${environment.apiUrl}/worklog`, payload)
       .subscribe({
-        next: (res) => {},
+        next: (res) => {
+          console.log('POST /worklog response:', res);
+          const updatedLog = [...this.workLog(), res];
+          this.workLog.set(updatedLog);
+        },
         error: (err) => {
+          console.error('POST /worklog error:', err);
+          this.routerService.navigate(['/error', err.status]);
+        },
+      });
+  }
+
+  deleteWorkLog(sessionId: number) {
+    this.http
+      .delete(`${environment.apiUrl}/worklog/${sessionId}`)
+      .subscribe({
+        next: () => {
+          this.workLog.update((logs) =>
+            logs.filter((wl) => wl.id !== sessionId)
+          );
+        },
+        error: (err) => this.routerService.navigate(['/error', err.status]),
+      });
+  }
+
+  updateWorkLog(session: Session) {
+    if (session.id === undefined) {
+      console.warn('Cannot update session without ID', session);
+      return;
+    }
+
+    const payload = {
+      workLogId: session.id,
+      userId: this.userData.user().id,
+      date: session.date,
+      timeWorked: session.timeWorked,
+    };
+
+    console.log('PUT /worklog payload:', payload);
+
+    this.http
+      .put<Session>(`${environment.apiUrl}/worklog`, payload)
+      .subscribe({
+        next: (updated) => {
+          console.log('PUT /worklog response:', updated);
+          this.workLog.update((logs) =>
+            logs.map((wl) => (wl.id === updated.id ? updated : wl))
+          );
+        },
+        error: (err) => {
+          console.error('PUT /worklog error:', err);
           this.routerService.navigate(['/error', err.status]);
         },
       });

@@ -112,11 +112,17 @@ export class EditSessionComponent implements OnChanges {
         return;
       }
       if (this.session) {
-        this.workLogService.editSession(
-          this.session,
-          transformTimeStringToDate(this.form.value.startTime + ':00'),
-          transformTimeStringToDate(this.form.value.endTime + ':00')
+        const start = transformTimeStringToDate(
+          this.form.value.startTime + ':00'
         );
+        const end = transformTimeStringToDate(this.form.value.endTime + ':00');
+
+        const timeWorked = end.getTime() - start.getTime();
+
+        this.session.date = start;
+        this.session.timeWorked = timeWorked;
+
+        this.workLogService.updateWorkLog(this.session);
       }
 
       this.snackBar.open('Session edited successfully !', '', {
