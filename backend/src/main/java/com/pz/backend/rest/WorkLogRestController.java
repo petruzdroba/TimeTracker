@@ -38,10 +38,7 @@ public class WorkLogRestController {
     }
 
     @DeleteMapping("/worklog/{workLogId}")
-    public String deleteWorkLog(@PathVariable Long workLogId) throws Exception {
-        WorkLog workLog = workLogService.findById(workLogId);
-
+    public void deleteWorkLog(@PathVariable Long workLogId) throws Exception {
         workLogService.delete(workLogId);
-        return "Deleted work log with id: "+workLogId;
     }
 }
