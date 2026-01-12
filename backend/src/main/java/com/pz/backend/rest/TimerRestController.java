@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/timer")
+@RequestMapping("/api")
 public class TimerRestController {
 
     private final TimerService timerService;
@@ -16,12 +16,12 @@ public class TimerRestController {
         this.timerService = timerService;
     }
 
-    @GetMapping("/get/{id}/")
-    public TimerData getTimerData(@PathVariable Long id) throws Exception {
-        return timerService.get(id);
+    @GetMapping("/timer/{userId}")
+    public TimerData getTimerData(@PathVariable Long userId) throws Exception {
+        return timerService.get(userId);
     }
 
-    @PutMapping("/sync/")
+    @PutMapping("/timer")
     public TimerData syncTimerData(@RequestBody TimerDataRequest request) throws Exception {
         return timerService.sync(
                 request.userId(),

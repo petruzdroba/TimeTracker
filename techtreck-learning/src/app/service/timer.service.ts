@@ -108,7 +108,7 @@ export class TimerService implements OnDestroy {
     if (this.userData.isLoggedIn()) {
       this.http
         .get<TimerData>(
-          environment.apiUrl + `/timer/get/${this.userData.user().id}/`
+          environment.apiUrl + `/timer/${this.userData.user().id}`
         )
         .pipe(take(1))
         .subscribe({
@@ -132,7 +132,7 @@ export class TimerService implements OnDestroy {
     ) {
       // Prevent syncing more than once every 15 minutes
       this.subscription = this.http
-        .put<TimerData>(`${environment.apiUrl}/timer/sync/`, {
+        .put<TimerData>(`${environment.apiUrl}/timer`, {
           userId: this.userData.user().id,
           data: this.timerData(),
         })
