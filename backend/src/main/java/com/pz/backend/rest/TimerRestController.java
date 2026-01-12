@@ -2,6 +2,7 @@ package com.pz.backend.rest;
 
 import com.pz.backend.dto.TimerDataRequest;
 import com.pz.backend.entity.TimerData;
+import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.TimerService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,12 +18,12 @@ public class TimerRestController {
     }
 
     @GetMapping("/timer/{userId}")
-    public TimerData getTimerData(@PathVariable Long userId) throws Exception {
+    public TimerData getTimerData(@PathVariable Long userId) throws NotFoundException {
         return timerService.get(userId);
     }
 
     @PutMapping("/timer")
-    public TimerData syncTimerData(@RequestBody TimerDataRequest request) throws Exception {
+    public TimerData syncTimerData(@RequestBody TimerDataRequest request) throws NotFoundException {
         return timerService.sync(
                 request.userId(),
                 request.data().startTime(),

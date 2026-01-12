@@ -4,6 +4,8 @@ package com.pz.backend.service;
 import com.pz.backend.dao.WorkLogRepository;
 import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.WorkLog;
+import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.NotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -25,11 +27,11 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws Exception {
+    public WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws AlreadyExistsException {
         WorkLog existing = workLogRepository.findByUserIdAndDate(userId, date);
 
         if (existing != null) {
-            throw new Exception("Work log for this date already exists");
+            throw new AlreadyExistsException("Work log for this date already exists");
         }
 
         UserAuth auth = entityManager.getReference(UserAuth.class, userId);
@@ -48,8 +50,8 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog put(Long workLogId, Long timeWorked) throws Exception {
-        WorkLog existing = workLogRepository.findById(workLogId).orElseThrow(() -> new Exception("Work log not found"));
+    public WorkLog put(Long workLogId, Long timeWorked) throws NotFoundException {
+        WorkLog existing = workLogRepository.findById(workLogId).orElseThrow(() -> new NotFoundException(WorkLog.class.getName(), workLogId));
 
         existing.setTimeWorked(timeWorked);
         return workLogRepository.save(existing);
@@ -57,16 +59,16 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public void delete(Long workLogId) throws Exception {
+    public void delete(Long workLogId) throws NotFoundException {
         if (!workLogRepository.existsById(workLogId)) {
-            throw new Exception("Work log not found");
+            throw new NotFoundException(WorkLog.class.getName(), workLogId);
         }
         workLogRepository.deleteById(workLogId);
     }
 
     @Override
-    public WorkLog findById(Long workLogId) throws Exception {
+    public WorkLog findById(Long workLogId) throws NotFoundException {
         return workLogRepository.findById(workLogId)
-                .orElseThrow(() -> new Exception("Work Log with id " + workLogId + " not found"));
+                .orElseThrow(() -> new NotFoundException(WorkLog.class.getName(), workLogId));
     }
 }
