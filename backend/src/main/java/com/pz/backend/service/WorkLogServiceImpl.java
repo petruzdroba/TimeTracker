@@ -9,7 +9,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,7 +25,7 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog post(Long userId, LocalDate date, Long timeWorked) throws Exception {
+    public WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws Exception {
         WorkLog existing = workLogRepository.findByUserIdAndDate(userId, date);
 
         if (existing != null) {

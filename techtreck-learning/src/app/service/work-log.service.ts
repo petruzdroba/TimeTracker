@@ -73,14 +73,12 @@ export class WorkLogService implements OnDestroy {
     return this._firstClockIn();
   }
 
-  addSession(newSession: Omit<Session, 'id'>) {
-    const localDate = new Date(newSession.date);
-    const dateString = localDate.toISOString().split('T')[0];
+  addSession(session: Omit<Session, 'id'>) {
 
     const payload = {
       userId: this.userData.user().id,
-      date: dateString,
-      timeWorked: newSession.timeWorked,
+      date: session.date,
+      timeWorked: session.timeWorked,
     };
 
     console.log('POST /worklog payload:', payload);
@@ -119,13 +117,10 @@ export class WorkLogService implements OnDestroy {
       return;
     }
 
-    const localDate = new Date(session.date);
-    const dateString = localDate.toISOString().split('T')[0];
-
     const payload = {
       workLogId: session.id,
       userId: this.userData.user().id,
-      date: dateString,
+      date: session.date,
       timeWorked: session.timeWorked,
     };
 

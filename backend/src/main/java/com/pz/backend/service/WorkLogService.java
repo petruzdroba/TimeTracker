@@ -2,11 +2,11 @@ package com.pz.backend.service;
 
 import com.pz.backend.entity.WorkLog;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface WorkLogService {
-    WorkLog post(Long userId, LocalDate date, Long timeWorked) throws Exception;
+    WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws Exception;
 
     List<WorkLog> get(Long userId) throws Exception;
 
