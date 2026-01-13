@@ -3,7 +3,7 @@ package com.pz.backend.dto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record WorkLogPutRequest(
         @NotNull(message = "Work log ID must be provided")
@@ -12,7 +12,7 @@ public record WorkLogPutRequest(
         Long userId,
         @NotNull(message = "Date must be provided")
         @Past(message = "Date cannot be in the future/today")
-        LocalDateTime date,
+        Instant date,
         @NotNull(message = "Time worked must be provided")
         Long timeWorked) {
 }

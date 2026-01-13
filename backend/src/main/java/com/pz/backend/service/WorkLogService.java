@@ -4,15 +4,15 @@ import com.pz.backend.entity.WorkLog;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.NotFoundException;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 public interface WorkLogService {
-    WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws AlreadyExistsException;
+    WorkLog post(Long userId, Instant date, Long timeWorked) throws AlreadyExistsException;
 
     List<WorkLog> get(Long userId) throws Exception;
 
-    WorkLog put(Long workLogId, LocalDateTime date ,Long timeWorked) throws NotFoundException;
+    WorkLog put(Long workLogId, Instant date ,Long timeWorked) throws NotFoundException;
 
     void delete(Long workLogId) throws NotFoundException;
 
