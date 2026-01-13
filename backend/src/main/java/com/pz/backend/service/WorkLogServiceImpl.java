@@ -50,10 +50,11 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog put(Long workLogId, Long timeWorked) throws NotFoundException {
+    public WorkLog put(Long workLogId, LocalDateTime date, Long timeWorked) throws NotFoundException {
         WorkLog existing = workLogRepository.findById(workLogId).orElseThrow(() -> new NotFoundException(WorkLog.class.getName(), workLogId));
 
         existing.setTimeWorked(timeWorked);
+        existing.setDate(date);
         return workLogRepository.save(existing);
     }
 

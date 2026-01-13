@@ -12,7 +12,7 @@ public interface WorkLogService {
 
     List<WorkLog> get(Long userId) throws Exception;
 
-    WorkLog put(Long workLogId, Long timeWorked) throws NotFoundException;
+    WorkLog put(Long workLogId, LocalDateTime date ,Long timeWorked) throws NotFoundException;
 
     void delete(Long workLogId) throws NotFoundException;
 
