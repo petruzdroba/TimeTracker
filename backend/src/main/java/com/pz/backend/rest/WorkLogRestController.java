@@ -7,6 +7,7 @@ import com.pz.backend.entity.WorkLog;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.WorkLogService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +31,12 @@ public class WorkLogRestController {
     }
 
     @PostMapping("/worklog")
-    public WorkLog addWorkLog(@RequestBody WorkLogPostRequest workLog) throws AlreadyExistsException {
+    public WorkLog addWorkLog(@Valid @RequestBody WorkLogPostRequest workLog) throws AlreadyExistsException {
         return workLogService.post(workLog.userId(), workLog.date(), workLog.timeWorked());
     }
 
     @PutMapping("/worklog")
-    public WorkLog updateWorkLog(@RequestBody WorkLogPutRequest workLog) throws NotFoundException {
+    public WorkLog updateWorkLog(@Valid @RequestBody WorkLogPutRequest workLog) throws NotFoundException {
         return workLogService.put(workLog.id(), workLog.date(),workLog.timeWorked());
     }
 
