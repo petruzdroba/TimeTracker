@@ -6,6 +6,8 @@ import com.pz.backend.exceptions.InvalidCredentialsException;
 import com.pz.backend.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -38,6 +40,27 @@ public class RestExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
+
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException exception) {
+        StringBuilder sb = new StringBuilder();
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
+            sb.append(error.getField())
+                    .append(": ")
+                    .append(error.getDefaultMessage())
+                    .append("; ");
+        }
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                sb.toString(),
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception exception) {
