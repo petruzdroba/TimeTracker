@@ -11,7 +11,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -27,7 +27,7 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog post(Long userId, LocalDateTime date, Long timeWorked) throws AlreadyExistsException {
+    public WorkLog post(Long userId, Instant date, Long timeWorked) throws AlreadyExistsException {
         WorkLog existing = workLogRepository.findByUserIdAndDate(userId, date);
 
         if (existing != null) {
@@ -50,10 +50,11 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Override
     @Transactional
-    public WorkLog put(Long workLogId, Long timeWorked) throws NotFoundException {
+    public WorkLog put(Long workLogId, Instant date, Long timeWorked) throws NotFoundException {
         WorkLog existing = workLogRepository.findById(workLogId).orElseThrow(() -> new NotFoundException(WorkLog.class.getName(), workLogId));
 
         existing.setTimeWorked(timeWorked);
+        existing.setDate(date);
         return workLogRepository.save(existing);
     }
 

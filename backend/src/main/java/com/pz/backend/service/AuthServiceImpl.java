@@ -15,9 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 
 @Service
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserAuthRepository userAuthRepository;
     private final UserDataRepository userDataRepository;
@@ -45,10 +46,10 @@ public class AuthServiceImpl implements AuthService{
         UserData userData = new UserData(auth, name, email);
         userDataRepository.save(userData);
 
-        TimerData timerData = new TimerData(auth, userData.getWorkHours()*3600000);
+        TimerData timerData = new TimerData(auth, userData.getWorkHours() * 3600000);
         timerDataRepository.save(timerData);
 
-        WorkLog workLog = new WorkLog(auth, LocalDate.now().atStartOfDay(), 0L);
+        WorkLog workLog = new WorkLog(auth, LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant(), 0L);
         workLogRepository.save(workLog);
 
         auth.setUserData(userData);
@@ -57,7 +58,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public UserAuth logIn(String email, String password) throws NotFoundException,InvalidCredentialsException {
+    public UserAuth logIn(String email, String password) throws NotFoundException, InvalidCredentialsException {
         UserAuth auth = userAuthRepository.findByEmail(email)
                 .orElseThrow(() -> new NotFoundException(UserAuth.class.getName(), email));
 
@@ -69,7 +70,7 @@ public class AuthServiceImpl implements AuthService{
 
     @Override
     public UserData getMe(Long userId) throws NotFoundException {
-        if(userId == null)
+        if (userId == null)
             throw new NotFoundException("User cannot have id null");
 
         return userDataRepository.findById(userId)

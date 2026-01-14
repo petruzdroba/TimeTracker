@@ -10,6 +10,7 @@ import com.pz.backend.exceptions.InvalidCredentialsException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.AuthService;
 import com.pz.backend.service.JwtService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +31,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/signup/")
-    public ResponseEntity<?> signup(@RequestBody SignupRequest request) throws AlreadyExistsException {
+    public ResponseEntity<?> signup(@Valid @RequestBody SignupRequest request) throws AlreadyExistsException {
         UserData user = authService.signUp(request.name(), request.email(), request.password());
         UserAuth auth = user.getUser();
 
@@ -55,7 +56,7 @@ public class AuthRestController {
     }
 
     @PostMapping("/login/")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest request) throws NotFoundException, InvalidCredentialsException {
+    public ResponseEntity<Object> login(@Valid @RequestBody LoginRequest request) throws NotFoundException, InvalidCredentialsException {
         UserAuth auth = authService.logIn(request.email(), request.password());
         UserData user = auth.getUserData();
 

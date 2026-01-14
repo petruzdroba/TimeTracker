@@ -134,7 +134,10 @@ export class TimerService implements OnDestroy {
       this.subscription = this.http
         .put<TimerData>(`${environment.apiUrl}/timer`, {
           userId: this.userData.user().id,
-          data: this.timerData(),
+          startTime: this.timerData().startTime,
+          endTime: this.timerData().endTime,
+          remainingTime: this.timerData().requiredTime,
+          timerType: this.timerData().timerType,
         })
         .subscribe({
           next: () => {

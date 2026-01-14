@@ -118,19 +118,16 @@ export class WorkLogService implements OnDestroy {
     }
 
     const payload = {
-      workLogId: session.id,
+      id: session.id,
       userId: this.userData.user().id,
-      date: session.date,
+      date:session.date,
       timeWorked: session.timeWorked,
     };
-
-    console.log('PUT /worklog payload:', payload);
 
     this.http
       .put<Session>(`${environment.apiUrl}/worklog`, payload)
       .subscribe({
         next: (updated) => {
-          console.log('PUT /worklog response:', updated);
           this.workLog.update((logs) =>
             logs.map((wl) => (wl.id === updated.id ? updated : wl))
           );

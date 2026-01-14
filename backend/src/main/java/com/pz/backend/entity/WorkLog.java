@@ -3,7 +3,7 @@ package com.pz.backend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -21,7 +21,7 @@ public class WorkLog {
     private UserAuth user;
 
     @Column(name = "work_date", nullable = false)
-    private LocalDateTime date;
+    private Instant date;
 
     @Column(name = "time_worked", nullable = false)
     private Long timeWorked;
@@ -29,7 +29,7 @@ public class WorkLog {
     public WorkLog() {
     }
 
-    public WorkLog(UserAuth user, LocalDateTime date, Long timeWorked) {
+    public WorkLog(UserAuth user, Instant date, Long timeWorked) {
         this.user = user;
         this.date = date;
         this.timeWorked = timeWorked;
@@ -51,11 +51,11 @@ public class WorkLog {
         this.user = user;
     }
 
-    public LocalDateTime getDate() {
+    public Instant getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(Instant date) {
         this.date = date;
     }
 
