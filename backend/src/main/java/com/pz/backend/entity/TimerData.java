@@ -2,6 +2,8 @@ package com.pz.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="timer_data")
@@ -12,6 +14,7 @@ public class TimerData {
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private UserAuth user;
 

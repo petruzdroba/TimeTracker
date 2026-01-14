@@ -1,6 +1,8 @@
 package com.pz.backend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="user_data")
@@ -11,6 +13,7 @@ public class UserData {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserAuth user;
 
     @Column(length = 100)
