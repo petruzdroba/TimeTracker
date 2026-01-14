@@ -1,5 +1,7 @@
 package com.pz.backend.dto;
 
+import com.pz.backend.entity.Role;
+
 public record UserResponse(
         Long id,
         String name,
@@ -7,5 +9,5 @@ public record UserResponse(
         int workHours,
         int vacationDays,
         int personalTime,
-        String role
+        Role role
 ) {}

@@ -27,12 +27,13 @@ public class UserData {
     private int personalTime=12;
 
     @Column(length = 50)
-    private String role = "employee";
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.EMPLOYEE;
 
     protected UserData() {
     }
 
-    public UserData(UserAuth user,String role, int personalTime, int vacationDays, int workHours, String email, String name) {
+    public UserData(UserAuth user,Role role, int personalTime, int vacationDays, int workHours, String email, String name) {
         this.user=user;
         this.role = role;
         this.personalTime = personalTime;
@@ -104,11 +105,11 @@ public class UserData {
         this.personalTime = personalTime;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }

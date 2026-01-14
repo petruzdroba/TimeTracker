@@ -21,7 +21,10 @@ public class TimerData {
     private String startTime;
     private String endTime;
     private Integer remainingTime; // in ms
-    private String timerType = "OFF";
+
+    @Column(length = 50)
+    @Enumerated(EnumType.STRING)
+    private TimerType timerType = TimerType.OFF;
 
     protected TimerData() {
     }
@@ -31,7 +34,6 @@ public class TimerData {
         this.remainingTime = remainingTime;
         this.endTime = "";
         this.startTime = "";
-        this.timerType = "OFF";
     }
 
     public Long getId() {
@@ -74,11 +76,11 @@ public class TimerData {
         this.remainingTime = remainingTime;
     }
 
-    public String getTimerType() {
+    public TimerType getTimerType() {
         return timerType;
     }
 
-    public void setTimerType(String timerType) {
+    public void setTimerType(TimerType timerType) {
         this.timerType = timerType;
     }
 }

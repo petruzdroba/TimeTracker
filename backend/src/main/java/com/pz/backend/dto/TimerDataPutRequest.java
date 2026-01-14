@@ -1,6 +1,7 @@
 package com.pz.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.pz.backend.entity.TimerType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -26,8 +27,8 @@ public record TimerDataPutRequest(
         @NotNull
         @JsonProperty(required = true)
         Integer requiredTime,
-        @NotBlank
+        @NotNull
         @JsonProperty(required = true)
-        String timerType
+        TimerType timerType
 ) {
 }
