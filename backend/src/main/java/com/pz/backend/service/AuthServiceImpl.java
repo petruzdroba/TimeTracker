@@ -11,6 +11,7 @@ import com.pz.backend.entity.WorkLog;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.InvalidCredentialsException;
 import com.pz.backend.exceptions.NotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public UserData signUp(String name, String email, String password) throws AlreadyExistsException {
         if (userAuthRepository.findByEmail(email).isPresent() || userDataRepository.findByEmail(email).isPresent()) {
             throw new AlreadyExistsException(UserAuth.class.getName(), email);
@@ -66,6 +68,19 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidCredentialsException();
         }
         return auth;
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id, String password) throws NotFoundException, InvalidCredentialsException {
+        UserAuth auth = userAuthRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(UserAuth.class.getName(), id));
+
+        if (!passwordEncoder.matches(password, auth.getPassword())) {
+            throw new InvalidCredentialsException();
+        }
+
+        userAuthRepository.delete(auth);
     }
 
     @Override
