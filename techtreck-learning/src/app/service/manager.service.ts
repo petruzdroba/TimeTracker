@@ -1,10 +1,9 @@
-import { inject, Injectable, OnDestroy, signal, computed } from '@angular/core';
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { LeaveWithUser, ManagerData } from '../model/manager-data.interface';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { take, map, firstValueFrom } from 'rxjs';
+import { take, firstValueFrom } from 'rxjs';
 import { Vacation } from '../model/vacation.interface';
-import { getDaysBetweenDates } from '../shared/utils/time.utils';
 import { UserData } from '../model/user-data.interface';
 import { LeaveSlip } from '../model/leave-slip.interface';
 import { environment } from '../../environments/environment';
@@ -15,10 +14,9 @@ interface VacationWithUser {
 }
 
 @Injectable({ providedIn: 'root' })
-export class ManagerService implements OnDestroy {
+export class ManagerService {
   private routerService = inject(Router);
   private http = inject(HttpClient);
-  private subscription: any;
 
   private managerData = signal<ManagerData>({
     vacations: {},
@@ -38,133 +36,55 @@ export class ManagerService implements OnDestroy {
 
   private fetchManagerData(): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.http
-        .get<{ vacations: any[]; leaves: any[] }>(
-          environment.apiUrl + '/manager/get/'
-        )
-        .pipe(
-          map((response) => ({
-            vacations: Object.fromEntries(
-              response.vacations.map((v) => [v.id, v])
-            ),
-            leaves: Object.fromEntries(response.leaves.map((l) => [l.id, l])),
-          })),
-          take(1)
-        )
-        .subscribe({
-          next: (res) => {
-            this.managerData.set(res);
-            resolve();
-          },
-          error: (err) => {
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          },
-        });
+      // TODO: Backend endpoints not implemented yet
+      // Old endpoint /manager/get/ returned all users' vacation/leave data in one monolithic response
+      //
+      // Needed manager endpoints:
+      // GET /manager/vacations?status=pending - get all pending vacation requests from managed users
+      // GET /manager/vacations?status=all - get all vacation requests
+      // PUT /vacations/{vacationId}/status - update status to accepted/denied/pending
+      //
+      // Similar pattern for leaves when that gets refactored
+
+      console.warn('ManagerService.fetchManagerData() - Backend endpoints not implemented yet');
+
+      this.managerData.set({
+        vacations: {},
+        leaves: {},
+      });
+
+      resolve();
     });
   }
 
   readonly futureVacations = computed(() => {
-    const result: { userId: number; vacation: Vacation }[] = [];
-    const vacations = this.managerData().vacations;
-
-    for (const [userId, userData] of Object.entries(vacations)) {
-      if (userData && userData.vacations) {
-        userData.vacations
-          .filter((vacation) => vacation && Object.keys(vacation).length > 0)
-          .forEach((vacation) => {
-            result.push({
-              userId: Number(userId),
-              vacation,
-            });
-          });
-      }
-    }
-    return result;
+    // TODO: Replace with GET /manager/vacations?status=pending when backend is ready
+    return [];
   });
 
   readonly pastVacations = computed(() => {
-    const result: { userId: number; vacation: Vacation }[] = [];
-    const vacations = this.managerData().vacations;
-
-    for (const [userId, userData] of Object.entries(vacations)) {
-      if (userData && userData.vacations) {
-        userData.vacations
-          .filter((vacation) => vacation && Object.keys(vacation).length > 0)
-          .forEach((vacation) => {
-            result.push({
-              userId: Number(userId),
-              vacation,
-            });
-          });
-      }
-    }
-    return result;
+    // TODO: Replace with GET /manager/vacations?status=all when backend is ready
+    return [];
   });
 
   readonly futureLeaves = computed(() => {
-    const result: { userId: number; leave: LeaveSlip }[] = [];
-    const leaves = this.managerData().leaves;
-
-    for (const [userId, userData] of Object.entries(leaves)) {
-      if (userData && userData.futureLeaves) {
-        userData.futureLeaves
-          .filter((leave) => leave && Object.keys(leave).length > 0)
-          .forEach((leave) => {
-            result.push({
-              userId: Number(userId),
-              leave,
-            });
-          });
-      }
-    }
-    return result;
+    // TODO: Replace with proper leave endpoints when backend is ready
+    return [];
   });
 
   readonly pastLeaves = computed(() => {
-    const result: { userId: number; leave: LeaveSlip }[] = [];
-    const leaves = this.managerData().leaves;
-
-    for (const [userId, userData] of Object.entries(leaves)) {
-      if (userData && userData.pastLeaves) {
-        userData.pastLeaves
-          .filter((leave) => leave && Object.keys(leave).length > 0)
-          .forEach((leave) => {
-            result.push({
-              userId: Number(userId),
-              leave,
-            });
-          });
-      }
-    }
-    return result;
+    // TODO: Replace with proper leave endpoints when backend is ready
+    return [];
   });
 
   acceptVacation(vacationWithUser: VacationWithUser): Promise<void> {
     const { userId, vacation } = vacationWithUser;
-    const userVacations = this.managerData().vacations[userId];
-    if (!userVacations) return Promise.reject();
+
+    if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${environment.apiUrl}/vacation/update/`, {
-          userId,
-          data: {
-            futureVacations: userVacations.vacations.map((v) =>
-              v.startDate === vacation.startDate &&
-              v.description === vacation.description
-                ? { ...v, status: 'accepted' }
-                : v
-            ),
-            pastVacations: userVacations.vacations,
-            remainingVacationDays:
-              userVacations.remainingVacationDays -
-              getDaysBetweenDates(
-                new Date(vacation.startDate),
-                new Date(vacation.endDate)
-              ),
-          },
-        })
+        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'accepted' })
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -172,6 +92,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -181,24 +102,12 @@ export class ManagerService implements OnDestroy {
 
   rejectVacation(vacationWithUser: VacationWithUser): Promise<void> {
     const { userId, vacation } = vacationWithUser;
-    const userVacations = this.managerData().vacations[userId];
-    if (!userVacations) return Promise.reject();
+
+    if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${environment.apiUrl}/vacation/update/`, {
-          userId,
-          data: {
-            futureVacations: userVacations.vacations.map((v) =>
-              v.startDate === vacation.startDate &&
-              v.description === vacation.description
-                ? { ...v, status: 'denied' }
-                : v
-            ),
-            pastVacations: userVacations.vacations,
-            remainingVacationDays: userVacations.remainingVacationDays,
-          },
-        })
+        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'denied' })
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -206,6 +115,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -215,30 +125,12 @@ export class ManagerService implements OnDestroy {
 
   undoVacation(vacationWithUser: VacationWithUser): Promise<void> {
     const { userId, vacation } = vacationWithUser;
-    const userVacations = this.managerData().vacations[userId];
+
+    if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(environment.apiUrl + '/vacation/update/', {
-          userId,
-          data: {
-            futureVacations: userVacations.vacations.map((v) =>
-              v.startDate === vacation.startDate &&
-              v.description === vacation.description
-                ? { ...v, status: 'pending' }
-                : v
-            ),
-            pastVacations: userVacations.vacations,
-            remainingVacationDays:
-              vacation.status === 'accepted'
-                ? userVacations.remainingVacationDays +
-                  getDaysBetweenDates(
-                    new Date(vacation.startDate),
-                    new Date(vacation.endDate)
-                  )
-                : userVacations.remainingVacationDays,
-          },
-        })
+        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'pending' })
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -246,6 +138,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -284,6 +177,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -317,6 +211,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -357,6 +252,7 @@ export class ManagerService implements OnDestroy {
             resolve();
           },
           error: (err) => {
+            console.error(err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
           },
@@ -389,6 +285,7 @@ export class ManagerService implements OnDestroy {
           return res;
         })
         .catch((err) => {
+          console.error(err);
           this.routerService.navigate(['/error', err.status]);
           this.pendingRequests.delete(userId);
           throw err;
@@ -401,22 +298,12 @@ export class ManagerService implements OnDestroy {
   }
 
   getVacationIndex(vacationWithUser: VacationWithUser): number {
-    const { userId, vacation } = vacationWithUser;
-    return this.managerData().vacations[userId]?.vacations.findIndex(
-      (v) => v === vacation
-    );
+    // TODO: Remove this method when backend is refactored - won't be needed
+    return -1;
   }
 
   getLeaveIndex(leaveWithUser: LeaveWithUser): number {
-    const { userId, leave } = leaveWithUser;
-    return this.managerData().leaves[userId]?.futureLeaves.findIndex(
-      (l) => l === leave
-    );
-  }
-
-  ngOnDestroy(): void {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+    // TODO: Remove this method when backend is refactored - won't be needed
+    return -1;
   }
 }

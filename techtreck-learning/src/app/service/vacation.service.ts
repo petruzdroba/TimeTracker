@@ -13,34 +13,46 @@ export class VacationService {
   private router = inject(Router);
   private http = inject(HttpClient);
 
-  private vacationData = signal<VacationData>({
-    vacations: [],
-    remainingVacationDays: 0,
-  });
+  private futureVacations = signal<Vacation[]>([]);
+  private pastVacations = signal<Vacation[]>([]);
+  private remainingDaysSignal = signal<number>(0);
 
-  readonly vacations = computed(() => this.vacationData().vacations);
-  readonly remainingDays = computed(
-    () => this.vacationData().remainingVacationDays
-  );
+  readonly futureVacations$ = computed(() => this.futureVacations());
+  readonly pastVacations$ = computed(() => this.pastVacations());
+  readonly remainingDays = computed(() => this.remainingDaysSignal());
+  readonly vacationData = computed(() => ({
+    futureVacations: this.futureVacations(),
+    pastVacations: this.pastVacations(),
+    remainingVacationDays: this.remainingDaysSignal(),
+  }));
 
   loadVacations(): void {
     if (!this.userData.isLoggedIn()) return;
 
+    const userId = this.userData.user().id;
+
     this.http
-      .get<Vacation[]>(
-        `${environment.apiUrl}/vacations/${this.userData.user().id}`
-      )
+      .get<Vacation[]>(`${environment.apiUrl}/vacations/${userId}/future`)
       .pipe(take(1))
       .subscribe({
         next: (res) => {
-          this.vacationData.update((data) => ({
-            ...data,
-            vacations: res,
-          }));
+          this.futureVacations.set(res);
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
+        },
+      });
+
+    this.http
+      .get<Vacation[]>(`${environment.apiUrl}/vacations/${userId}/past`)
+      .pipe(take(1))
+      .subscribe({
+        next: (res) => {
+          this.pastVacations.set(res);
+        },
+        error: (err) => {
+          console.error(err);
         },
       });
 
@@ -57,10 +69,7 @@ export class VacationService {
       .pipe(take(1))
       .subscribe({
         next: (res) => {
-          this.vacationData.update((data) => ({
-            ...data,
-            remainingVacationDays: res.remainingVacationDays,
-          }));
+          this.remainingDaysSignal.set(res.remainingVacationDays);
         },
         error: (err) => {
           console.error(err);
@@ -77,10 +86,10 @@ export class VacationService {
       .pipe(take(1))
       .subscribe({
         next: (newVacation) => {
-          this.vacationData.update((data) => ({
-            ...data,
-            vacations: [...data.vacations, newVacation],
-          }));
+          this.futureVacations.update((vacations) => [
+            ...vacations,
+            newVacation,
+          ]);
           this.loadRemainingDays();
         },
         error: (err) => {
@@ -96,12 +105,9 @@ export class VacationService {
       .pipe(take(1))
       .subscribe({
         next: (updatedVacation) => {
-          this.vacationData.update((data) => ({
-            ...data,
-            vacations: data.vacations.map((v) =>
-              v.id === vacationId ? updatedVacation : v
-            ),
-          }));
+          this.futureVacations.update((vacations) =>
+            vacations.map((v) => (v.id === vacationId ? updatedVacation : v))
+          );
           this.loadRemainingDays();
         },
         error: (err) => {
@@ -117,10 +123,12 @@ export class VacationService {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.vacationData.update((data) => ({
-            ...data,
-            vacations: data.vacations.filter((v) => v.id !== vacationId),
-          }));
+          this.futureVacations.update((vacations) =>
+            vacations.filter((v) => v.id !== vacationId)
+          );
+          this.pastVacations.update((vacations) =>
+            vacations.filter((v) => v.id !== vacationId)
+          );
           this.loadRemainingDays();
         },
         error: (err) => {
