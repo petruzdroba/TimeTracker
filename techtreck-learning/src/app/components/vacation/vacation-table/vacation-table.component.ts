@@ -25,7 +25,9 @@ import { StatusFilterComponent } from '../../../shared/status-filter/status-filt
 export class VacationTableComponent {
   @Input({ required: true }) vacationList!: Vacation[];
   @Output() deleteVacation = new EventEmitter<number>();
-  @Output() editVacation = new EventEmitter<[Vacation, Vacation]>();
+  @Output() editVacation = new EventEmitter<[Vacation, Partial<Vacation>]>();
+
+  protected editingVacation: Vacation | null = null;
 
   protected sortType: 'asc' | 'dsc' = 'asc';
   protected isOpen: boolean = false;
@@ -118,9 +120,9 @@ export class VacationTableComponent {
     this.deleteVacation.emit(index);
   }
 
-  onEdit([oldLeave, newLeave]: [Vacation, Vacation]) {
-    this.editVacation.emit([oldLeave, newLeave]);
-    // this.closeEditWindow();
+  onEdit(updatedVacation: [Vacation, Partial<Vacation>]) {
+    this.editVacation.emit(updatedVacation);
+    this.editingVacation = null;
   }
 
   openEditWindow(vacation: Vacation) {

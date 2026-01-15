@@ -1,32 +1,31 @@
 <div class="vacation">
   <div class="info">
-    <h1>You have {{ vacationData().remainingVacationDays ? vacationData().remainingVacationDays : 'no' }} vacation days
+    <h1>You have {{ vacationData.remainingVacationDays ? vacationData.remainingVacationDays : 'no' }} vacation days
       remaining!</h1>
-    <app-progress-bar [currentValue]="14 - vacationData().remainingVacationDays" [totalValue]="14"
+    <app-progress-bar [currentValue]="14 - vacationData.remainingVacationDays" [totalValue]="14"
       class="progress-bar-group-vacation" />
   </div>
-
   <div class="vacation-plan">
     <app-vacation-picker (addVacation)="addVacation($event)" />
     <div class="table">
       <mat-tab-group>
         <mat-tab label="Upcoming Vacations">
           <div class="tab-box">
-            @if(vacationData().futureVacations.length === 0){
-            <p>You have no planned vacations</p>
+            @if(vacationData.futureVacations.length === 0){
+              <p>You have no planned vacations</p>
             }@else {
-            <app-vacation-table [vacationList]="vacationData().futureVacations"
-              (deleteVacation)="deleteVacation($event, 'future')" (editVacation)="editVacation($event)" />
+              <app-vacation-table [vacationList]="vacationData.futureVacations"
+                (deleteVacation)="deleteVacation($event)" (editVacation)="editVacation($event)" />
             }
           </div>
         </mat-tab>
         <mat-tab label="Past Vacations">
           <div class="tab-box">
-            @if(vacationData().pastVacations.length === 0){
-            <p>You have no vacations on record</p>
+            @if(vacationData.pastVacations.length === 0){
+              <p>You have no vacations on record</p>
             }@else {
-            <app-vacation-table [vacationList]="vacationData().pastVacations"
-              (deleteVacation)="deleteVacation($event, 'past')" />
+              <app-vacation-table [vacationList]="vacationData.pastVacations"
+                (deleteVacation)="deleteVacation($event)" />
             }
           </div>
         </mat-tab>

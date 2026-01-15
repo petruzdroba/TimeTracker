@@ -40,11 +40,9 @@ import { validateDateRange } from '../../../shared/utils/time.utils';
 export class VacationFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) vacation!: Vacation | null;
   @Output() closeEditWindow = new EventEmitter<void>();
-  @Output() vacationAdded = new EventEmitter<Vacation>();
-  @Output() vacationEdited = new EventEmitter<[Vacation, Vacation]>();
+  @Output() vacationAdded = new EventEmitter<Omit<Vacation, 'id'>>();
+  @Output() vacationEdited = new EventEmitter<[Vacation, Partial<Vacation>]>();
 
-  private futureVacations: Vacation[] = [];
-  private remainingDays: number = 0;
   private vacationService = inject(VacationService);
 
   protected form = new FormGroup({
@@ -60,8 +58,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
   });
 
   ngOnInit(): void {
-    this.futureVacations = this.vacationService.futureVacations;
-    this.remainingDays = this.vacationService.remainingDays;
+    // Data now comes from service computed signals
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -78,8 +75,11 @@ export class VacationFormComponent implements OnInit, OnChanges {
     const day = (d || new Date()).getDay();
     const today = new Date();
     let alreadyTaken: boolean = true;
+
     if (day != null && d != undefined && this.vacation === null) {
-      this.futureVacations.map((vacation) => {
+      const futureVacations = this.vacationService.futureVacations$();
+
+      futureVacations.forEach((vacation) => {
         const dateA = new Date(vacation.startDate);
         const dateB = new Date(vacation.endDate);
 
@@ -92,7 +92,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
         }
       });
     }
-    // Prevent Saturday (6) and Sunday (0) from being selected.
+
     return alreadyTaken && day !== 0 && day !== 6 && (d || new Date()) >= today;
   };
 
@@ -101,7 +101,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
       return validateDateRange(
         this.form.value.startDate,
         this.form.value.endDate,
-        this.remainingDays
+        this.vacationService.remainingDays()
       );
     }
     return false;
@@ -122,19 +122,20 @@ export class VacationFormComponent implements OnInit, OnChanges {
         !validateDateRange(
           this.form.value.startDate,
           this.form.value.endDate,
-          this.remainingDays
+          this.vacationService.remainingDays()
         )
       ) {
-        //console.log('Date range cannot exceed 30 days');
         this.form.get('endDate')?.reset();
         return;
       }
-      const newVacation: Vacation = {
+
+      const newVacation = {
         startDate: new Date(this.form.value.startDate!),
         endDate: new Date(this.form.value.endDate!),
         description: this.form.value.description!,
-        status: 'pending',
+        status: 'pending' as const,
       };
+
       if (this.vacation !== null) {
         this.vacationEdited.emit([this.vacation, newVacation]);
         this.closeEditWindow.emit();
