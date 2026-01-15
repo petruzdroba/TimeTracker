@@ -69,8 +69,8 @@ export class ManagerService implements OnDestroy {
     const vacations = this.managerData().vacations;
 
     for (const [userId, userData] of Object.entries(vacations)) {
-      if (userData && userData.futureVacations) {
-        userData.futureVacations
+      if (userData && userData.vacations) {
+        userData.vacations
           .filter((vacation) => vacation && Object.keys(vacation).length > 0)
           .forEach((vacation) => {
             result.push({
@@ -88,8 +88,8 @@ export class ManagerService implements OnDestroy {
     const vacations = this.managerData().vacations;
 
     for (const [userId, userData] of Object.entries(vacations)) {
-      if (userData && userData.pastVacations) {
-        userData.pastVacations
+      if (userData && userData.vacations) {
+        userData.vacations
           .filter((vacation) => vacation && Object.keys(vacation).length > 0)
           .forEach((vacation) => {
             result.push({
@@ -150,13 +150,13 @@ export class ManagerService implements OnDestroy {
         .put(`${environment.apiUrl}/vacation/update/`, {
           userId,
           data: {
-            futureVacations: userVacations.futureVacations.map((v) =>
+            futureVacations: userVacations.vacations.map((v) =>
               v.startDate === vacation.startDate &&
               v.description === vacation.description
                 ? { ...v, status: 'accepted' }
                 : v
             ),
-            pastVacations: userVacations.pastVacations,
+            pastVacations: userVacations.vacations,
             remainingVacationDays:
               userVacations.remainingVacationDays -
               getDaysBetweenDates(
@@ -189,13 +189,13 @@ export class ManagerService implements OnDestroy {
         .put(`${environment.apiUrl}/vacation/update/`, {
           userId,
           data: {
-            futureVacations: userVacations.futureVacations.map((v) =>
+            futureVacations: userVacations.vacations.map((v) =>
               v.startDate === vacation.startDate &&
               v.description === vacation.description
                 ? { ...v, status: 'denied' }
                 : v
             ),
-            pastVacations: userVacations.pastVacations,
+            pastVacations: userVacations.vacations,
             remainingVacationDays: userVacations.remainingVacationDays,
           },
         })
@@ -222,13 +222,13 @@ export class ManagerService implements OnDestroy {
         .put(environment.apiUrl + '/vacation/update/', {
           userId,
           data: {
-            futureVacations: userVacations.futureVacations.map((v) =>
+            futureVacations: userVacations.vacations.map((v) =>
               v.startDate === vacation.startDate &&
               v.description === vacation.description
                 ? { ...v, status: 'pending' }
                 : v
             ),
-            pastVacations: userVacations.pastVacations,
+            pastVacations: userVacations.vacations,
             remainingVacationDays:
               vacation.status === 'accepted'
                 ? userVacations.remainingVacationDays +
@@ -402,7 +402,7 @@ export class ManagerService implements OnDestroy {
 
   getVacationIndex(vacationWithUser: VacationWithUser): number {
     const { userId, vacation } = vacationWithUser;
-    return this.managerData().vacations[userId]?.futureVacations.findIndex(
+    return this.managerData().vacations[userId]?.vacations.findIndex(
       (v) => v === vacation
     );
   }
