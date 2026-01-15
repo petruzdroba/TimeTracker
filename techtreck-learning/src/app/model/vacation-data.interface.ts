@@ -1,7 +1,6 @@
 import { Vacation } from './vacation.interface';
 
 export interface VacationData {
-  futureVacations: Vacation[];
-  pastVacations: Vacation[];
+  vacations: Vacation[];
   remainingVacationDays: number;
 }
