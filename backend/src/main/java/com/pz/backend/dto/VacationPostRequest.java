@@ -22,8 +22,5 @@ public record VacationPostRequest(
         Instant endDate,
         @NotBlank(message = "Description must be provided")
         @JsonProperty(required = true)
-        String description,
-        @NotNull
-        @JsonProperty(required=true)
-        Status status
+        String description
 ){ }

@@ -39,8 +39,8 @@ public class VacationRestController {
     }
 
     @GetMapping("/vacation/user/{userId}/{relation}")
-    public List<Vacation> getAllByTimeRelation(@PathVariable Long userId, @PathVariable TimeRelation timeRelation) throws NotFoundException {
-        return vacationService.getVacationsByTimeRelation(userId, timeRelation);
+    public List<Vacation> getAllByTimeRelation(@PathVariable Long userId, @PathVariable TimeRelation relation) throws NotFoundException {
+        return vacationService.getVacationsByTimeRelation(userId, relation);
     }
 
     @GetMapping("/vacation/user/remaining/{userId}")
