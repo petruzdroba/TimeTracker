@@ -1,8 +1,7 @@
-import { computed, inject, Injectable, signal } from '@angular/core';
-import { Vacation } from '../model/vacation.interface';
-import { VacationData } from '../model/vacation-data.interface';
+import { inject, Injectable, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { take } from 'rxjs';
+import { Vacation } from '../model/vacation.interface';
 import { UserDataService } from './user-data.service';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
@@ -23,7 +22,7 @@ export class VacationService {
   readonly vacationData = computed(() => ({
     futureVacations: this.futureVacations(),
     pastVacations: this.pastVacations(),
-    remainingVacationDays: this.remainingDaysSignal(),
+    remainingVacationDays: this.remainingDaysSignal()
   }));
 
   loadVacations(): void {
@@ -32,7 +31,7 @@ export class VacationService {
     const userId = this.userData.user().id;
 
     this.http
-      .get<Vacation[]>(`${environment.apiUrl}/vacations/${userId}/future`)
+      .get<Vacation[]>(`${environment.apiUrl}/vacation/user/${userId}/FUTURE`)
       .pipe(take(1))
       .subscribe({
         next: (res) => {
@@ -41,11 +40,11 @@ export class VacationService {
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        },
+        }
       });
 
     this.http
-      .get<Vacation[]>(`${environment.apiUrl}/vacations/${userId}/past`)
+      .get<Vacation[]>(`${environment.apiUrl}/vacation/user/${userId}/PAST`)
       .pipe(take(1))
       .subscribe({
         next: (res) => {
@@ -53,7 +52,7 @@ export class VacationService {
         },
         error: (err) => {
           console.error(err);
-        },
+        }
       });
 
     this.loadRemainingDays();
@@ -63,78 +62,83 @@ export class VacationService {
     if (!this.userData.isLoggedIn()) return;
 
     this.http
-      .get<{ remainingVacationDays: number }>(
-        `${environment.apiUrl}/vacations/${this.userData.user().id}/remaining`
+      .get<number>(
+        `${environment.apiUrl}/vacation/user/remaining/${this.userData.user().id}`
       )
       .pipe(take(1))
       .subscribe({
         next: (res) => {
-          this.remainingDaysSignal.set(res.remainingVacationDays);
+          this.remainingDaysSignal.set(res);
         },
         error: (err) => {
           console.error(err);
-        },
+        }
       });
   }
 
   addVacation(vacation: Omit<Vacation, 'id'>): void {
     this.http
-      .post<Vacation>(`${environment.apiUrl}/vacations`, {
-        ...vacation,
+      .post<Vacation>(`${environment.apiUrl}/vacation`, {
         userId: this.userData.user().id,
+        startDate: vacation.startDate,
+        endDate: vacation.endDate,
+        description: vacation.description
       })
       .pipe(take(1))
       .subscribe({
         next: (newVacation) => {
-          this.futureVacations.update((vacations) => [
-            ...vacations,
-            newVacation,
-          ]);
+          this.futureVacations.update(vacations => [...vacations, newVacation]);
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        },
+        }
       });
   }
 
-  updateVacation(vacationId: number, updates: Partial<Vacation>): void {
+  updateVacation(vacation: Vacation): void {
     this.http
-      .put<Vacation>(`${environment.apiUrl}/vacations/${vacationId}`, updates)
+      .put<Vacation>(`${environment.apiUrl}/vacation`, {
+        id: vacation.id,
+        userId: this.userData.user().id,
+        startDate: vacation.startDate,
+        endDate: vacation.endDate,
+        description: vacation.description
+      })
       .pipe(take(1))
       .subscribe({
         next: (updatedVacation) => {
-          this.futureVacations.update((vacations) =>
-            vacations.map((v) => (v.id === vacationId ? updatedVacation : v))
+          this.futureVacations.update(vacations =>
+            vacations.map(v => v.id === vacation.id ? updatedVacation : v)
           );
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        },
+        }
       });
   }
 
   deleteVacation(vacationId: number): void {
     this.http
-      .delete<void>(`${environment.apiUrl}/vacations/${vacationId}`)
+      .delete<void>(`${environment.apiUrl}/vacation/${vacationId}`)
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.futureVacations.update((vacations) =>
-            vacations.filter((v) => v.id !== vacationId)
+          this.futureVacations.update(vacations =>
+            vacations.filter(v => v.id !== vacationId)
           );
-          this.pastVacations.update((vacations) =>
-            vacations.filter((v) => v.id !== vacationId)
+          this.pastVacations.update(vacations =>
+            vacations.filter(v => v.id !== vacationId)
           );
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        },
+        }
       });
   }
 }

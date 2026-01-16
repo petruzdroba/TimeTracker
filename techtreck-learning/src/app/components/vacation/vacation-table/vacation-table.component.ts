@@ -25,7 +25,7 @@ import { StatusFilterComponent } from '../../../shared/status-filter/status-filt
 export class VacationTableComponent {
   @Input({ required: true }) vacationList!: Vacation[];
   @Output() deleteVacation = new EventEmitter<number>();
-  @Output() editVacation = new EventEmitter<[Vacation, Partial<Vacation>]>();
+  @Output() editVacation = new EventEmitter<[Vacation, Vacation]>();
 
   protected editingVacation: Vacation | null = null;
 
@@ -120,7 +120,7 @@ export class VacationTableComponent {
     this.deleteVacation.emit(index);
   }
 
-  onEdit(updatedVacation: [Vacation, Partial<Vacation>]) {
+  onEdit(updatedVacation: [Vacation, Vacation]) {
     this.editVacation.emit(updatedVacation);
     this.editingVacation = null;
   }

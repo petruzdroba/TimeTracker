@@ -33,11 +33,9 @@ export class VacationComponent implements OnInit {
     this.vacationService.deleteVacation(vacationId);
   }
 
-  editVacation([oldVacation, newVacation]: [Vacation, Partial<Vacation>]) {
-    if (oldVacation.id) {
-      this.vacationService.updateVacation(oldVacation.id, newVacation);
-    }
-  }
+  editVacation([oldVacation, newVacation]: [Vacation, Vacation]) {
+  this.vacationService.updateVacation(newVacation);
+}
 
   // Expose service data directly
   get vacationData() {

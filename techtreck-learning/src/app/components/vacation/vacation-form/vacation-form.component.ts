@@ -41,7 +41,7 @@ export class VacationFormComponent implements OnInit, OnChanges {
   @Input({ required: true }) vacation!: Vacation | null;
   @Output() closeEditWindow = new EventEmitter<void>();
   @Output() vacationAdded = new EventEmitter<Omit<Vacation, 'id'>>();
-  @Output() vacationEdited = new EventEmitter<[Vacation, Partial<Vacation>]>();
+  @Output() vacationEdited = new EventEmitter<[Vacation,Vacation]>();
 
   private vacationService = inject(VacationService);
 
@@ -129,11 +129,12 @@ export class VacationFormComponent implements OnInit, OnChanges {
         return;
       }
 
-      const newVacation = {
+      const newVacation: Vacation = {
+        id: this.vacation?.id, // Keep existing ID if editing
         startDate: new Date(this.form.value.startDate!),
         endDate: new Date(this.form.value.endDate!),
         description: this.form.value.description!,
-        status: 'pending' as const,
+        status: this.vacation?.status || 'pending',
       };
 
       if (this.vacation !== null) {
