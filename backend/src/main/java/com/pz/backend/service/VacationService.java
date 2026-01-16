@@ -13,7 +13,7 @@ public interface VacationService {
 
     List<Vacation> get(Long userId);
 
-    Vacation put(Long id, Long userId, Instant startDate, Instant endDate) throws NotFoundException;
+    Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description) throws NotFoundException;
 
     Vacation findById(Long id) throws NotFoundException;
 

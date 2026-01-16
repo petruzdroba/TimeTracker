@@ -22,22 +22,33 @@ public class VacationRestController {
     }
 
     @GetMapping("/vacation/{userId}")
-    public List<Vacation> getAllByUser(@PathVariable Long userId){
-
+    public List<Vacation> getAllByUser(@PathVariable Long userId) {
+        return vacationService.get(userId);
     }
 
     @PostMapping("/vacation")
     public Vacation post(@Valid @RequestBody VacationPostRequest request) throws AlreadyExistsException {
-
+        return vacationService.post(
+                request.userId(),
+                request.startDate(),
+                request.endDate(),
+                request.description()
+        );
     }
 
     @PutMapping("/vacation")
-    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException{
-
+    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException {
+        return vacationService.put(
+                request.id(),
+                request.userId(),
+                request.startDate(),
+                request.endDate(),
+                request.description()
+        );
     }
 
     @DeleteMapping("vacation/{vacationId}")
-    public void delete(@PathVariable Long vacationId) throws NotFoundException{
-
+    public void delete(@PathVariable Long vacationId) throws NotFoundException {
+        vacationService.delete(vacationId);
     }
 }
