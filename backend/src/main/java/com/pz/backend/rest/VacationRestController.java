@@ -1,7 +1,9 @@
 package com.pz.backend.rest;
 
+import com.pz.backend.common.TimeRelation;
 import com.pz.backend.dto.VacationPostRequest;
 import com.pz.backend.dto.VacationPutRequest;
+import com.pz.backend.entity.Status;
 import com.pz.backend.entity.Vacation;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.NotFoundException;
@@ -21,9 +23,29 @@ public class VacationRestController {
         this.vacationService = vacationService;
     }
 
-    @GetMapping("/vacation/{userId}")
-    public List<Vacation> getAllByUser(@PathVariable Long userId) {
+    @GetMapping("/vacation")
+    public List<Vacation> getAll() {
+        return vacationService.getAll();
+    }
+
+    @GetMapping("/vacation/status/{status}")
+    public List<Vacation> getByStatus(@PathVariable Status status){
+        return vacationService.getStatus(status);
+    }
+
+    @GetMapping("/vacation/user/{userId}")
+    public List<Vacation> getAllByUser(@PathVariable Long userId) throws NotFoundException {
         return vacationService.get(userId);
+    }
+
+    @GetMapping("/vacation/user/{userId}/{relation}")
+    public List<Vacation> getAllByTimeRelation(@PathVariable Long userId, @PathVariable TimeRelation timeRelation) throws NotFoundException {
+        return vacationService.getVacationsByTimeRelation(userId, timeRelation);
+    }
+
+    @GetMapping("/vacation/user/remaining/{userId}")
+    public Long getRemaining(@PathVariable Long userId) throws NotFoundException {
+        return vacationService.getRemainingDays(userId);
     }
 
     @PostMapping("/vacation")
@@ -45,6 +67,11 @@ public class VacationRestController {
                 request.endDate(),
                 request.description()
         );
+    }
+
+    @PutMapping("/vacation/{vacationId}/{status}")
+    public Vacation putStatus(@PathVariable Long vacationId, @PathVariable Status status) throws NotFoundException{
+        return vacationService.updateStatus(vacationId, status);
     }
 
     @DeleteMapping("vacation/{vacationId}")
