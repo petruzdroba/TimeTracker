@@ -18,6 +18,9 @@ export class ManagerService {
   private routerService = inject(Router);
   private http = inject(HttpClient);
 
+  private pendingVacations = signal<Vacation[]>([]);
+  private allVacations = signal<Vacation[]>([]);
+
   private managerData = signal<ManagerData>({
     vacations: {},
     leaves: {},
@@ -36,55 +39,75 @@ export class ManagerService {
 
   private fetchManagerData(): Promise<void> {
     return new Promise((resolve, reject) => {
-      // TODO: Backend endpoints not implemented yet
-      // Old endpoint /manager/get/ returned all users' vacation/leave data in one monolithic response
-      //
-      // Needed manager endpoints:
-      // GET /manager/vacations?status=pending - get all pending vacation requests from managed users
-      // GET /manager/vacations?status=all - get all vacation requests
-      // PUT /vacations/{vacationId}/status - update status to accepted/denied/pending
-      //
-      // Similar pattern for leaves when that gets refactored
+      this.http
+        .get<Vacation[]>(`${environment.apiUrl}/vacation/status/PENDING`)
+        .pipe(take(1))
+        .subscribe({
+          next: (vacations) => {
+            this.pendingVacations.set(vacations);
+          },
+          error: (err) => {
+            console.error('Error fetching pending vacations:', err);
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          }
+        });
 
-      console.warn('ManagerService.fetchManagerData() - Backend endpoints not implemented yet');
+      this.http
+        .get<Vacation[]>(`${environment.apiUrl}/vacation`)
+        .pipe(take(1))
+        .subscribe({
+          next: (vacations) => {
+            this.allVacations.set(vacations);
+            resolve();
+          },
+          error: (err) => {
+            console.error('Error fetching all vacations:', err);
+            this.routerService.navigate(['/error', err.status]);
+            reject(err);
+          }
+        });
 
       this.managerData.set({
         vacations: {},
         leaves: {},
       });
-
-      resolve();
     });
   }
 
   readonly futureVacations = computed(() => {
-    // TODO: Replace with GET /manager/vacations?status=pending when backend is ready
-    return [];
+    const today = new Date();
+    return this.pendingVacations()
+      .filter(v => new Date(v.startDate) >= today)
+      .map(vacation => ({
+        userId: vacation.userId || 0,
+        vacation
+      }));
   });
 
   readonly pastVacations = computed(() => {
-    // TODO: Replace with GET /manager/vacations?status=all when backend is ready
-    return [];
+    return this.allVacations().map(vacation => ({
+      userId: vacation.userId || 0,
+      vacation
+    }));
   });
 
   readonly futureLeaves = computed(() => {
-    // TODO: Replace with proper leave endpoints when backend is ready
     return [];
   });
 
   readonly pastLeaves = computed(() => {
-    // TODO: Replace with proper leave endpoints when backend is ready
     return [];
   });
 
   acceptVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { userId, vacation } = vacationWithUser;
+    const { vacation } = vacationWithUser;
 
     if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'accepted' })
+        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/ACCEPTED`, {})
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -101,13 +124,13 @@ export class ManagerService {
   }
 
   rejectVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { userId, vacation } = vacationWithUser;
+    const { vacation } = vacationWithUser;
 
     if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'denied' })
+        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/DENIED`, {})
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -124,13 +147,13 @@ export class ManagerService {
   }
 
   undoVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { userId, vacation } = vacationWithUser;
+    const { vacation } = vacationWithUser;
 
     if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put(`${environment.apiUrl}/vacations/${vacation.id}`, { status: 'pending' })
+        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/PENDING`, {})
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -298,12 +321,10 @@ export class ManagerService {
   }
 
   getVacationIndex(vacationWithUser: VacationWithUser): number {
-    // TODO: Remove this method when backend is refactored - won't be needed
     return -1;
   }
 
   getLeaveIndex(leaveWithUser: LeaveWithUser): number {
-    // TODO: Remove this method when backend is refactored - won't be needed
     return -1;
   }
 }
