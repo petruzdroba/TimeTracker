@@ -1,10 +1,9 @@
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { VacationPickerComponent } from './vacation-picker/vacation-picker.component';
 import { VacationTableComponent } from './vacation-table/vacation-table.component';
 import { Vacation } from '../../model/vacation.interface';
 import { VacationService } from '../../service/vacation.service';
 import { ProgressBarComponent } from '../../shared/progress-bar/progress-bar.component';
-import { VacationData } from '../../model/vacation-data.interface';
 import { MatTabsModule } from '@angular/material/tabs';
 
 @Component({
@@ -20,30 +19,26 @@ import { MatTabsModule } from '@angular/material/tabs';
   styleUrl: './vacation.component.css',
 })
 export class VacationComponent implements OnInit {
-  protected vacationData = signal<VacationData>({} as VacationData);
+  protected vacationService = inject(VacationService);
 
-  private vacationService = inject(VacationService);
-
-  async ngOnInit(): Promise<void> {
-    this.vacationService.initialize();
-    this.vacationData.set(this.vacationService.vacation);
+  ngOnInit(): void {
+    this.vacationService.loadVacations();
   }
 
-  addVacation(vacationData: Vacation) {
+  addVacation(vacationData: Omit<Vacation, 'id'>) {
     this.vacationService.addVacation(vacationData);
-    this.vacationService.updateVacationData();
-    this.vacationData.set(this.vacationService.vacation);
   }
 
-  deleteVacation(index: number, tableType: string) {
-    this.vacationService.deleteVacation(index, tableType);
-    this.vacationService.updateVacationData();
-    this.vacationData.set(this.vacationService.vacation);
+  deleteVacation(vacationId: number) {
+    this.vacationService.deleteVacation(vacationId);
   }
 
-  editVacation([oldLeave, newLeave]: [Vacation, Vacation]) {
-    this.vacationService.editVacation(oldLeave, newLeave);
-    this.vacationService.updateVacationData();
-    this.vacationData.set(this.vacationService.vacation);
+  editVacation([oldVacation, newVacation]: [Vacation, Vacation]) {
+  this.vacationService.updateVacation(newVacation);
+}
+
+  // Expose service data directly
+  get vacationData() {
+    return this.vacationService.vacationData();
   }
 }

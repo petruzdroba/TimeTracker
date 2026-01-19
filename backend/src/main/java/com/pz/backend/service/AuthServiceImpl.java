@@ -1,9 +1,6 @@
 package com.pz.backend.service;
 
-import com.pz.backend.dao.TimerDataRepository;
-import com.pz.backend.dao.UserAuthRepository;
-import com.pz.backend.dao.UserDataRepository;
-import com.pz.backend.dao.WorkLogRepository;
+import com.pz.backend.dao.*;
 import com.pz.backend.entity.TimerData;
 import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
@@ -25,13 +22,15 @@ public class AuthServiceImpl implements AuthService {
     private final UserDataRepository userDataRepository;
     private final TimerDataRepository timerDataRepository;
     private final WorkLogRepository workLogRepository;
+    private final VacationRepository vacationRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, TimerDataRepository timerDataRepository, WorkLogRepository workLogRepository, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserAuthRepository userAuthRepository, UserDataRepository userDataRepository, TimerDataRepository timerDataRepository, WorkLogRepository workLogRepository, VacationRepository vacationRepository, PasswordEncoder passwordEncoder) {
         this.userAuthRepository = userAuthRepository;
         this.userDataRepository = userDataRepository;
         this.timerDataRepository = timerDataRepository;
         this.workLogRepository = workLogRepository;
+        this.vacationRepository = vacationRepository;
         this.passwordEncoder = passwordEncoder;
     }
 

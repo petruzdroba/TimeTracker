@@ -25,6 +25,7 @@ export class DaysInfoComponent {
       0
     ).getDate(); //nr of days in this month
     let weekends = 0;
+
     for (let index = 1; index <= unworkedDays; index++) {
       if (
         new Date(index, today.getMonth(), today.getFullYear()).getDay() === 0 ||
@@ -33,7 +34,9 @@ export class DaysInfoComponent {
         weekends++;
       }
     }
+
     unworkedDays -= weekends;
+
     this.workLogService.getWorkLog.forEach((session) => {
       const dateA = new Date(session.date);
       if (
@@ -47,6 +50,7 @@ export class DaysInfoComponent {
         }
       }
     });
+
     unworkedDays -= this.vacationsPastThisMonth; //days vacationed are paid
     return unworkedDays;
   }
@@ -55,10 +59,10 @@ export class DaysInfoComponent {
     const today = new Date();
     let vacationDays = 0;
 
-    // Combine past and future vacations and process them
+    // Get vacations from service computed signals
     const allVacations = [
-      ...this.vacationService.pastVacations,
-      ...this.vacationService.futureVacations,
+      ...this.vacationService.pastVacations$(),
+      ...this.vacationService.futureVacations$(),
     ];
 
     allVacations
@@ -79,7 +83,6 @@ export class DaysInfoComponent {
             0
           );
           const effectiveEndDate = endDate > monthEnd ? monthEnd : endDate;
-
           vacationDays += getDaysBetweenDates(startDate, effectiveEndDate);
         }
       });
@@ -88,11 +91,12 @@ export class DaysInfoComponent {
   }
 
   get remainingVacationDays() {
-    return this.vacationService.remainingDays;
+    return this.vacationService.remainingDays();
   }
 
   get nextVacation() {
-    const newArr = this.vacationService.futureVacations.sort((a, b) => {
+    const futureVacations = [...this.vacationService.futureVacations$()];
+    const newArr = futureVacations.sort((a, b) => {
       const dateA = new Date(a.startDate).getTime();
       const dateB = new Date(b.startDate).getTime();
       return dateA - dateB;
@@ -116,7 +120,6 @@ export class DaysInfoComponent {
         }
       }
     }
-
     return '-';
   }
 }

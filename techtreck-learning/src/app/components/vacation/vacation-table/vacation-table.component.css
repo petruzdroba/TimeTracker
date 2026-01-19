@@ -76,17 +76,17 @@
   color: var(--primary-hover-color);
 }
 
-.pending{
+.PENDING{
   color: yellow;
 }
-.accepted{
+.ACCEPTED{
   color: chartreuse;
 }
-.denied{
+.DENIED{
   color: red;
 }
 
-.ignored{
+.IGNORED{
   color:grey;
 }
 

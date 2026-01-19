@@ -71,7 +71,7 @@ describe('EditSessionComponent', () => {
   it('should not submit if form invalid', () => {
     component.form.setErrors({ required: true });
     component.onSubmit();
-    expect(workLogServiceSpy.editSession).not.toHaveBeenCalled();
+    expect(workLogServiceSpy.updateWorkLog).not.toHaveBeenCalled();
   });
 
   it('should set invalidTimeRange error if endTime before startTime', () => {
@@ -87,7 +87,7 @@ describe('EditSessionComponent', () => {
     component.onSubmit();
 
     expect(component.form.get('endTime').errors.invalidTimeRange).toBeTrue();
-    expect(workLogServiceSpy.editSession).not.toHaveBeenCalled();
+    expect(workLogServiceSpy.updateWorkLog).not.toHaveBeenCalled();
   });
 
   it('should reset endTime if session duration exceeds 8 hours', () => {
@@ -103,10 +103,10 @@ describe('EditSessionComponent', () => {
     component.onSubmit();
 
     expect(component.form.get('endTime').value).toBeNull();
-    expect(workLogServiceSpy.editSession).not.toHaveBeenCalled();
+    expect(workLogServiceSpy.updateWorkLog).not.toHaveBeenCalled();
   });
 
-  it('should submit valid form and call editSession and emit closeWindow', () => {
+  it('should submit valid form and call updateWorkLog and emit closeWindow', () => {
     component.form.setValue({
       startTime: '09:00',
       endTime: '17:00',
@@ -119,10 +119,8 @@ describe('EditSessionComponent', () => {
 
     component.onSubmit();
 
-    expect(workLogServiceSpy.editSession).toHaveBeenCalledWith(
+    expect(workLogServiceSpy.updateWorkLog).toHaveBeenCalledWith(
       component.session!,
-      jasmine.any(Date),
-      jasmine.any(Date)
     );
     expect(snackBarSpy.open).toHaveBeenCalledWith(
       'Session edited successfully !',

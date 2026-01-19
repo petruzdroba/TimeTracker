@@ -39,7 +39,7 @@
         </td>
         <td><button class="btn-icon-primary" (click)="openEditWindow(vacation)" [disabled]="disabledEdit(vacation)"><i
               class="fa-solid fa-pen" title="Edit session"></i></button></td>
-        <td><button class="btn-icon" (click)="onDelete(list.indexOf(vacation))"><i class="fas fa-trash"
+        <td><button class="btn-icon" (click)="onDelete(vacation.id!)"><i class="fas fa-trash"
               title="Delete vacation entry"></i></button>
         </td>
       </tr>
