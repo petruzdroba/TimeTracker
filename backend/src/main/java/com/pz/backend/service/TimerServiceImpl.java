@@ -2,6 +2,7 @@ package com.pz.backend.service;
 
 import com.pz.backend.dao.TimerDataRepository;
 import com.pz.backend.entity.TimerData;
+import com.pz.backend.entity.TimerType;
 import com.pz.backend.exceptions.NotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,7 @@ public class TimerServiceImpl implements TimerService{
     }
 
     @Override
-    public TimerData sync(Long userId, String startTime, String endTime, Integer requiredTime, String timerType) throws NotFoundException {
+    public TimerData sync(Long userId, String startTime, String endTime, Integer requiredTime, TimerType timerType) throws NotFoundException {
         TimerData existing =  timerDataRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(TimerData.class.getName(), userId));
 

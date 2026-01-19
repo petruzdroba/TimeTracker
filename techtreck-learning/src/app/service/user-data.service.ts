@@ -72,10 +72,12 @@ export class UserDataService implements OnDestroy {
   }
 
   delete(password: string): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/user/delete/`, {
-      userId: this.userData().id,
-      password: password,
-    });
+    return this.http.delete(
+      `${environment.apiUrl}/auth/delete/${this.userData().id}`,
+      {
+        body: { password },
+      }
+    );
   }
 
   logout(): void {

@@ -1,5 +1,6 @@
 package com.pz.backend.rest;
 
+import com.pz.backend.dto.AuthDeleteRequest;
 import com.pz.backend.dto.LoginRequest;
 import com.pz.backend.dto.SignupRequest;
 import com.pz.backend.dto.UserResponse;
@@ -78,6 +79,11 @@ public class AuthRestController {
                 "refresh", refreshToken,
                 "user", userResponse
         ));
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    public void delete(@PathVariable Long userId, @Valid @RequestBody AuthDeleteRequest request) throws NotFoundException, InvalidCredentialsException{
+        authService.delete(userId, request.password());
     }
 
     @GetMapping("/me/")

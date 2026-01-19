@@ -2,6 +2,8 @@ package com.pz.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="timer_data")
@@ -12,13 +14,17 @@ public class TimerData {
     @OneToOne
     @MapsId
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @JsonIgnore
     private UserAuth user;
 
     private String startTime;
     private String endTime;
     private Integer remainingTime; // in ms
-    private String timerType = "OFF";
+
+    @Column(length = 50)
+    @Enumerated(EnumType.STRING)
+    private TimerType timerType = TimerType.OFF;
 
     protected TimerData() {
     }
@@ -28,7 +34,6 @@ public class TimerData {
         this.remainingTime = remainingTime;
         this.endTime = "";
         this.startTime = "";
-        this.timerType = "OFF";
     }
 
     public Long getId() {
@@ -71,11 +76,11 @@ public class TimerData {
         this.remainingTime = remainingTime;
     }
 
-    public String getTimerType() {
+    public TimerType getTimerType() {
         return timerType;
     }
 
-    public void setTimerType(String timerType) {
+    public void setTimerType(TimerType timerType) {
         this.timerType = timerType;
     }
 }

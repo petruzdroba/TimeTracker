@@ -11,5 +11,7 @@ public interface AuthService {
 
     UserAuth logIn(String email, String password) throws NotFoundException, InvalidCredentialsException;
 
+    void delete(Long id, String password) throws NotFoundException, InvalidCredentialsException;
+
     UserData getMe(Long userId) throws NotFoundException;
 }

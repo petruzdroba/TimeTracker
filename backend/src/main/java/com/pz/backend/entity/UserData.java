@@ -1,6 +1,8 @@
 package com.pz.backend.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name="user_data")
@@ -11,6 +13,7 @@ public class UserData {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private UserAuth user;
 
     @Column(length = 100)
@@ -24,12 +27,13 @@ public class UserData {
     private int personalTime=12;
 
     @Column(length = 50)
-    private String role = "employee";
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.EMPLOYEE;
 
     protected UserData() {
     }
 
-    public UserData(UserAuth user,String role, int personalTime, int vacationDays, int workHours, String email, String name) {
+    public UserData(UserAuth user,Role role, int personalTime, int vacationDays, int workHours, String email, String name) {
         this.user=user;
         this.role = role;
         this.personalTime = personalTime;
@@ -101,11 +105,11 @@ public class UserData {
         this.personalTime = personalTime;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }

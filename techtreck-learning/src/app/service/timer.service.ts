@@ -118,7 +118,7 @@ export class TimerService implements OnDestroy {
             }
           },
           error: (err) => {
-            this.router.navigate(['/error', err]);
+            this.router.navigate(['/error', err.status]);
           },
         });
     }
@@ -136,7 +136,7 @@ export class TimerService implements OnDestroy {
           userId: this.userData.user().id,
           startTime: this.timerData().startTime,
           endTime: this.timerData().endTime,
-          remainingTime: this.timerData().requiredTime,
+          requiredTime: this.timerData().requiredTime,
           timerType: this.timerData().timerType,
         })
         .subscribe({
@@ -144,7 +144,7 @@ export class TimerService implements OnDestroy {
             this.lastSync = currentTime;
           },
           error: (err) => {
-            this.router.navigate(['/error', err]);
+            this.router.navigate(['/error', err.status]);
           },
         });
     }
