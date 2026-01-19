@@ -62,42 +62,59 @@ describe('VacationService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should load vacations', fakeAsync(() => {
-    const mockVacations: Vacation[] = [
+  it('should load future and past vacations and remaining days', fakeAsync(() => {
+    const mockFuture: Vacation[] = [
       {
         id: 1,
-        startDate: new Date(Date.now() + 86400000),
-        endDate: new Date(Date.now() + 172800000),
+        startDate: new Date(),
+        endDate: new Date(),
+        description: 'Future',
         status: 'pending',
-        description: 'Vacation 1',
+      },
+    ];
+    const mockPast: Vacation[] = [
+      {
+        id: 2,
+        startDate: new Date(),
+        endDate: new Date(),
+        description: 'Past',
+        status: 'accepted',
       },
     ];
 
     service.loadVacations();
 
-    const vacationsReq = httpMock.expectOne(`${baseUrl}/vacations/1`);
-    expect(vacationsReq.request.method).toBe('GET');
-    vacationsReq.flush(mockVacations);
+    const futureReq = httpMock.expectOne(`${baseUrl}/vacation/user/1/FUTURE`);
+    expect(futureReq.request.method).toBe('GET');
+    futureReq.flush(mockFuture);
 
-    const remainingReq = httpMock.expectOne(`${baseUrl}/vacations/1/remaining`);
+    const pastReq = httpMock.expectOne(`${baseUrl}/vacation/user/1/PAST`);
+    expect(pastReq.request.method).toBe('GET');
+    pastReq.flush(mockPast);
+
+    const remainingReq = httpMock.expectOne(
+      `${baseUrl}/vacation/user/remaining/1`
+    );
     expect(remainingReq.request.method).toBe('GET');
-    remainingReq.flush({ remainingVacationDays: 15 });
+    remainingReq.flush(15);
 
     tick();
 
-    expect(service.vacations().length).toBe(1);
-    expect(service.vacations()[0].description).toBe('Vacation 1');
+    expect(service.futureVacations$()).toEqual(mockFuture);
+    expect(service.pastVacations$()).toEqual(mockPast);
     expect(service.remainingDays()).toBe(15);
   }));
 
-  it('should handle fetch vacation data error', fakeAsync(() => {
+  it('should handle error when loading vacations', fakeAsync(() => {
     service.loadVacations();
 
-    const vacationsReq = httpMock.expectOne(`${baseUrl}/vacations/1`);
-    vacationsReq.flush('Error fetching', { status: 500, statusText: 'Server Error' });
-
-    const remainingReq = httpMock.expectOne(`${baseUrl}/vacations/1/remaining`);
-    remainingReq.flush('Error', { status: 500, statusText: 'Server Error' });
+    httpMock
+      .expectOne(`${baseUrl}/vacation/user/1/FUTURE`)
+      .flush('Error', { status: 500, statusText: 'Server Error' });
+    httpMock
+      .expectOne(`${baseUrl}/vacation/user/1/PAST`)
+      .flush([], { status: 200, statusText: 'OK' });
+    httpMock.expectOne(`${baseUrl}/vacation/user/remaining/1`).flush(0);
 
     tick();
 
@@ -106,102 +123,99 @@ describe('VacationService', () => {
 
   it('should add a vacation', fakeAsync(() => {
     const newVacation: Vacation = {
-      id: 1,
+      id: 3,
       startDate: new Date(),
       endDate: new Date(),
-      status: 'pending',
       description: 'New Vacation',
+      status: 'pending',
     };
 
     service.addVacation({
       startDate: newVacation.startDate,
       endDate: newVacation.endDate,
-      status: newVacation.status,
       description: newVacation.description,
+      status: 'pending',
     });
 
-    const addReq = httpMock.expectOne(`${baseUrl}/vacations`);
+    const addReq = httpMock.expectOne(`${baseUrl}/vacation`);
     expect(addReq.request.method).toBe('POST');
     expect(addReq.request.body.userId).toBe(1);
     addReq.flush(newVacation);
 
-    const remainingReq = httpMock.expectOne(`${baseUrl}/vacations/1/remaining`);
-    remainingReq.flush({ remainingVacationDays: 18 });
+    const remainingReq = httpMock.expectOne(
+      `${baseUrl}/vacation/user/remaining/1`
+    );
+    remainingReq.flush(18);
 
     tick();
 
-    expect(service.vacations().length).toBe(1);
-    expect(service.vacations()[0].description).toBe('New Vacation');
+    expect(service.futureVacations$().length).toBe(1);
+    expect(service.futureVacations$()[0].description).toBe('New Vacation');
     expect(service.remainingDays()).toBe(18);
   }));
 
   it('should update a vacation', fakeAsync(() => {
-    // First add a vacation
-    const existingVacation: Vacation = {
+    const existing: Vacation = {
       id: 1,
       startDate: new Date(),
       endDate: new Date(),
+      description: 'Old',
       status: 'pending',
-      description: 'Old Description',
     };
 
-    service.addVacation(existingVacation);
-    const addReq = httpMock.expectOne(`${baseUrl}/vacations`);
-    addReq.flush(existingVacation);
-    httpMock.expectOne(`${baseUrl}/vacations/1/remaining`).flush({ remainingVacationDays: 18 });
-    tick();
+    // First, add it to signal manually
+(service as any).futureVacations.set([existing]);
 
-    // Now update it
-    const updatedVacation: Vacation = {
-      ...existingVacation,
-      description: 'New Description',
-    };
+    service.updateVacation({ ...existing, description: 'Updated' });
 
-    service.updateVacation(1, { description: 'New Description' });
-
-    const updateReq = httpMock.expectOne(`${baseUrl}/vacations/1`);
+    const updateReq = httpMock.expectOne(`${baseUrl}/vacation`);
     expect(updateReq.request.method).toBe('PUT');
-    updateReq.flush(updatedVacation);
+    updateReq.flush({ ...existing, description: 'Updated' });
 
-    const remainingReq = httpMock.expectOne(`${baseUrl}/vacations/1/remaining`);
-    remainingReq.flush({ remainingVacationDays: 18 });
+    const remainingReq = httpMock.expectOne(
+      `${baseUrl}/vacation/user/remaining/1`
+    );
+    remainingReq.flush(18);
 
     tick();
 
-    expect(service.vacations()[0].description).toBe('New Description');
+    expect(service.futureVacations$()[0].description).toBe('Updated');
   }));
 
   it('should delete a vacation', fakeAsync(() => {
-    // First add a vacation
-    const vacation: Vacation = {
+    const vac: Vacation = {
       id: 1,
       startDate: new Date(),
       endDate: new Date(),
-      status: 'pending',
       description: 'Vacation',
+      status: 'pending',
     };
+    const existing: Vacation = {
+      id: 1,
+      startDate: new Date(),
+      endDate: new Date(),
+      description: 'Old',
+      status: 'pending',
+    };
+    (service as any).futureVacations.set([existing]);
+    (service as any).futureVacations.set([vac] as any);
+    (service as any).pastVacations.set([vac] as any);
 
-    service.addVacation(vacation);
-    const addReq = httpMock.expectOne(`${baseUrl}/vacations`);
-    addReq.flush(vacation);
-    httpMock.expectOne(`${baseUrl}/vacations/1/remaining`).flush({ remainingVacationDays: 18 });
-    tick();
-
-    expect(service.vacations().length).toBe(1);
-
-    // Now delete it
     service.deleteVacation(1);
 
-    const deleteReq = httpMock.expectOne(`${baseUrl}/vacations/1`);
+    const deleteReq = httpMock.expectOne(`${baseUrl}/vacation/1`);
     expect(deleteReq.request.method).toBe('DELETE');
     deleteReq.flush(null);
 
-    const remainingReq = httpMock.expectOne(`${baseUrl}/vacations/1/remaining`);
-    remainingReq.flush({ remainingVacationDays: 20 });
+    const remainingReq = httpMock.expectOne(
+      `${baseUrl}/vacation/user/remaining/1`
+    );
+    remainingReq.flush(20);
 
     tick();
 
-    expect(service.vacations().length).toBe(0);
+    expect(service.futureVacations$().length).toBe(0);
+    expect(service.pastVacations$().length).toBe(0);
     expect(service.remainingDays()).toBe(20);
   }));
 
@@ -209,11 +223,11 @@ describe('VacationService', () => {
     service.addVacation({
       startDate: new Date(),
       endDate: new Date(),
-      status: 'pending',
       description: 'Vacation',
+      status: 'pending',
     });
 
-    const req = httpMock.expectOne(`${baseUrl}/vacations`);
+    const req = httpMock.expectOne(`${baseUrl}/vacation`);
     req.flush('Error', { status: 500, statusText: 'Server Error' });
 
     tick();
@@ -226,6 +240,8 @@ describe('VacationService', () => {
 
     service.loadVacations();
 
-    httpMock.expectNone(`${baseUrl}/vacations/1`);
+    httpMock.expectNone(`${baseUrl}/vacation/user/1/FUTURE`);
+    httpMock.expectNone(`${baseUrl}/vacation/user/1/PAST`);
+    httpMock.expectNone(`${baseUrl}/vacation/user/remaining/1`);
   });
 });

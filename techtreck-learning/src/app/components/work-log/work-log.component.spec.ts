@@ -155,21 +155,19 @@ describe('WorkLogComponent', () => {
     component.workLog.set(mockSessions);
     component['updatePaginatedData'] = jasmine.createSpy('updatePaginatedData');
 
-    workLogServiceSpy.deleteSession.and.callFake((session) => {
-      const index = mockSessions.findIndex(
-        (s) =>
-          s.date.getTime() === session.date.getTime() &&
-          s.timeWorked === session.timeWorked
-      );
+    workLogServiceSpy.deleteWorkLog.and.callFake((sessionId: number) => {
+      const index = mockSessions.findIndex((s) => s.id === sessionId);
       if (index > -1) mockSessions.splice(index, 1);
+      // update the Signal like the real service
+      component.workLog.set(mockSessions);
     });
 
     const sessionToDelete = mockSessions[1]; // store this before deletion
 
     component.onDeleteSession(sessionToDelete);
 
-    expect(workLogServiceSpy.deleteSession).toHaveBeenCalledWith(
-      sessionToDelete
+    expect(workLogServiceSpy.deleteWorkLog).toHaveBeenCalledWith(
+      sessionToDelete.id!
     );
     expect(component.workLog()).toEqual(mockSessions);
     expect(component['updatePaginatedData']).toHaveBeenCalled();

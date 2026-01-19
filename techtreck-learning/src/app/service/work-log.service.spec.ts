@@ -132,7 +132,7 @@ describe('WorkLogService', () => {
     httpMock.expectOne(`${baseUrl}/worklog/get/1/`).flush([session1, session2]);
     tick();
 
-    service.deleteSession(session1);
+    service.deleteWorkLog(session1.id!);
 
     const putReq = httpMock.expectOne(`${baseUrl}/worklog/update/`);
     expect(putReq.request.method).toBe('PUT');
@@ -152,7 +152,7 @@ describe('WorkLogService', () => {
     const startTime = new Date();
     const endTime = new Date(startTime.getTime() + 120000); // 2 minutes later
 
-    service.editSession(oldSession, startTime, endTime);
+    service.updateWorkLog(oldSession);
 
     const putReq = httpMock.expectOne(`${baseUrl}/worklog/update/`);
     expect(putReq.request.method).toBe('PUT');
