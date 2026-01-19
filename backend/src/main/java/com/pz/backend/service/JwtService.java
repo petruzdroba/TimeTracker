@@ -22,7 +22,7 @@ public class JwtService {
     @Value("${jwt.refresh-expiration:604800000}") // default  7 days
     private long refreshExpiration;
 
-    private SecretKey getSigningKey() {
+    public SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
@@ -30,6 +30,7 @@ public class JwtService {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("user_id", user.getUserData().getId())
+                .claim("role", user.getUserData().getRole().name())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -55,4 +56,14 @@ public class JwtService {
                 .getPayload()
                 .get("user_id", Long.class);
     }
+
+    public String getRoleFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith(getSigningKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
+    }
+
 }
