@@ -18,7 +18,6 @@ export class ManagerService {
   private routerService = inject(Router);
   private http = inject(HttpClient);
 
-  private pendingVacations = signal<Vacation[]>([]);
   private allVacations = signal<Vacation[]>([]);
 
   private managerData = signal<ManagerData>({
@@ -40,20 +39,6 @@ export class ManagerService {
   private fetchManagerData(): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
-        .get<Vacation[]>(`${environment.apiUrl}/vacation/status/PENDING`)
-        .pipe(take(1))
-        .subscribe({
-          next: (vacations) => {
-            this.pendingVacations.set(vacations);
-          },
-          error: (err) => {
-            console.error('Error fetching pending vacations:', err);
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          }
-        });
-
-      this.http
         .get<Vacation[]>(`${environment.apiUrl}/vacation`)
         .pipe(take(1))
         .subscribe({
@@ -65,7 +50,7 @@ export class ManagerService {
             console.error('Error fetching all vacations:', err);
             this.routerService.navigate(['/error', err.status]);
             reject(err);
-          }
+          },
         });
 
       this.managerData.set({
@@ -75,85 +60,52 @@ export class ManagerService {
     });
   }
 
-  readonly futureVacations = computed(() => {
-    const today = new Date();
-    return this.pendingVacations()
-      .filter(v => new Date(v.startDate) >= today)
-      .map(vacation => ({
-        userId: vacation.userId || 0,
-        vacation
+  readonly pendingVacationsComputed = computed(() => {
+    return this.allVacations()
+      .filter((v) => v.status === 'PENDING')
+      .map((vacation) => ({
+        userId: vacation.userId!,
+        vacation,
       }));
   });
 
-  readonly pastVacations = computed(() => {
-    return this.allVacations().map(vacation => ({
-      userId: vacation.userId || 0,
-      vacation
-    }));
+  readonly completedVacationsComputed = computed(() => {
+    return this.allVacations()
+      .filter((v) => v.status !== 'PENDING')
+      .map((vacation) => ({
+        userId: vacation.userId!,
+        vacation,
+      }));
   });
 
-  readonly futureLeaves = computed(() => {
-    return [];
-  });
-
-  readonly pastLeaves = computed(() => {
-    return [];
-  });
+  readonly futureLeaves = computed(() => []);
+  readonly pastLeaves = computed(() => []);
 
   acceptVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { vacation } = vacationWithUser;
-
-    if (!vacation.id) return Promise.reject('Vacation ID required');
-
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/ACCEPTED`, {})
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.fetchManagerData();
-            resolve();
-          },
-          error: (err) => {
-            console.error(err);
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          },
-        });
-    });
+    return this.updateVacationStatus(vacationWithUser, 'ACCEPTED');
   }
 
   rejectVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { vacation } = vacationWithUser;
-
-    if (!vacation.id) return Promise.reject('Vacation ID required');
-
-    return new Promise((resolve, reject) => {
-      this.http
-        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/DENIED`, {})
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.fetchManagerData();
-            resolve();
-          },
-          error: (err) => {
-            console.error(err);
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          },
-        });
-    });
+    return this.updateVacationStatus(vacationWithUser, 'DENIED');
   }
 
   undoVacation(vacationWithUser: VacationWithUser): Promise<void> {
-    const { vacation } = vacationWithUser;
+    return this.updateVacationStatus(vacationWithUser, 'PENDING');
+  }
 
+  private updateVacationStatus(
+    vacationWithUser: VacationWithUser,
+    status: string,
+  ): Promise<void> {
+    const { vacation } = vacationWithUser;
     if (!vacation.id) return Promise.reject('Vacation ID required');
 
     return new Promise((resolve, reject) => {
       this.http
-        .put<Vacation>(`${environment.apiUrl}/vacation/${vacation.id}/PENDING`, {})
+        .put<Vacation>(
+          `${environment.apiUrl}/vacation/${vacation.id}/${status}`,
+          {},
+        )
         .pipe(take(1))
         .subscribe({
           next: () => {
@@ -170,79 +122,21 @@ export class ManagerService {
   }
 
   acceptLeave(leaveWithUser: LeaveWithUser): Promise<void> {
-    const { userId, leave } = leaveWithUser;
-    const userLeaves = this.managerData().leaves[userId];
-    if (!userLeaves) return Promise.reject();
-
-    return new Promise((resolve, reject) => {
-      this.http
-        .put(`${environment.apiUrl}/leaveslip/update/`, {
-          userId,
-          data: {
-            futureLeaves: userLeaves.futureLeaves.map((l) =>
-              l.date === leave.date && l.description === leave.description
-                ? { ...l, status: 'accepted' }
-                : l
-            ),
-            pastLeaves: userLeaves.pastLeaves,
-            remainingTime:
-              userLeaves.remainingTime -
-              Number(
-                new Date(leave.endTime).getTime() -
-                  new Date(leave.startTime).getTime()
-              ),
-          },
-        })
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.fetchManagerData();
-            resolve();
-          },
-          error: (err) => {
-            console.error(err);
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          },
-        });
-    });
+    return this.updateLeaveStatus(leaveWithUser, 'accepted');
   }
 
   rejectLeave(leaveWithUser: LeaveWithUser): Promise<void> {
-    const { userId, leave } = leaveWithUser;
-    const userLeaves = this.managerData().leaves[userId];
-    if (!userLeaves) return Promise.reject();
-
-    return new Promise((resolve, reject) => {
-      this.http
-        .put(`${environment.apiUrl}/leaveslip/update/`, {
-          userId,
-          data: {
-            futureLeaves: userLeaves.futureLeaves.map((l) =>
-              l.date === leave.date && l.description === leave.description
-                ? { ...l, status: 'denied' }
-                : l
-            ),
-            pastLeaves: userLeaves.pastLeaves,
-            remainingTime: userLeaves.remainingTime,
-          },
-        })
-        .pipe(take(1))
-        .subscribe({
-          next: () => {
-            this.fetchManagerData();
-            resolve();
-          },
-          error: (err) => {
-            console.error(err);
-            this.routerService.navigate(['/error', err.status]);
-            reject(err);
-          },
-        });
-    });
+    return this.updateLeaveStatus(leaveWithUser, 'denied');
   }
 
   undoLeave(leaveWithUser: LeaveWithUser): Promise<void> {
+    return this.updateLeaveStatus(leaveWithUser, 'pending');
+  }
+
+  private updateLeaveStatus(
+    leaveWithUser: LeaveWithUser,
+    status: 'accepted' | 'denied' | 'pending',
+  ): Promise<void> {
     const { userId, leave } = leaveWithUser;
     const userLeaves = this.managerData().leaves[userId];
     if (!userLeaves) return Promise.reject();
@@ -254,18 +148,20 @@ export class ManagerService {
           data: {
             futureLeaves: userLeaves.futureLeaves.map((l) =>
               l.date === leave.date && l.description === leave.description
-                ? { ...l, status: 'pending' }
-                : l
+                ? { ...l, status }
+                : l,
             ),
             pastLeaves: userLeaves.pastLeaves,
             remainingTime:
-              leave.status === 'accepted'
-                ? userLeaves.remainingTime +
-                  Number(
-                    new Date(leave.endTime).getTime() -
-                      new Date(leave.startTime).getTime()
-                  )
-                : userLeaves.remainingTime,
+              status === 'accepted' && leave.status === 'pending'
+                ? userLeaves.remainingTime -
+                  (new Date(leave.endTime).getTime() -
+                    new Date(leave.startTime).getTime())
+                : status === 'pending' && leave.status === 'accepted'
+                  ? userLeaves.remainingTime +
+                    (new Date(leave.endTime).getTime() -
+                      new Date(leave.startTime).getTime())
+                  : userLeaves.remainingTime,
           },
         })
         .pipe(take(1))
@@ -283,9 +179,12 @@ export class ManagerService {
     });
   }
 
-  getRemainingDays(userId: number): number {
-    const userVacations = this.managerData().vacations[userId];
-    return userVacations ? userVacations.remainingVacationDays : 0;
+  getRemainingDays(userId: number): Promise<number> {
+    return firstValueFrom(
+      this.http.get<number>(
+        `${environment.apiUrl}/vacation/user/remaining/${userId}`,
+      ),
+    );
   }
 
   getRemainingTime(userId: number): number {
@@ -294,13 +193,11 @@ export class ManagerService {
   }
 
   getUserById(userId: number): UserData | null {
-    if (this.usersData()[userId]) {
-      return this.usersData()[userId];
-    }
+    if (this.usersData()[userId]) return this.usersData()[userId];
 
     if (!this.pendingRequests.has(userId)) {
       const request = firstValueFrom(
-        this.http.get<UserData>(`${environment.apiUrl}/auth/getuser/${userId}/`)
+        this.http.get<UserData>(`${environment.apiUrl}/user/${userId}`),
       )
         .then((res) => {
           this.usersData.update((state) => ({ ...state, [userId]: res }));
@@ -308,7 +205,6 @@ export class ManagerService {
           return res;
         })
         .catch((err) => {
-          console.error(err);
           this.routerService.navigate(['/error', err.status]);
           this.pendingRequests.delete(userId);
           throw err;

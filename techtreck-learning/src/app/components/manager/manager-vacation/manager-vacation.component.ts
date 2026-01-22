@@ -1,5 +1,5 @@
 import { Vacation } from './../../../model/vacation.interface';
-import { Component, inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { ManagerService } from '../../../service/manager.service';
 import { VacationWithUser } from '../../../model/manager-data.interface';
 import { DateFilter } from '../../../model/date-filter.interface';
@@ -18,164 +18,183 @@ import { getDaysBetweenDates } from '../../../shared/utils/time.utils';
 })
 export class ManagerVacationComponent implements OnInit {
   private managerService = inject(ManagerService);
-  futureVacations: VacationWithUser[] = [];
-  pastVacations: VacationWithUser[] = [];
+  private cdr = inject(ChangeDetectorRef);
 
-  private dateFilterPending: DateFilter = {
-    startDate: new Date(0),
-    endDate: new Date(0),
-  };
+  pendingVacations: VacationWithUser[] = [];
+  completedVacations: VacationWithUser[] = [];
 
-  private dateFilterCompleted: DateFilter = {
-    startDate: new Date(0),
-    endDate: new Date(0),
-  };
+  private userEmailCache = new Map<number, string>();
+  private remainingDaysCache = new Map<number, number>();
+  private validVacationCache = new Map<string, boolean>();
+
+  private dateFilterPending: DateFilter = { startDate: new Date(0), endDate: new Date(0) };
+  private dateFilterCompleted: DateFilter = { startDate: new Date(0), endDate: new Date(0) };
   private statusFilter: StatusFilter = { status: 'all' };
 
   async ngOnInit(): Promise<void> {
     await this.managerService.initialize();
-    this.futureVacations = this.managerService.futureVacations();
-    this.pastVacations = this.managerService.pastVacations();
+    // this.pendingVacations = this.managerService.pendingVacationsComputed();
+    // this.completedVacations = this.managerService.completedVacationsComputed();
+    // console.log(this.pendingVacations)
+    await this.refreshVacations();
+
+    await this.preloadUserData();
   }
 
-  private get completedVacationRequests() {
-    return [
-      ...this.pastVacations.filter((v) => v.vacation.status !== 'pending'),
-      ...this.futureVacations.filter((v) => v.vacation.status !== 'pending'),
-    ];
-  }
+  private async preloadUserData() {
+    const allVacations = [...this.pendingVacations, ...this.completedVacations];
+    const userIds = new Set(allVacations.map(v => v.userId));
 
-  private get statusFiltered() {
-    if (this.statusFilter.status === 'all')
-      return this.completedVacationRequests;
-    else {
-      return this.completedVacationRequests.filter((v) => {
-        return v.vacation.status === this.statusFilter.status;
-      });
+    for (const userId of userIds) {
+      if (!this.userEmailCache.has(userId)) {
+        const user = this.managerService.getUserById(userId);
+        if (user) {
+          this.userEmailCache.set(userId, user.email);
+        }
+      }
     }
+
+    for (const v of this.pendingVacations) {
+      if (!this.remainingDaysCache.has(v.userId)) {
+        try {
+          const remaining = await this.managerService.getRemainingDays(v.userId);
+          this.remainingDaysCache.set(v.userId, remaining);
+
+          const days = getDaysBetweenDates(
+            new Date(v.vacation.startDate),
+            new Date(v.vacation.endDate)
+          );
+          const cacheKey = `${v.userId}-${v.vacation.id}`;
+          this.validVacationCache.set(cacheKey, remaining >= days);
+        } catch (err) {
+          console.error('Error fetching remaining days:', err);
+        }
+      }
+    }
+
+    this.cdr.markForCheck();
+  }
+
+  private get statusFilteredCompleted() {
+    if (this.statusFilter.status === 'all') return this.completedVacations;
+    return this.completedVacations.filter(v => v.vacation.status === this.statusFilter.status);
   }
 
   get filteredCompletedVacationRequests() {
-    if (
-      !this.dateFilterCompleted.startDate.getTime() &&
-      !this.dateFilterCompleted.endDate.getTime()
-    ) {
-      return this.statusFiltered;
+    const filtered = this.statusFilteredCompleted;
+    if (!this.dateFilterCompleted.startDate.getTime() && !this.dateFilterCompleted.endDate.getTime()) {
+      return filtered;
     }
-    return [
-      ...this.statusFiltered.filter((v) => {
-        const dateA = new Date(v.vacation.startDate);
-        const dateB = new Date(this.dateFilterCompleted.startDate);
-        const dateC = new Date(this.dateFilterCompleted.endDate);
-        if (
-          dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() < dateC.getTime() + 86400000
-        ) {
-          return true;
-        }
-        return false;
-      }),
-    ];
+    return filtered.filter(v => {
+      const start = new Date(v.vacation.startDate).getTime();
+      const from = this.dateFilterCompleted.startDate.getTime();
+      const to = this.dateFilterCompleted.endDate.getTime() + 86400000; // include end date
+      return start >= from && start < to;
+    });
   }
 
   private get pendingVacationRequests() {
-    return [
-      ...this.futureVacations.filter((v) => v.vacation.status === 'pending'),
-    ];
+    return this.pendingVacations.filter(v => v.vacation.status === 'PENDING');
   }
 
   get filteredPendingVacationRequests() {
-    if (
-      !this.dateFilterPending.startDate.getTime() &&
-      !this.dateFilterPending.endDate.getTime()
-    ) {
-      return this.pendingVacationRequests;
+    const filtered = this.pendingVacationRequests;
+    if (!this.dateFilterPending.startDate.getTime() && !this.dateFilterPending.endDate.getTime()) {
+      return filtered;
     }
-    return [
-      ...this.pendingVacationRequests.filter((v) => {
-        const dateA = new Date(v.vacation.startDate);
-        const dateB = new Date(this.dateFilterPending.startDate);
-        const dateC = new Date(this.dateFilterPending.endDate);
-        if (
-          dateA.getTime() >= dateB.getTime() &&
-          dateA.getTime() < dateC.getTime() + 86400000
-        ) {
-          return true;
-        }
-        return false;
-      }),
-    ];
+    return filtered.filter(v => {
+      const start = new Date(v.vacation.startDate).getTime();
+      const from = this.dateFilterPending.startDate.getTime();
+      const to = this.dateFilterPending.endDate.getTime() + 86400000;
+      return start >= from && start < to;
+    });
   }
 
   onChangeDateFilterPending(newDateFilter: DateFilter) {
-    if (newDateFilter.startDate === null && newDateFilter.endDate === null) {
-      this.dateFilterPending = {
-        startDate: new Date(0),
-        endDate: new Date(0),
-      };
-    } else {
-      this.dateFilterPending = newDateFilter;
-    }
+    this.dateFilterPending = newDateFilter.startDate && newDateFilter.endDate
+      ? newDateFilter
+      : { startDate: new Date(0), endDate: new Date(0) };
   }
 
   onChangeDateFilterCompleted(newDateFilter: DateFilter) {
-    if (newDateFilter.startDate === null && newDateFilter.endDate === null) {
-      this.dateFilterCompleted = {
-        startDate: new Date(0),
-        endDate: new Date(0),
-      };
-    } else {
-      this.dateFilterCompleted = newDateFilter;
-    }
+    this.dateFilterCompleted = newDateFilter.startDate && newDateFilter.endDate
+      ? newDateFilter
+      : { startDate: new Date(0), endDate: new Date(0) };
   }
 
   onChangeStatusFilter(newStatusFilter: StatusFilter) {
     this.statusFilter.status = newStatusFilter.status;
   }
 
-  getValidVacation(vacationWithUser: VacationWithUser): boolean {
-    const userVacations = this.managerService.getRemainingDays(
-      vacationWithUser.userId
-    );
-    if (!userVacations) return false;
+  isValidVacation(v: VacationWithUser): boolean {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    return (
-      userVacations >=
-      getDaysBetweenDates(
-        new Date(vacationWithUser.vacation.startDate),
-        new Date(vacationWithUser.vacation.endDate)
-      )
-    );
+    const vacationStart = new Date(v.vacation.startDate);
+    vacationStart.setHours(0, 0, 0, 0);
+
+    if (vacationStart < today) return false;
+
+    const cacheKey = `${v.userId}-${v.vacation.id}`;
+    return this.validVacationCache.get(cacheKey) ?? true;
   }
 
+  getValidationMessage(v: VacationWithUser): string {
+    return this.isValidVacation(v) ? 'Accept' : 'Insufficient vacation days';
+  }
+
+  // Now synchronous using cached data
   getUserEmail(userId: number): string {
+    if (this.userEmailCache.has(userId)) {
+      return this.userEmailCache.get(userId)!;
+    }
+
     const user = this.managerService.getUserById(userId);
-    return user?.email || '';
+    if (user) {
+      this.userEmailCache.set(userId, user.email);
+      return user.email;
+    }
+
+    return 'Loading...';
   }
 
   disabled(v: VacationWithUser): boolean {
-    const index = this.managerService.getVacationIndex(v);
-    return index === -1;
+    return this.managerService.getVacationIndex(v) === -1;
   }
 
   async onAccept(v: VacationWithUser) {
-    await this.managerService.acceptVacation(v);
-    await this.managerService.initialize();
-    this.futureVacations = this.managerService.futureVacations();
-    this.pastVacations = this.managerService.pastVacations();
+    try {
+      await this.managerService.acceptVacation(v);
+      await this.refreshVacations();
+      await this.preloadUserData();
+    } catch (err) {
+      console.error('Error accepting vacation:', err);
+    }
   }
 
   async onDeny(v: VacationWithUser) {
-    await this.managerService.rejectVacation(v);
-    await this.managerService.initialize();
-    this.futureVacations = this.managerService.futureVacations();
-    this.pastVacations = this.managerService.pastVacations();
+    try {
+      await this.managerService.rejectVacation(v);
+      await this.refreshVacations();
+      await this.preloadUserData();
+    } catch (err) {
+      console.error('Error denying vacation:', err);
+    }
   }
 
   async onUndo(v: VacationWithUser) {
-    await this.managerService.undoVacation(v);
+    try {
+      await this.managerService.undoVacation(v);
+      await this.refreshVacations();
+      await this.preloadUserData();
+    } catch (err) {
+      console.error('Error undoing vacation:', err);
+    }
+  }
+
+  private async refreshVacations() {
     await this.managerService.initialize();
-    this.futureVacations = this.managerService.futureVacations();
-    this.pastVacations = this.managerService.pastVacations();
+    this.pendingVacations = this.managerService.pendingVacationsComputed();
+    this.completedVacations = this.managerService.completedVacationsComputed();
   }
 }
