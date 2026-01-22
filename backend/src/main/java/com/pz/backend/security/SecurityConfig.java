@@ -59,6 +59,8 @@ public class SecurityConfig {
             if (role == null) return Collections.emptyList();
             return List.of(new SimpleGrantedAuthority("ROLE_" + role));
         });
+
+        converter.setPrincipalClaimName("user_id");
         return converter;
     }
 

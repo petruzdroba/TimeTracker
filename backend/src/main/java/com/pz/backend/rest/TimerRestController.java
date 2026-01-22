@@ -5,6 +5,7 @@ import com.pz.backend.entity.TimerData;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.TimerService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,6 +24,7 @@ public class TimerRestController {
         return timerService.get(userId);
     }
 
+    @PreAuthorize("@timerSecurity.isOwner(#request.userId, authentication)")
     @PutMapping("/timer")
     public TimerData syncTimerData(@Valid @RequestBody TimerDataPutRequest request) throws NotFoundException {
         return timerService.sync(
