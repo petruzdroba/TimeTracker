@@ -52,6 +52,7 @@ public class VacationRestController {
         return vacationService.getRemainingDays(userId);
     }
 
+    @PreAuthorize("@vacationSecurity.canAccessUser(#request.userId, authentication)")
     @PostMapping("/vacation")
     public Vacation post(@Valid @RequestBody VacationPostRequest request) throws AlreadyExistsException {
         return vacationService.post(
@@ -62,6 +63,7 @@ public class VacationRestController {
         );
     }
 
+    @PreAuthorize("@vacationSecurity.isOwner(#request.id, authentication)")
     @PutMapping("/vacation")
     public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException {
         return vacationService.put(
@@ -80,7 +82,7 @@ public class VacationRestController {
     }
 
     @PreAuthorize("@vacationSecurity.isOwner(#vacationId, authentication)")
-    @DeleteMapping("vacation/{vacationId}")
+    @DeleteMapping("/vacation/{vacationId}")
     public void delete(@PathVariable Long vacationId) throws NotFoundException {
         vacationService.delete(vacationId);
     }
