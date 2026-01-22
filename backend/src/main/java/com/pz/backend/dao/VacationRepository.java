@@ -21,5 +21,5 @@ public interface VacationRepository extends JpaRepository<Vacation, Long> {
     @Query("UPDATE Vacation v SET v.status = 'IGNORED' " +
             "WHERE v.startDate < :now " +
             "AND v.status IN ('PENDING', 'ACCEPTED', 'DENIED')")
-    int updateExpiredVacationsToIgnored(@Param("now") Instant now);
+    void updateExpiredVacationsToIgnored(@Param("now") Instant now);
 }
