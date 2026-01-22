@@ -46,7 +46,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
+    @Transactional
     public List<Vacation> get(Long userId) throws NotFoundException {
+        vacationRepository.updateExpiredVacationsToIgnored(Instant.now());
         return vacationRepository.findAllByUser_Id(userId);
     }
 
@@ -87,12 +89,16 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
+    @Transactional
     public List<Vacation> getStatus(Status status) {
+        vacationRepository.updateExpiredVacationsToIgnored(Instant.now());
         return vacationRepository.findAllByStatus(status);
     }
 
     @Override
+    @Transactional
     public List<Vacation> getAll() {
+        vacationRepository.updateExpiredVacationsToIgnored(Instant.now());
         return vacationRepository.findAll();
     }
 
