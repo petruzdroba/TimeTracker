@@ -8,9 +8,9 @@ import java.time.Instant;
 import java.util.List;
 
 public interface VacationRepository extends JpaRepository<Vacation, Long> {
-    List<Vacation> findAllByUserId(Long userId);
+    List<Vacation> findAllByUser_Id(Long userId);
 
-    Vacation findByUserIdAndStartDate(Long userId, Instant startDate);
+    Vacation findByUser_IdAndStartDate(Long userId, Instant startDate);
 
     List<Vacation> findAllByStatus(Status status);
 }

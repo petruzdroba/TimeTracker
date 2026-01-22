@@ -22,9 +22,9 @@ export class UserDataService implements OnDestroy {
   });
   public readonly user = computed(() => this.userData());
   public readonly isLoggedIn = computed(() => this.userData().id !== -1);
-  public readonly isAdmin = computed(() => this.userData().role === 'admin');
+  public readonly isAdmin = computed(() => this.userData().role === 'admin' || this.userData().role === 'ADMIN');
   public readonly isManager = computed(
-    () => this.userData().role === 'manager'
+    () => this.userData().role === 'manager' || this.userData().role === 'MANAGER'
   );
 
   constructor() {

@@ -33,7 +33,7 @@ public class VacationServiceImpl implements VacationService {
     @Override
     @Transactional
     public Vacation post(Long userId, Instant startDate, Instant endDate, String description) throws AlreadyExistsException {
-        Vacation existing = vacationRepository.findByUserIdAndStartDate(userId, startDate);
+        Vacation existing = vacationRepository.findByUser_IdAndStartDate(userId, startDate);
 
         if (existing != null) {
             throw new AlreadyExistsException("Vacation for this day already exists");
@@ -47,7 +47,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public List<Vacation> get(Long userId) throws NotFoundException {
-        return vacationRepository.findAllByUserId(userId);
+        return vacationRepository.findAllByUser_Id(userId);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class VacationServiceImpl implements VacationService {
         }
 
         int totalDays = user.getVacationDays();
-        int totalTaken = vacationRepository.findAllByUserId(userId).stream()
+        int totalTaken = vacationRepository.findAllByUser_Id(userId).stream()
                 .filter(vacation -> vacation.getStatus() == Status.ACCEPTED)
                 .mapToInt(vacation -> getDaysBetweenDates(vacation.getStartDate(), vacation.getEndDate()))
                 .sum();
@@ -116,7 +116,7 @@ public class VacationServiceImpl implements VacationService {
     public List<Vacation> getVacationsByTimeRelation(Long userId, TimeRelation timeRelation) {
         Instant now = Instant.now();
 
-        return vacationRepository.findAllByUserId(userId).stream()
+        return vacationRepository.findAllByUser_Id(userId).stream()
                 .filter(vacation -> {
                     Instant start = vacation.getStartDate();
                     return switch (timeRelation) {
