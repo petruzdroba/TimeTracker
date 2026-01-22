@@ -52,7 +52,7 @@ export class AdminComponent implements OnInit {
     }
 
     const filtered = this.adminData.filter((user) =>
-      user.email.toLowerCase().includes(this.searchText.toLowerCase())
+      user.email.toLowerCase().includes(this.searchText.toLowerCase()),
     );
     this.filteredUsers.set(filtered);
   }
@@ -62,18 +62,20 @@ export class AdminComponent implements OnInit {
     this.selectedUser = user;
   }
 
-  getBenefits(userId: number) {
+  async getBenefits(userId: number) {
+    const vacations = await this.managerService.getRemainingDays(userId);
+    const leave = this.managerService.getRemainingTime(userId) / 360000;
     return {
-      vacations: this.managerService.getRemainingDays(userId),
-      leave: this.managerService.getRemainingTime(userId) / 360000,
+      vacations,
+      leave,
     };
   }
 
-  getUsedLeaveHours(user: UserData): number {
+  async getUsedLeaveHours(user: UserData): Promise<number> {
     if (!user?.personalTime) return 0;
     const benefits = this.getBenefits(user.id);
-    const leaveHours = benefits?.leave ?? 0;
-    return user.personalTime - leaveHours;
+    const leaveHours = (await benefits)?.leave ?? 0;
+    return user.personalTime - (await leaveHours);
   }
 
   async restoreVacation(userId: number) {
