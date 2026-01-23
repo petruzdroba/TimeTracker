@@ -1,5 +1,6 @@
 package com.pz.backend.security;
 
+import com.pz.backend.entity.Role;
 import com.pz.backend.service.UserService;
 import org.springframework.security.core.Authentication;
 
@@ -29,5 +30,9 @@ public class UserSecurity {
         Long userId = jwt.getClaim("user_id");
 
         return Objects.equals(userService.findById(userId).getEmail(), email);
+    }
+
+    public boolean modifiable(Long id){
+        return !Objects.equals(userService.findById(id).getRole(), Role.ADMIN);
     }
 }
