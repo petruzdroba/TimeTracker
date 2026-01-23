@@ -42,9 +42,15 @@ export class AdminService implements OnDestroy {
   updateUser(data: UserData): Promise<void> {
     return new Promise((resolve, reject) => {
       this.subscription = this.http
-        .put<UserData>(`${environment.apiUrl}/user/update/`,
-           { data: data }
-          )
+        .put<UserData>(`${environment.apiUrl}/user`, {
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          workHours: data.workHours,
+          vacationDays: data.vacationDays,
+          personalTime: data.personalTime,
+          role: data.role
+        })
         .subscribe({
           next: () => {
             this.fetchAdminData();
@@ -58,7 +64,7 @@ export class AdminService implements OnDestroy {
     });
   }
 
-  // restoreVacation(userId: number): Promise<void> {
+  // `restoreVacation(userId: number): Promise<void> {
   //   return new Promise((resolve, reject) => {
   //     this.http
   //       .post(`${environment.apiUrl}/vacation/restore/`, { userId: userId })
@@ -92,7 +98,7 @@ export class AdminService implements OnDestroy {
   //         },
   //       });
   //   });
-  // }
+  // }`
 
   readonly getAdminData = computed(() => this.adminData());
 

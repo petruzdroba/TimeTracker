@@ -10,7 +10,7 @@
       matInput
       type="text"
       [(ngModel)]="searchText"
-      (ngModelChange)="filterUsers()"
+      (ngModelChange)="filteredUsers()"
     />
     <mat-icon matPrefix>search</mat-icon>
   </mat-form-field>
@@ -66,17 +66,14 @@
               <tr>
                 <td class="txt-head">Used vacation days</td>
                 <td class="txt-right" *ngIf="user">
-                  {{
-                    user.vacationDays -
-                      ((getBenefits(user.id) | async)?.vacations ?? 0)
-                  }}
+                  {{ getUsedVacationDays(user.id) }}
                 </td>
               </tr>
 
               <tr>
                 <td class="txt-head">Used leave time</td>
                 <td class="txt-right">
-                  {{ getUsedLeaveHours(user) | async | number: "1.0-0" }}
+                  <!-- {{ getUsedLeaveHours(user) | async | number: "1.0-0" }} -->
                 </td>
               </tr>
 
