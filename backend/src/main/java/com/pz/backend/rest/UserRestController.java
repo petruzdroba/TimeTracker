@@ -1,17 +1,18 @@
 package com.pz.backend.rest;
 
+import com.pz.backend.dto.UserPutRequest;
 import com.pz.backend.dto.UserResponse;
 import com.pz.backend.entity.UserData;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api")
 public class UserRestController {
 
     private final UserService userService;
@@ -20,9 +21,25 @@ public class UserRestController {
         this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('ADMIN') or @userSecurity.canAccessUser(#id, authentication)")
-    @GetMapping("/{id}")
-    public UserResponse findById(@PathVariable Long id) throws NotFoundException{
+    @GetMapping("/user")
+    public List<UserResponse> getAll() {
+        return userService.get()
+                .stream()
+                .map(user -> new UserResponse(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getWorkHours(),
+                        user.getVacationDays(),
+                        user.getPersonalTime(),
+                        user.getRole()
+                ))
+                .toList();
+    }
+
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER') or @userSecurity.canAccessUser(#id, authentication)")
+    @GetMapping("/user/{id}")
+    public UserResponse findById(@PathVariable Long id) throws NotFoundException {
         UserData data = userService.findById(id);
 
         return new UserResponse(
@@ -37,9 +54,33 @@ public class UserRestController {
     }
 
     @PreAuthorize("hasRole('ADMIN') or  @userSecurity.canAccessUser(#email, authentication)")
-    @GetMapping("/email/{email}")
-    public UserResponse findByEmail(@PathVariable String email) throws NotFoundException{
+    @GetMapping("/user/email/{email}")
+    public UserResponse findByEmail(@PathVariable String email) throws NotFoundException {
         UserData data = userService.findByEmail(email);
+
+        return new UserResponse(
+                data.getId(),
+                data.getName(),
+                data.getEmail(),
+                data.getWorkHours(),
+                data.getVacationDays(),
+                data.getPersonalTime(),
+                data.getRole()
+        );
+    }
+
+    @PreAuthorize("hasRole('ADMIN') and @userSecurity.modifiable(#request.id)")
+    @PutMapping("/user")
+    public UserResponse put(@Valid @RequestBody UserPutRequest request) throws NotFoundException {
+        UserData data = userService.put(
+                request.id(),
+                request.name(),
+                request.email(),
+                request.workHours(),
+                request.vacationDays(),
+                request.personalTime(),
+                request.role()
+        );
 
         return new UserResponse(
                 data.getId(),
