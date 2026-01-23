@@ -78,29 +78,29 @@ export class AdminComponent implements OnInit {
     return user.personalTime - (await leaveHours);
   }
 
-  async restoreVacation(userId: number) {
-    await this.adminService.restoreVacation(userId);
-    await this.adminService.initialize();
-    this.adminData = this.adminService
-      .getAdminData()
-      .filter((user) => user.role !== 'admin');
-    this.filterUsers();
+  // async restoreVacation(userId: number) {
+  //   await this.adminService.restoreVacation(userId);
+  //   await this.adminService.initialize();
+  //   this.adminData = this.adminService
+  //     .getAdminData()
+  //     .filter((user) => user.role !== 'admin');
+  //   this.filterUsers();
 
-    this.isOpenEdit = false;
-    this.selectedUser = null;
-  }
+  //   this.isOpenEdit = false;
+  //   this.selectedUser = null;
+  // }
 
-  async restoreLeaveTime(userId: number) {
-    await this.adminService.restoreLeaveTime(userId);
-    await this.adminService.initialize();
-    this.adminData = this.adminService
-      .getAdminData()
-      .filter((user) => user.role !== 'admin');
-    this.filterUsers();
+  // async restoreLeaveTime(userId: number) {
+  //   await this.adminService.restoreLeaveTime(userId);
+  //   await this.adminService.initialize();
+  //   this.adminData = this.adminService
+  //     .getAdminData()
+  //     .filter((user) => user.role !== 'admin');
+  //   this.filterUsers();
 
-    this.isOpenEdit = false;
-    this.selectedUser = null;
-  }
+  //   this.isOpenEdit = false;
+  //   this.selectedUser = null;
+  // }
 
   async closeEditWindow() {
     await this.adminService.initialize();
