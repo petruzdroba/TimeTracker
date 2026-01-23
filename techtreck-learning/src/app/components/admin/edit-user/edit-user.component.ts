@@ -62,6 +62,12 @@ export class EditUserComponent implements OnChanges {
         vacationDays: this.user?.vacationDays,
         role: this.user?.role,
       });
+
+      if (this.user.role === 'admin') {
+        this.form.get('role')?.disable();
+      } else {
+        this.form.get('role')?.enable();
+      }
     }
   }
 

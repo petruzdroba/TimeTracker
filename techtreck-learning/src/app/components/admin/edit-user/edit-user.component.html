@@ -41,7 +41,7 @@
 
     <mat-form-field class="form-input" [hideRequiredMarker]="true">
       <mat-label>Role</mat-label>
-      <mat-select formControlName="role">
+      <mat-select formControlName="role" [disabled]="user?.role === 'ADMIN' || user?.role === 'admin'">
         <mat-option value="employee">Employee</mat-option>
         <mat-option value="manager">Manager</mat-option>
         <!-- <mat-option value="admin">Admin</mat-option> -->
