@@ -73,6 +73,11 @@
   font-size: large;
 }
 
+.btn-icon-primary:disabled{
+  color: var(--text-disabled-color);
+  cursor: not-allowed;
+}
+
 .search-field {
   width: 80%;
   margin: 20px 0;
