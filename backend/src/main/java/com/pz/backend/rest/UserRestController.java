@@ -3,6 +3,7 @@ package com.pz.backend.rest;
 import com.pz.backend.dto.UserPutRequest;
 import com.pz.backend.dto.UserResponse;
 import com.pz.backend.entity.UserData;
+import com.pz.backend.exceptions.AdminRoleUpdateException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -69,9 +70,9 @@ public class UserRestController {
         );
     }
 
-    @PreAuthorize("hasRole('ADMIN') and @userSecurity.modifiable(#request.id)")
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/user")
-    public UserResponse put(@Valid @RequestBody UserPutRequest request) throws NotFoundException {
+    public UserResponse put(@Valid @RequestBody UserPutRequest request) throws NotFoundException, AdminRoleUpdateException {
         UserData data = userService.put(
                 request.id(),
                 request.name(),
