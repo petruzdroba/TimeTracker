@@ -9,6 +9,7 @@ import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.VacationService;
 import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -33,21 +34,25 @@ public class VacationRestController {
         return vacationService.getStatus(status);
     }
 
+    @PreAuthorize("hasRole('MANAGER') or @vacationSecurity.canAccessUser(#userId, authentication)")
     @GetMapping("/vacation/user/{userId}")
     public List<Vacation> getAllByUser(@PathVariable Long userId) throws NotFoundException {
         return vacationService.get(userId);
     }
 
+    @PreAuthorize("hasRole('MANAGER') or @vacationSecurity.canAccessUser(#userId, authentication)")
     @GetMapping("/vacation/user/{userId}/{relation}")
     public List<Vacation> getAllByTimeRelation(@PathVariable Long userId, @PathVariable TimeRelation relation) throws NotFoundException {
         return vacationService.getVacationsByTimeRelation(userId, relation);
     }
 
+    @PreAuthorize("hasRole('MANAGER') or @vacationSecurity.canAccessUser(#userId, authentication)")
     @GetMapping("/vacation/user/remaining/{userId}")
     public Long getRemaining(@PathVariable Long userId) throws NotFoundException {
         return vacationService.getRemainingDays(userId);
     }
 
+    @PreAuthorize("@vacationSecurity.canAccessUser(#request.userId, authentication)")
     @PostMapping("/vacation")
     public Vacation post(@Valid @RequestBody VacationPostRequest request) throws AlreadyExistsException {
         return vacationService.post(
@@ -58,6 +63,7 @@ public class VacationRestController {
         );
     }
 
+    @PreAuthorize("@vacationSecurity.isOwner(#request.id, authentication)")
     @PutMapping("/vacation")
     public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException {
         return vacationService.put(
@@ -69,12 +75,14 @@ public class VacationRestController {
         );
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/vacation/{vacationId}/{status}")
     public Vacation putStatus(@PathVariable Long vacationId, @PathVariable Status status) throws NotFoundException{
         return vacationService.updateStatus(vacationId, status);
     }
 
-    @DeleteMapping("vacation/{vacationId}")
+    @PreAuthorize("@vacationSecurity.isOwner(#vacationId, authentication)")
+    @DeleteMapping("/vacation/{vacationId}")
     public void delete(@PathVariable Long vacationId) throws NotFoundException {
         vacationService.delete(vacationId);
     }

@@ -4,5 +4,5 @@ export interface Vacation {
   startDate: Date;
   endDate: Date;
   description: string;
-  status: 'pending' | 'accepted' | 'denied' | 'ignored';
+  status: 'pending' | 'accepted' | 'denied' | 'ignored' | 'PENDING' | 'ACCEPTED' | 'DENIED' | 'IGNORED';
 }

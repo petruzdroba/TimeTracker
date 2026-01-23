@@ -2,7 +2,7 @@
   <div class="info">
     <h1>You have {{ vacationData.remainingVacationDays ? vacationData.remainingVacationDays : 'no' }} vacation days
       remaining!</h1>
-    <app-progress-bar [currentValue]="14 - vacationData.remainingVacationDays" [totalValue]="14"
+    <app-progress-bar [currentValue]="vacationDays - vacationData.remainingVacationDays" [totalValue]="vacationDays"
       class="progress-bar-group-vacation" />
   </div>
   <div class="vacation-plan">

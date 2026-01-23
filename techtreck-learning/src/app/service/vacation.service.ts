@@ -22,7 +22,7 @@ export class VacationService {
   readonly vacationData = computed(() => ({
     futureVacations: this.futureVacations(),
     pastVacations: this.pastVacations(),
-    remainingVacationDays: this.remainingDaysSignal()
+    remainingVacationDays: this.remainingDaysSignal(),
   }));
 
   loadVacations(): void {
@@ -40,7 +40,7 @@ export class VacationService {
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        }
+        },
       });
 
     this.http
@@ -52,7 +52,7 @@ export class VacationService {
         },
         error: (err) => {
           console.error(err);
-        }
+        },
       });
 
     this.loadRemainingDays();
@@ -63,7 +63,7 @@ export class VacationService {
 
     this.http
       .get<number>(
-        `${environment.apiUrl}/vacation/user/remaining/${this.userData.user().id}`
+        `${environment.apiUrl}/vacation/user/remaining/${this.userData.user().id}`,
       )
       .pipe(take(1))
       .subscribe({
@@ -72,7 +72,7 @@ export class VacationService {
         },
         error: (err) => {
           console.error(err);
-        }
+        },
       });
   }
 
@@ -82,18 +82,22 @@ export class VacationService {
         userId: this.userData.user().id,
         startDate: vacation.startDate,
         endDate: vacation.endDate,
-        description: vacation.description
+        description: vacation.description,
       })
       .pipe(take(1))
       .subscribe({
         next: (newVacation) => {
-          this.futureVacations.update(vacations => [...vacations, newVacation]);
+          newVacation.userId = this.userData.user().id;
+          this.futureVacations.update((vacations) => [
+            ...vacations,
+            newVacation,
+          ]);
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        }
+        },
       });
   }
 
@@ -104,20 +108,20 @@ export class VacationService {
         userId: this.userData.user().id,
         startDate: vacation.startDate,
         endDate: vacation.endDate,
-        description: vacation.description
+        description: vacation.description,
       })
       .pipe(take(1))
       .subscribe({
         next: (updatedVacation) => {
-          this.futureVacations.update(vacations =>
-            vacations.map(v => v.id === vacation.id ? updatedVacation : v)
+          this.futureVacations.update((vacations) =>
+            vacations.map((v) => (v.id === vacation.id ? updatedVacation : v)),
           );
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        }
+        },
       });
   }
 
@@ -127,18 +131,18 @@ export class VacationService {
       .pipe(take(1))
       .subscribe({
         next: () => {
-          this.futureVacations.update(vacations =>
-            vacations.filter(v => v.id !== vacationId)
+          this.futureVacations.update((vacations) =>
+            vacations.filter((v) => v.id !== vacationId),
           );
-          this.pastVacations.update(vacations =>
-            vacations.filter(v => v.id !== vacationId)
+          this.pastVacations.update((vacations) =>
+            vacations.filter((v) => v.id !== vacationId),
           );
           this.loadRemainingDays();
         },
         error: (err) => {
           console.error(err);
           this.router.navigate(['/error', err.status]);
-        }
+        },
       });
   }
 }

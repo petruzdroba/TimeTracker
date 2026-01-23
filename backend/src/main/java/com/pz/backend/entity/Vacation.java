@@ -1,6 +1,7 @@
 package com.pz.backend.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.time.Instant;
@@ -25,6 +26,11 @@ public class Vacation {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
+
+    @JsonProperty("userId")
+    public Long getUserId() {
+        return user != null ? user.getId() : null;
+    }
 
     public Vacation() {
     }
