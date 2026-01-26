@@ -1,6 +1,7 @@
 package com.pz.backend.rest;
 
 import com.pz.backend.entity.ErrorResponse;
+import com.pz.backend.exceptions.AdminRoleUpdateException;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.InvalidCredentialsException;
 import com.pz.backend.exceptions.NotFoundException;
@@ -30,6 +31,16 @@ public class RestExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AdminRoleUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleAdminRoleUpdate(AdminRoleUpdateException exception) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.FORBIDDEN.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(InvalidCredentialsException.class)

@@ -13,10 +13,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.List;
 
 @Service
@@ -109,13 +106,18 @@ public class VacationServiceImpl implements VacationService {
             throw new NotFoundException(UserData.class.getName(), userId);
         }
 
-        int totalDays = user.getVacationDays();
-        int totalTaken = vacationRepository.findAllByUser_Id(userId).stream()
-                .filter(vacation -> vacation.getStatus() == Status.ACCEPTED)
-                .mapToInt(vacation -> getDaysBetweenDates(vacation.getStartDate(), vacation.getEndDate()))
+        int currentYear = LocalDate.now(ZoneId.systemDefault()).getYear();
+
+        int totalTakenThisYear = vacationRepository.findAllByUser_Id(userId).stream()
+                .filter(v -> v.getStatus() == Status.ACCEPTED)
+                .filter(v -> v.getStartDate()
+                        .atZone(ZoneId.systemDefault())
+                        .getYear() == currentYear
+                )
+                .mapToInt(v -> getDaysBetweenDates(v.getStartDate(), v.getEndDate()))
                 .sum();
 
-        return (long) (totalDays - totalTaken);
+        return (long) (user.getVacationDays() - totalTakenThisYear);
     }
 
     @Override

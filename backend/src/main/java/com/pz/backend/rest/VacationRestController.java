@@ -46,7 +46,7 @@ public class VacationRestController {
         return vacationService.getVacationsByTimeRelation(userId, relation);
     }
 
-    @PreAuthorize("hasRole('MANAGER') or @vacationSecurity.canAccessUser(#userId, authentication)")
+    @PreAuthorize("hasRole('MANAGER') or hasRole('ADMIN') or @vacationSecurity.canAccessUser(#userId, authentication)")
     @GetMapping("/vacation/user/remaining/{userId}")
     public Long getRemaining(@PathVariable Long userId) throws NotFoundException {
         return vacationService.getRemainingDays(userId);

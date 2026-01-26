@@ -51,6 +51,8 @@ body {
   --mat-select-enabled-arrow-color: var(--text-color) !important;
   --mat-select-focused-arrow-color: var(--primary-color) !important;
 
+  --mat-select-disabled-trigger-text-color: var(--text-disabled-color) !important;
+  --mat-select-disabled-arrow-color: var(--text-disabled-color) !important;
 }
 
 .mat-mdc-form-field-flex {
@@ -82,6 +84,9 @@ body {
   --mat-datepicker-range-input-separator-color: var(--text-color) !important;
   --mdc-filled-text-field-focus-active-indicator-color: var(--primary-hover-color) !important;
 
+  --mdc-filled-text-field-disabled-container-color: var(--background-hover-color) !important;
+  --mdc-filled-text-field-disabled-input-text-color: var(--text-disabled-color) !important;
+  --mdc-filled-text-field-disabled-label-text-color: var(--text-disabled-color) !important;
 }
 
 .mat-datepicker-popup {

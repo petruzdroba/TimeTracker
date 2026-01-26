@@ -1,54 +1,100 @@
-<app-edit-box [isOpen]="isOpen" [title]="'Edit User - '+ user?.name " (close)="onCloseWindow()">
+<app-edit-box
+  [isOpen]="isOpen"
+  [title]="'Edit User - ' + user?.name"
+  (close)="onCloseWindow()"
+>
   <div class="email-info">
     <p>Email:</p>
     <p>{{ user?.email }}</p>
   </div>
 
   <form class="form-box" [formGroup]="form" (ngSubmit)="onSubmit()">
-
-    <mat-form-field appearance="fill" class="form-input" [hideRequiredMarker]="true">
+    <mat-form-field
+      appearance="fill"
+      class="form-input"
+      [hideRequiredMarker]="true"
+    >
       <mat-label>Work Hours</mat-label>
-      <input matInput type="number" formControlName="workHours" min="1" max="8">
-      @if (form.get('workHours')?.errors?.['required']) {
-      <mat-error>Work hours is required</mat-error>
+      <input
+        matInput
+        type="number"
+        formControlName="workHours"
+        min="0"
+        max="12"
+      />
+      @if (form.get("workHours")?.errors?.["required"]) {
+        <mat-error>Work hours is required</mat-error>
       }
-      @if (form.get('workHours')?.errors?.['min'] || form.get('workHours')?.errors?.['max']) {
-      <mat-error>Hours must be between 0 and 24</mat-error>
+      @if (
+        form.get("workHours")?.errors?.["min"] ||
+        form.get("workHours")?.errors?.["max"]
+      ) {
+        <mat-error>Hours must be between 0 and 12</mat-error>
       }
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="form-input" [hideRequiredMarker]="true">
+    <mat-form-field
+      appearance="fill"
+      class="form-input"
+      [hideRequiredMarker]="true"
+    >
       <mat-label>Vacation Days</mat-label>
-      <input matInput type="number" formControlName="vacationDays" min="0" max="365">
-      @if (form.get('vacationDays')?.errors?.['required']) {
-      <mat-error>Vacation days is required</mat-error>
+      <input
+        matInput
+        type="number"
+        formControlName="vacationDays"
+        min="0"
+        max="365"
+      />
+      @if (form.get("vacationDays")?.errors?.["required"]) {
+        <mat-error>Vacation days is required</mat-error>
       }
-      @if (form.get('vacationDays')?.errors?.['min'] || form.get('vacationDays')?.errors?.['max']) {
-      <mat-error>Days must be between 0 and 365</mat-error>
+      @if (
+        form.get("vacationDays")?.errors?.["min"] ||
+        form.get("vacationDays")?.errors?.["max"]
+      ) {
+        <mat-error>Days must be between 0 and 365</mat-error>
       }
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="form-input" [hideRequiredMarker]="true">
+    <mat-form-field
+      appearance="fill"
+      class="form-input"
+      [hideRequiredMarker]="true"
+    >
       <mat-label>Personal Time (hours)</mat-label>
-      <input matInput type="number" formControlName="personalTime" min="0" max="480">
-      @if (form.get('personalTime')?.errors?.['required']) {
-      <mat-error>Personal time is required</mat-error>
+      <input
+        matInput
+        type="number"
+        formControlName="personalTime"
+        min="0"
+        max="480"
+      />
+      @if (form.get("personalTime")?.errors?.["required"]) {
+        <mat-error>Personal time is required</mat-error>
       }
-      @if (form.get('personalTime')?.errors?.['min'] || form.get('personalTime')?.errors?.['max']) {
-      <mat-error>Minutes must be between 0 and 480</mat-error>
+      @if (
+        form.get("personalTime")?.errors?.["min"] ||
+        form.get("personalTime")?.errors?.["max"]
+      ) {
+        <mat-error>Minutes must be between 0 and 480</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field class="form-input" [hideRequiredMarker]="true">
       <mat-label>Role</mat-label>
-      <mat-select formControlName="role">
+      <mat-select
+        formControlName="role"
+        [disabled]="user?.role === 'ADMIN' || user?.role === 'admin'"
+      >
         <mat-option value="employee">Employee</mat-option>
         <mat-option value="manager">Manager</mat-option>
-        <!-- <mat-option value="admin">Admin</mat-option> -->
       </mat-select>
     </mat-form-field>
 
     <button type="button" class="btn-form" (click)="onReset()">Reset</button>
-    <button type="submit" class="btn-form" [disabled]="form.invalid">Submit</button>
+    <button type="submit" class="btn-form" [disabled]="form.invalid">
+      Submit
+    </button>
   </form>
 </app-edit-box>
