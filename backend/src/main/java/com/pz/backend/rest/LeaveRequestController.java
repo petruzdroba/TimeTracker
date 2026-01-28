@@ -8,6 +8,7 @@ import com.pz.backend.entity.Status;
 import com.pz.backend.exceptions.AlreadyExistsException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.LeaveRequestService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -48,7 +49,7 @@ public class LeaveRequestController {
     }
 
     @PostMapping("/leaverequest")
-    public LeaveRequest post(@RequestBody LeaveRequestPostRequest request) throws AlreadyExistsException {
+    public LeaveRequest post(@Valid @RequestBody LeaveRequestPostRequest request) throws AlreadyExistsException {
         return leaveRequestService.post(
                 request.userId(),
                 request.startTime(),
@@ -57,7 +58,7 @@ public class LeaveRequestController {
     }
 
     @PutMapping("/leaverequest")
-    public LeaveRequest update(@RequestBody LeaveRequestPutRequest request) throws NotFoundException{
+    public LeaveRequest update(@Valid @RequestBody LeaveRequestPutRequest request) throws NotFoundException{
         return leaveRequestService.put(
                 request.id(),
                 request.userId(),

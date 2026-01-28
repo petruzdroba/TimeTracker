@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 
 public record VacationPutRequest(
-        @NotNull(message = "Work log ID must be provided")
+        @NotNull(message = "Vacation ID must be provided")
         @JsonProperty(required = true)
         Long id,
         @NotNull(message = "User ID must be provided")
