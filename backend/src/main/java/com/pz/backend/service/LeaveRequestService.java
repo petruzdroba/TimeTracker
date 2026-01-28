@@ -4,6 +4,7 @@ import com.pz.backend.common.TimeRelation;
 import com.pz.backend.entity.LeaveRequest;
 import com.pz.backend.entity.Status;
 import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.InsufficientPersonalTimeException;
 import com.pz.backend.exceptions.NotFoundException;
 
 import java.time.Instant;
@@ -21,7 +22,7 @@ public interface LeaveRequestService {
 
     Long getRemaining(Long userId) throws NotFoundException;
 
-    LeaveRequest post(Long userId, Instant startTime, Instant endTime, String description) throws AlreadyExistsException;
+    LeaveRequest post(Long userId, Instant startTime, Instant endTime, String description) throws AlreadyExistsException, InsufficientPersonalTimeException;
 
     LeaveRequest put(Long id, Long userId, Instant startTime, Instant endTime, String description) throws NotFoundException;
 
