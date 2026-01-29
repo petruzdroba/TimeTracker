@@ -7,6 +7,8 @@ import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
 import com.pz.backend.entity.Vacation;
 import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.InsufficientPersonalTimeException;
+import com.pz.backend.exceptions.InsufficientVacationDaysException;
 import com.pz.backend.exceptions.NotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -20,26 +22,12 @@ import java.util.List;
 public class VacationServiceImpl implements VacationService {
 
     private final VacationRepository vacationRepository;
+
     @PersistenceContext
     private EntityManager entityManager;
 
     public VacationServiceImpl(VacationRepository vacationRepository) {
         this.vacationRepository = vacationRepository;
-    }
-
-    @Override
-    @Transactional
-    public Vacation post(Long userId, Instant startDate, Instant endDate, String description) throws AlreadyExistsException {
-        Vacation existing = vacationRepository.findByUser_IdAndStartDate(userId, startDate);
-
-        if (existing != null) {
-            throw new AlreadyExistsException("Vacation for this day already exists");
-        }
-
-        UserAuth auth = entityManager.getReference(UserAuth.class, userId);
-        Vacation vacation = new Vacation(auth, startDate, endDate, description);
-
-        return vacationRepository.save(vacation);
     }
 
     @Override
@@ -50,39 +38,9 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    @Transactional
-    public Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description) throws NotFoundException {
-        Vacation existing = vacationRepository.findById(id).orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
-
-        existing.setStartDate(startDate);
-        existing.setEndDate(endDate);
-        existing.setDescription(description);
-
-        return vacationRepository.save(existing);
-    }
-
-    @Override
     public Vacation findById(Long id) throws NotFoundException {
-        return vacationRepository.findById(id).orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
-    }
-
-    @Override
-    @Transactional
-    public void delete(Long id) throws NotFoundException {
-        if (!vacationRepository.existsById(id)) {
-            throw new NotFoundException(Vacation.class.getName(), id);
-        }
-
-        vacationRepository.deleteById(id);
-    }
-
-    @Override
-    @Transactional
-    public Vacation updateStatus(Long id, Status status) throws NotFoundException {
-        Vacation existing = vacationRepository.findById(id).orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
-
-        existing.setStatus(status);
-        return vacationRepository.save(existing);
+        return vacationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
     }
 
     @Override
@@ -112,8 +70,7 @@ public class VacationServiceImpl implements VacationService {
                 .filter(v -> v.getStatus() == Status.ACCEPTED)
                 .filter(v -> v.getStartDate()
                         .atZone(ZoneId.systemDefault())
-                        .getYear() == currentYear
-                )
+                        .getYear() == currentYear)
                 .mapToInt(v -> getDaysBetweenDates(v.getStartDate(), v.getEndDate()))
                 .sum();
 
@@ -133,6 +90,77 @@ public class VacationServiceImpl implements VacationService {
                     };
                 })
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public Vacation post(Long userId, Instant startDate, Instant endDate, String description)
+            throws AlreadyExistsException, InsufficientVacationDaysException {
+
+        Vacation existing = vacationRepository.findByUser_IdAndStartDate(userId, startDate);
+
+        if (existing != null) {
+            throw new AlreadyExistsException("Vacation for this day already exists");
+        }
+
+        int requestedDays = getDaysBetweenDates(startDate, endDate);
+        long remainingDays = getRemainingDays(userId);
+
+        if (requestedDays > remainingDays) {
+            throw new InsufficientVacationDaysException(
+                    "Not enough remaining vacation days"
+            );
+        }
+
+        UserAuth auth = entityManager.getReference(UserAuth.class, userId);
+        Vacation vacation = new Vacation(auth, startDate, endDate, description);
+
+        return vacationRepository.save(vacation);
+    }
+
+    @Override
+    @Transactional
+    public Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description)
+            throws NotFoundException, InsufficientPersonalTimeException {
+
+        int requestedDays = getDaysBetweenDates(startDate, endDate);
+        long remainingDays = getRemainingDays(userId);
+
+        if (requestedDays > remainingDays) {
+            throw new InsufficientVacationDaysException(
+                    "Not enough remaining vacation days"
+            );
+        }
+
+        Vacation existing = vacationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
+
+        existing.setStartDate(startDate);
+        existing.setEndDate(endDate);
+        existing.setDescription(description);
+        existing.setStatus(Status.PENDING);
+
+        return vacationRepository.save(existing);
+    }
+
+    @Override
+    @Transactional
+    public Vacation updateStatus(Long id, Status status) throws NotFoundException {
+        Vacation existing = vacationRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
+
+        existing.setStatus(status);
+        return vacationRepository.save(existing);
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) throws NotFoundException {
+        if (!vacationRepository.existsById(id)) {
+            throw new NotFoundException(Vacation.class.getName(), id);
+        }
+
+        vacationRepository.deleteById(id);
     }
 
     private static int getDaysBetweenDates(Instant start, Instant end) {

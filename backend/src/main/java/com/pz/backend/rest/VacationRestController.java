@@ -6,6 +6,7 @@ import com.pz.backend.dto.VacationPutRequest;
 import com.pz.backend.entity.Status;
 import com.pz.backend.entity.Vacation;
 import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.InsufficientVacationDaysException;
 import com.pz.backend.exceptions.NotFoundException;
 import com.pz.backend.service.VacationService;
 import jakarta.validation.Valid;
@@ -30,7 +31,7 @@ public class VacationRestController {
     }
 
     @GetMapping("/vacation/status/{status}")
-    public List<Vacation> getByStatus(@PathVariable Status status){
+    public List<Vacation> getByStatus(@PathVariable Status status) {
         return vacationService.getStatus(status);
     }
 
@@ -54,7 +55,7 @@ public class VacationRestController {
 
     @PreAuthorize("@vacationSecurity.canAccessUser(#request.userId, authentication)")
     @PostMapping("/vacation")
-    public Vacation post(@Valid @RequestBody VacationPostRequest request) throws AlreadyExistsException {
+    public Vacation post(@Valid @RequestBody VacationPostRequest request) throws AlreadyExistsException, InsufficientVacationDaysException {
         return vacationService.post(
                 request.userId(),
                 request.startDate(),
@@ -65,7 +66,7 @@ public class VacationRestController {
 
     @PreAuthorize("@vacationSecurity.isOwner(#request.id, authentication)")
     @PutMapping("/vacation")
-    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException {
+    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException,InsufficientVacationDaysException {
         return vacationService.put(
                 request.id(),
                 request.userId(),
@@ -77,7 +78,7 @@ public class VacationRestController {
 
     @PreAuthorize("hasRole('MANAGER')")
     @PutMapping("/vacation/{vacationId}/{status}")
-    public Vacation putStatus(@PathVariable Long vacationId, @PathVariable Status status) throws NotFoundException{
+    public Vacation putStatus(@PathVariable Long vacationId, @PathVariable Status status) throws NotFoundException {
         return vacationService.updateStatus(vacationId, status);
     }
 

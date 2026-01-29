@@ -1,10 +1,7 @@
 package com.pz.backend.rest;
 
 import com.pz.backend.entity.ErrorResponse;
-import com.pz.backend.exceptions.AdminRoleUpdateException;
-import com.pz.backend.exceptions.AlreadyExistsException;
-import com.pz.backend.exceptions.InvalidCredentialsException;
-import com.pz.backend.exceptions.NotFoundException;
+import com.pz.backend.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -51,6 +48,32 @@ public class RestExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(InsufficientVacationDaysException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientVacationDays(
+            InsufficientVacationDaysException exception) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InsufficientPersonalTimeException.class)
+    public ResponseEntity<ErrorResponse> handleInsufficientPersonalTime(
+            InsufficientPersonalTimeException exception) {
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                exception.getMessage(),
+                System.currentTimeMillis()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

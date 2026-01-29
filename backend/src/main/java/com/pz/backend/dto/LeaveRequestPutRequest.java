@@ -1,30 +1,27 @@
 package com.pz.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.pz.backend.entity.Status;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 
-public record VacationPutRequest(
-        @NotNull(message = "Vacation ID must be provided")
+public record LeaveRequestPutRequest(
         @JsonProperty(required = true)
+        @NotNull(message = "Leave Slip ID must be provided")
         Long id,
+        @JsonProperty(required = true)
         @NotNull(message = "User ID must be provided")
-        @JsonProperty(required = true)
         Long userId,
-        @NotNull(message = "Date must be provided")
-        @Future(message = "Date cannot be in the past/today")
         @JsonProperty(required = true)
-        Instant startDate,
-        @NotNull(message = "Date must be provided")
         @Future(message = "Date cannot be in the past/today")
+        Instant startTime,
         @JsonProperty(required = true)
-        Instant endDate,
+        @Future(message = "Date cannot be in the past/today")
+        Instant endTime,
+        @JsonProperty(required = true)
         @NotBlank(message = "Description must be provided")
-        @JsonProperty(required = true)
         String description
 ) {
 }
