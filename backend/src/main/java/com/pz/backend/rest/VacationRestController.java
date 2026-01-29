@@ -66,7 +66,7 @@ public class VacationRestController {
 
     @PreAuthorize("@vacationSecurity.isOwner(#request.id, authentication)")
     @PutMapping("/vacation")
-    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException {
+    public Vacation put(@Valid @RequestBody VacationPutRequest request) throws NotFoundException,InsufficientVacationDaysException {
         return vacationService.put(
                 request.id(),
                 request.userId(),

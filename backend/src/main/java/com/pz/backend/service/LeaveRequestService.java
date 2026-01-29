@@ -24,7 +24,7 @@ public interface LeaveRequestService {
 
     LeaveRequest post(Long userId, Instant startTime, Instant endTime, String description) throws AlreadyExistsException, InsufficientPersonalTimeException;
 
-    LeaveRequest put(Long id, Long userId, Instant startTime, Instant endTime, String description) throws NotFoundException;
+    LeaveRequest put(Long id, Long userId, Instant startTime, Instant endTime, String description) throws NotFoundException, InsufficientPersonalTimeException;
 
     LeaveRequest put(Long id, Status status) throws NotFoundException;
 

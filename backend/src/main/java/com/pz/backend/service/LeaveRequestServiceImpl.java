@@ -95,7 +95,13 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
 
     @Override
     @Transactional
-    public LeaveRequest put(Long id, Long userId, Instant startTime, Instant endTime, String description) throws NotFoundException {
+    public LeaveRequest put(Long id, Long userId, Instant startTime, Instant endTime, String description) throws NotFoundException, InsufficientPersonalTimeException {
+
+        double requestedTime = getHoursBetweenTimes(startTime, endTime);
+        long takenTime = getRemaining(userId);
+
+        if (requestedTime > takenTime)
+            throw new InsufficientPersonalTimeException("Not enough personal time left");
 
         LeaveRequest existing = repository.findById(id)
                 .orElseThrow(() -> new NotFoundException(LeaveRequest.class.getName(), id));
@@ -103,6 +109,7 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
         existing.setStartTime(startTime);
         existing.setEndTime(endTime);
         existing.setDescription(description);
+        existing.setStatus(Status.PENDING);
 
         return repository.save(existing);
     }

@@ -7,6 +7,7 @@ import com.pz.backend.entity.UserAuth;
 import com.pz.backend.entity.UserData;
 import com.pz.backend.entity.Vacation;
 import com.pz.backend.exceptions.AlreadyExistsException;
+import com.pz.backend.exceptions.InsufficientPersonalTimeException;
 import com.pz.backend.exceptions.InsufficientVacationDaysException;
 import com.pz.backend.exceptions.NotFoundException;
 import jakarta.persistence.EntityManager;
@@ -120,7 +121,16 @@ public class VacationServiceImpl implements VacationService {
     @Override
     @Transactional
     public Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description)
-            throws NotFoundException {
+            throws NotFoundException, InsufficientPersonalTimeException {
+
+        int requestedDays = getDaysBetweenDates(startDate, endDate);
+        long remainingDays = getRemainingDays(userId);
+
+        if (requestedDays > remainingDays) {
+            throw new InsufficientVacationDaysException(
+                    "Not enough remaining vacation days"
+            );
+        }
 
         Vacation existing = vacationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(Vacation.class.getName(), id));
@@ -128,6 +138,7 @@ public class VacationServiceImpl implements VacationService {
         existing.setStartDate(startDate);
         existing.setEndDate(endDate);
         existing.setDescription(description);
+        existing.setStatus(Status.PENDING);
 
         return vacationRepository.save(existing);
     }

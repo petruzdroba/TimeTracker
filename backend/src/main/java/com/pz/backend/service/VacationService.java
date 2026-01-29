@@ -16,7 +16,7 @@ public interface VacationService {
 
     List<Vacation> get(Long userId) throws NotFoundException;
 
-    Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description) throws NotFoundException;
+    Vacation put(Long id, Long userId, Instant startDate, Instant endDate, String description) throws NotFoundException, InsufficientVacationDaysException;
 
     Vacation findById(Long id) throws NotFoundException;
 
