@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface LeaveRequestService {
 
+    LeaveRequest findById(Long id) throws NotFoundException;
+
     List<LeaveRequest> get(Long userId) throws NotFoundException;
 
     List<LeaveRequest> get();

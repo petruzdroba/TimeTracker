@@ -30,6 +30,11 @@ public class LeaveRequestServiceImpl implements LeaveRequestService {
     }
 
     @Override
+    public LeaveRequest findById(Long id) throws NotFoundException {
+        return repository.findById(id).orElseThrow(() -> new NotFoundException(LeaveRequest.class.getName(), id));
+    }
+
+    @Override
     public List<LeaveRequest> get(Long userId) throws NotFoundException {
         return repository.findAllByUser_Id(userId);
     }
